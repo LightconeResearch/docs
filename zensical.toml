@@ -1,6 +1,7 @@
 [project]
-site_name = "lightcone-cli"
-site_description = "Execution layer for ASTRA research pipelines"
+site_name = "Lightcone Research Stack"
+site_description = "Documentation for the Lightcone Research Stack"
+site_url = "https://docs.lightconeresearch.org/"
 site_author = "Lightcone Research Team"
 repo_url = "https://github.com/LightconeResearch/docs"
 repo_name = "LightconeResearch/docs"
