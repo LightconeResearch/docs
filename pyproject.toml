@@ -5,9 +5,6 @@ description = "Documentation for the Lightcone Research stack"
 requires-python = ">=3.11"
 dependencies = [
     "zensical>=0.0.34",
-    # squidfunk's mike fork — required by zensical's versioning provider.
-    # Not on PyPI; install from git.
-    "mike @ git+https://github.com/squidfunk/mike.git",
 ]
 
 # Not a Python package: uv only manages the environment that builds the site.
