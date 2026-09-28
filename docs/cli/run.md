@@ -1,27 +1,49 @@
 # lc run
 
 Run an ad-hoc command in the project environment, under isolation.
-This is the probe verb: it executes exactly one command the way a
-recipe would be executed — same environment, same sandbox — so "does
-it work under `lc run`?" and "will it work as a recipe?" are the same
-question.
+Use this to check imports or try a script before adding its recipe to
+`astra.yaml`. It uses the project's prepared environment and sandbox rules.
+Recipes have a narrower write scope: their output directory, whereas a probe
+can write throughout `results/`.
 
 ## Synopsis
 
 ```text
-lc run COMMAND...
+lc run CLUSTER_ID -- COMMAND...
 ```
 
-Everything after `run` is the command, verbatim — flags included.
+The first argument is the cluster ID returned by `lc compute launch`.
+Everything after `--` is the command, verbatim — flags included.
 Argv, the `docker run` / `uv run` convention: a single quoted string
 would be exec'd as one filename, so probe shell syntax through
-`bash -c` instead. `lc run` takes no options of its own, so nothing
-else needs escaping:
+`bash -c` instead. [Launch compute](../user/cluster.md#start-locally) and set
+`CLUSTER` to the returned cluster ID:
 
 ```bash
-lc run python -c "import numpy; print(numpy.__version__)"
-lc run python src/fit.py --points data/points.csv --outliers keep --output /tmp/probe
+lc run "$CLUSTER" -- python -c "import numpy; print(numpy.__version__)"
+lc run "$CLUSTER" -- python src/fit.py --points data/points.csv --outliers keep --output /tmp/probe
 ```
+
+The command is submitted as an ordinary task to the cluster's Dask scheduler,
+which chooses a worker. The command uses the prepared project environment and
+the same sandbox as a recipe. stdout/stderr are forwarded as bytes, preserving binary output and
+line endings when redirected. The client detaches on completion; the allocation
+stays available until `lc compute down` or its time limit. A missing cluster ID
+is an error, with no implicit local execution. See [compute](compute.md).
+
+The command receives EOF on stdin; terminal input and pipes into `lc run` are not
+forwarded. Pass input files through the project's declared inputs instead.
+For direct execution, ambient environment variables come from the worker's
+allocation environment. Prefixing the CLI with `NAME=value` does not forward
+that variable to an existing cluster. Set command-specific values inside the
+command, for example `lc run "$CLUSTER" -- env NAME=value python script.py`.
+Containerized commands use the image's environment and the sandbox overlays.
+
+Interrupting the CLI detaches its client; the remote command may still be running.
+Use `lc compute down "$CLUSTER"` to stop the allocation before working with files
+the interrupted command could still be writing. Confirm that the command has
+stopped; local containers may require separate termination through their runtime
+(see [execution limits](../user/cluster.md#execution-requirements-and-limits)).
 
 ## What it does
 
@@ -41,8 +63,9 @@ lc run python src/fit.py --points data/points.csv --outliers keep --output /tmp/
   an ASTRA input declaration for data, `results/` or
   `tempfile.mkdtemp()` for writes).
 
-A probe has no output and writes no manifest: nothing it does is
-recorded anywhere. Any uv project works — `lc run` doesn't require an
+A probe writes no provenance manifest or result commit. Files it writes in
+`results/` remain ordinary, untracked probe files; remove them before
+materializing the project. Any uv project works — `lc run` doesn't require an
 `astra.yaml`, only `pyproject.toml`, `uv.lock` and `.venv` in the
 current directory.
 
@@ -55,7 +78,7 @@ and the fix (declare the dependency) is the same in both places.
 ## Examples
 
 ```bash
-lc run python -c "import scipy"        # is the package in the lock?
-lc run bash -c 'echo $HOME'            # see the private HOME a recipe gets
-lc run python src/fit.py --help        # exercise a script exactly as a recipe would
+lc run "$CLUSTER" -- python -c "import scipy"        # is the package in the lock?
+lc run "$CLUSTER" -- bash -c 'echo $HOME'            # see the private HOME a recipe gets
+lc run "$CLUSTER" -- python src/fit.py --help        # exercise a script exactly as a recipe would
 ```

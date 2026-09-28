@@ -1,17 +1,32 @@
 # Glossary
 
-The terms you'll see all over the docs and the `lc` command output, in
-plain language.
+Terms used across the Lightcone research workflow, its agent skills, and
+the `lc` command output.
+
+## Lightcone
+
+The research stack that connects agent guidance, analysis implementation,
+reproducible execution, and reporting. Its agent skills help you develop a
+project; `lightcone-cli` executes it and records provenance. The analysis
+specification follows the external ASTRA standard.
+
+## Agent skill
+
+Instructions and supporting resources that teach a compatible coding agent
+a research workflow. Lightcone's `lightcone` plugin bundles the `lightcone`
+and `astra` skills, together with validation hooks. Skills guide the agent;
+the CLI and ASTRA tools perform execution and validation.
 
 ## ASTRA
 
 **A**gentic **S**chema for **T**ransparent **R**esearch **A**nalysis.
-The schema lightcone-cli is built around. ASTRA's job is to capture an
+An external standard that Lightcone uses. ASTRA's job is to capture an
 analysis's inputs, outputs, and methodological decisions in a single
 file (`astra.yaml`); lightcone-cli's job is to execute that spec
 reproducibly. ASTRA ships separately as the `astra-tools` package, and
 its `astra` CLI handles the spec itself (validation, universe
-management, evidence verification).
+management, evidence verification). Its authoritative documentation lives at
+[astra-spec.org](https://astra-spec.org/latest/).
 
 ## astra.yaml
 
@@ -61,6 +76,20 @@ Making the outputs the spec declares: `lc materialize` runs each recipe
 in dependency order and commits every result as it lands. Idempotent —
 a second run remakes only what is `stale`, and a run with nothing to do
 says so and touches nothing.
+
+## Compute allocation
+
+Resources launched with `lc compute launch` for a bounded lifetime, locally or
+on Slurm. The returned cluster ID is required by `lc materialize` and `lc run`.
+An execution command borrows the allocation; it stays available until you
+release it with `lc compute down` or its lifetime expires.
+
+## Resource offer
+
+A CPU and memory shape, node limit, and time limit that your compute catalog
+makes available. `lc compute resources` lists offers in selection order. CPU
+and memory are per node; an offer describes a requestable shape, not live free
+capacity. See [Compute and clusters](cluster.md).
 
 ## Manifest
 
@@ -169,8 +198,9 @@ The publication view. Declare a `license` under `[project]` in
 `pyproject.toml` and every materialize maintains
 `ro-crate-metadata.json` — a machine-readable description of the
 project, its outputs, and the runs that produced them, following the
-Provenance Run Crate profile. The repository is the crate; deposit is
-`git archive`.
+Provenance Run Crate profile. The metadata describes the repository. A complete
+deposit also needs the actual data and output files: `git archive` alone does
+not include git-annex content.
 
 ## Prior insight
 

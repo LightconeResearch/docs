@@ -18,9 +18,13 @@ plus `lightcone/_sandbox_exec.py`, the Landlock shim.
 | `Capability` | What this host can do — `detect()`'s answer, the only `sys.platform` branch. |
 | `Attestation` | What was actually enforced, derived from the flags applied — never from what the matrix says should have happened. |
 | `Backend.wrap(policy, argv)` | The pure rewrite. `contains_prefix` declares whether the uv hop rides inside (a container is a world; a host mechanism trusts host plumbing). |
-| `exec_policy(...)` | The one policy: probe and recipe get the same thing. Building it is where the impurity lives (the per-run private `$HOME`); `scope()` owns its cleanup. |
+| `exec_policy(...)` | Shared policy builder with a recipe output directory or probe `results/` write scope. Creates the private `$HOME`; `scope()` owns its cleanup. |
 | `Unavailable` | A real backend that wraps to the same argv and attests `fs: open`. Saying so is the caller's job; pretending is nobody's. |
 | `denial.explain()` / `denial.trailer()` | Best-guess remedies (allowed to return nothing) and the unconditional trailer on every nonzero sandboxed exit. |
+
+An optional output receiver gets stdout/stderr byte chunks. Capturing output never
+decodes or normalizes stdout; only the retained stderr tail is decoded for denial
+classification. Without a receiver, stdout remains inherited.
 
 ## What must stay true
 

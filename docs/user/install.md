@@ -1,124 +1,132 @@
-# Install
+# Install Lightcone
 
-To work on a lightcone project you need two things on your machine:
-[uv](https://docs.astral.sh/uv/) and git. Everything else — Python
-itself included — is installed by uv or ships with `lc`.
+Install the `lc` command, then add the agent plugin if you want to work with
+an assistant. You need **git and uv** on Linux or macOS. On Windows, use a
+Linux environment under WSL.
 
-!!! note "Supported platforms"
-    Linux (glibc 2.34+, x86_64 or aarch64) and macOS (14+ on Apple
-    silicon, 15+ on Intel). On Windows, use WSL.
+!!! info "Preview installation"
+    These docs follow the upcoming explicit compute workflow. The installation
+    below pins [the preview source](https://github.com/LightconeResearch/lightcone-cli/tree/835de9e7c2df726722ffff8c6863d6f9b16ee577),
+    which includes `lc compute`. The PyPI releases, including `0.5.0rc4`,
+    do not yet include that command.
 
-## 1. uv and git
+## 1. Install uv
 
-`lc` uses uv as its only environment substrate — projects are
-`pyproject.toml` + `uv.lock`, and uv manages the Python interpreters
-too, so there is no separate Python install step.
-
-=== "macOS / Linux"
-    ```bash
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-    ```
-
-    git is preinstalled on macOS; on Linux use your package manager
-    (`apt install git`, `dnf install git`, …).
-
-=== "NERSC Perlmutter"
-    NERSC doesn't ship `uv`, but it installs into your home directory
-    with a single curl:
-
-    ```bash
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-    ```
-
-    `uv` lands under `~/.local/bin` — make sure it's on your `PATH`.
-    git is already on the system.
-
-## 2. lightcone-cli
-
-The published name on PyPI is `lightcone-cli`; the command it provides
-is `lc`.
-
-=== "uv"
-    ```bash
-    uv tool install lightcone-cli
-    ```
-
-=== "pip"
-    ```bash
-    python -m pip install lightcone-cli
-    ```
-
-Get a confirmation of the proper installation by running
-
-    lc --version                # → lc, version ...
-
-> **Note** Some people may have already set a personal shell alias
-> `lc='ls --color'`. If that's you, installing lightcone-cli will shadow
-> the alias — make sure to rebind it (e.g. `alias l='ls --color'`).
-
-## 3. Tell git who you are
-
-Every output `lc` makes is committed, so git needs an identity before
-the first build — `lc materialize` checks up front rather than failing
-after your recipes have run:
+If `uv --version` already reports version **0.12 or newer**, skip this step.
+Otherwise, run the [official uv installer](https://docs.astral.sh/uv/getting-started/installation/):
 
 ```bash
-git config --global user.name "Ada Lovelace"
-git config --global user.email "ada@example.org"
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-If you already commit from this machine, you're done.
+Restart your terminal so it can find `uv`, then check that git is available:
 
-## 4. (Optional) Podman or Docker
+```bash
+uv --version
+git --version
+```
 
-Only *containerized* projects need a container runtime — a project opts
-in by declaring `[tool.lightcone.image]` in its `pyproject.toml`, and
-until it does, recipes run directly on your machine in the project's
-own locked environment.
+If git is missing, follow the [git installation instructions](https://git-scm.com/install/)
+for your operating system. uv installs and manages Python for you.
 
-- Local machine: install [Podman](https://podman.io/) (rootless, no
-  daemon) or [Docker](https://docs.docker.com/get-docker/).
-- HPC login node: see [Running on a Cluster](cluster.md).
+## 2. Install Lightcone
 
-There is nothing to configure: `lc` detects whichever runtime is
-available (`podman-hpc`, then `podman`, then `docker` — skipping docker
-if its daemon isn't running).
+```bash
+uv tool install 'lightcone-cli @ git+https://github.com/LightconeResearch/lightcone-cli.git@835de9e7c2df726722ffff8c6863d6f9b16ee577'
+lc --version
+lc compute --help
+```
 
-## Sanity check
+This installs `lc` and its dependencies in an isolated tool environment,
+including the git-annex executables needed to store project data. There
+is no separate Python, ASTRA, or container setup for the first analysis.
 
-    lc --help
-    lc init --help
+??? info "Supported platforms"
+    The bundled git-annex wheels require Linux with glibc 2.34 or newer
+    (x86_64 or aarch64), macOS 14 or newer on Apple silicon, or macOS 15
+    or newer on Intel. For Windows, run the installation and analysis
+    commands inside WSL.
 
-Both should print help text. If `lc` is shadowed by an `ls` alias,
-unset it (`unalias lc`) or use the full path (`$(which lc) --version`).
+If your terminal cannot find `lc`, run `uv tool update-shell` and open a
+new terminal. If you already have an unrelated shell alias named `lc`,
+remove or rename it first.
 
-## Updating
+## 3. Check your git identity
 
-=== "uv tool"
+Lightcone commits the outputs it produces. If you already make git commits
+on this machine, you can skip this step. Otherwise, set your own name and
+email:
+
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "you@example.org"
+```
+
+**You're ready.** Continue to [Your first analysis](getting-started.md),
+or add the agent plugin below.
+
+## Add an agent (optional)
+
+Use an existing installation of Claude Code or Codex. Register the Lightcone
+marketplace and install the **`lightcone`** plugin:
+
+=== "Claude Code"
+
+    Run in your terminal:
+
     ```bash
-    uv tool upgrade lightcone-cli
+    claude plugin marketplace add LightconeResearch/agent-skills
+    claude plugin install lightcone@lightcone-research
     ```
 
-=== "pip"
+    Start a new session and invoke `/lightcone:lightcone`.
+    See [Claude Code's plugin documentation](https://code.claude.com/docs/en/discover-plugins)
+    for plugin management.
+
+=== "Codex"
+
+    Run in your terminal:
+
     ```bash
-    pip install -U lightcone-cli
+    codex plugin marketplace add LightconeResearch/agent-skills
+    codex plugin add lightcone@lightcone-research
     ```
 
-An upgrade never invalidates your results: the engine's version is
-recorded in every output's manifest, but it is not part of any output's
-identity, so nothing gets rebuilt just because `lc` moved.
+    Start a new session and invoke `$lightcone:lightcone`.
+    If your Codex version does not offer `plugin add`, use its plugin browser
+    to install `lightcone` from the added marketplace. See
+    [OpenAI's marketplace documentation](https://developers.openai.com/plugins/build/plugins#add-a-marketplace-from-the-cli)
+    and [plugin installation guidance](https://developers.openai.com/learn/developers-codex-plugin#install-the-plugin).
 
-## Uninstalling
+The plugin bundles the Lightcone and ASTRA skills, including validation
+hooks. **Do not install the `astra` plugin alongside it**: that skill is
+already included. The plugin uses `uvx` to fetch its pinned ASTRA tools on
+first use.
 
-=== "uv tool"
-    ```bash
-    uv tool uninstall lightcone-cli
-    ```
+The current plugin was written for the earlier CLI release. For the preview's
+compute commands, use the workflow in these docs and the installed CLI's
+`--help`. Continue to [Work with an agent](agents.md).
 
-=== "pip"
-    ```bash
-    pip uninstall lightcone-cli
-    ```
+## Optional tools for later
 
-Your projects are untouched — everything `lc` knows about an analysis
-lives in the project's own repository, not in any global state.
+| When you need it | What to add |
+| --- | --- |
+| A project needs system libraries in a container | Podman or Docker; see [execution environments](concepts.md#two-execution-environments) |
+| You want more local resources or a Slurm allocation | A compute catalog; see [Running on a cluster](cluster.md) |
+| You want to inspect or validate ASTRA by hand | Use `uvx astra-tools@0.2.18`; see [ASTRA tools](astra.md#validate-and-inspect) |
+| You want to preview an interactive report | MyST and its Node.js runtime; see [Write a report](reporting.md) |
+
+## Update or remove Lightcone
+
+This preview is pinned so everyone following the tutorial gets the same
+CLI. To move to another preview commit or a published release, run
+`uv tool install` with that version or source. Check its release notes
+before changing the version used for an ongoing project.
+
+To remove the command:
+
+```bash
+uv tool uninstall lightcone-cli
+```
+
+Your project files and their git history remain on disk.

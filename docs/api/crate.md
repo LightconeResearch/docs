@@ -1,9 +1,10 @@
 # lightcone.engine.crate
 
 The publication view: the repository described as a Workflow Run
-RO-Crate. The project *is* the crate — `ro-crate-metadata.json` sits at
-the root, describes what the repository already holds, and a deposit is
-`git archive`, not an export step. lc's manifests stay the canonical
+RO-Crate. `ro-crate-metadata.json` sits at the root and describes the
+repository's research objects. A complete deposit must include the annexed data
+and results; `git archive` alone carries their Git representations, not their
+content. lc's manifests stay the canonical
 record; the crate is the same facts in schema.org vocabulary for
 archives and viewers that will never run `lc`.
 

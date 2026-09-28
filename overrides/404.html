@@ -1,0 +1,11 @@
+{% extends "main.html" %}
+
+{% block content %}
+  <h1 id="__skip">Page not found</h1>
+  <p>Use search to find a command or guide, or continue from one of these pages.</p>
+  <ul>
+    <li><a href="{{ 'index.html' | url }}">Research stack overview</a></li>
+    <li><a href="{{ 'user/install/' | url }}">Install Lightcone</a></li>
+    <li><a href="{{ 'user/getting-started/' | url }}">Your first analysis</a></li>
+  </ul>
+{% endblock %}

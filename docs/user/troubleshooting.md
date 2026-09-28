@@ -1,199 +1,185 @@
 # Troubleshooting
 
-Common situations and how to unstick them, roughly ordered by how often
-they come up. `lc`'s refusals try to carry their own remedy — this page
-adds the context around them.
+Start with the command's error message and `lc --version`. The installation
+and examples on this site target the compute-enabled development version;
+follow the [installation guide](install.md) if your CLI has a different surface.
+
+## "lc: command not found" or `lc` prints a directory listing
+
+Check what your shell resolves:
+
+```bash
+type lc
+uv tool update-shell
+```
+
+Open a new shell after updating its configuration. If a personal alias such as
+`lc='ls --color'` hides the command, remove it with `unalias lc`.
+
+## "No such command 'compute'"
+
+You have a CLI release from before explicit compute allocation. Install the
+source version in the [installation guide](install.md), then verify:
+
+```bash
+lc compute --help
+```
+
+## Missing or unavailable cluster
+
+Execution requires the ID returned by `lc compute launch`. Check its state before
+running the project:
+
+```bash
+lc compute status "$CLUSTER" --wait
+lc materialize "$CLUSTER"
+```
+
+Here `CLUSTER` must contain your allocation's ID. Follow
+[Compute and clusters](cluster.md#start-locally) if you have not launched one.
+For a read-only check, omit the ID: `lc materialize --check`.
+
+A readiness timeout leaves the allocation in place. Inspect its status before
+launching another. If it has ended, launch a new allocation. Keep the catalog
+connection that created it, and use the same `LC_COMPUTE_CONFIG` for launch and
+execution. If submission reports a token with an uncertain result, inspect
+existing allocations before retrying.
 
 ## "uncommitted changes in …"
 
-```
-Error: uncommitted changes in /home/you/my-analysis — every
-materialization is committed with the code that produced it, so a run
-cannot start from a tree that does not say what that code is.
+Materialization records the code revision that produced each result. Review
+and commit your analysis edits before running:
 
-  commit these:   git add -A . && git commit -m "…"
-      M src/fit.py
+```bash
+git status
+git add astra.yaml src/ pyproject.toml uv.lock
+git commit -m "Update analysis"
 ```
 
-Not an error in your project — just the order of operations: commit,
-then materialize. The refusal sorts the paths it found: work you own
-gets the `commit these` line, while leftover files under `results/`
-(from an interrupted run of an older `lc`, or a hand write) are listed
-as wreckage to discard instead — `results/` is `lc`'s to write, and
-committing hand-placed files there defeats the provenance the tool
-exists for.
+Adjust the paths to your own edits. Files under `results/` need separate care:
+those are generated outputs, not research code to commit by hand. If an earlier
+run was interrupted, stop its allocation and confirm its recipes have stopped
+before cleaning partial results. See
+[execution limits](cluster.md#execution-requirements-and-limits).
 
 ## "… is not a Lightcone project"
 
-You're outside a project. The current directory *is* the project — `lc`
-never walks up to find one, by design — so:
+Project commands inspect the current directory, without searching parent
+folders. Move to the directory containing your project:
 
 ```bash
 cd path/to/your/project
 ```
 
-or, starting fresh, `lc init my-analysis && cd my-analysis`. If you're
-in a fresh clone, run `lc init` once — it rebuilds the `.venv` and the
-annex, the two pieces of local state git doesn't carry.
-
-## "lc: command not found" or `lc` prints a directory listing
-
-Two possibilities:
-
-1. The tool isn't on `PATH` — with `uv tool install`, that's
-   `~/.local/bin`; `uv tool update-shell` fixes the profile.
-2. Your shell has a personal alias `lc='ls --color'` shadowing the
-   real command. Run `type lc` to see; `unalias lc` to remove.
+For a fresh clone, run `lc init` to reconstruct the environment and initialize
+git-annex. To start a new project, use `lc init my-analysis`.
 
 ## A recipe fails with "Permission denied" or "No module named …"
 
-Every sandboxed failure ends with this trailer:
+Recipes use the project's locked environment and filesystem sandbox. Check
+these common causes:
 
-```
-this ran under the lc sandbox (landlock) — a permissions or missing-file
-error can mean the command reached for something outside the declared
-environment
-```
+| Symptom | Fix |
+|---|---|
+| Missing Python package | Run `uv add PACKAGE`, commit the dependency changes, and rerun. |
+| Cannot read data outside the project | Declare the file as an ASTRA input; workers also need access at that path. |
+| Cannot write a file | Write the product to `{output}` and use `tempfile.mkdtemp()` for scratch files. |
 
-Recipes run in the project's locked environment, with the tree
-read-only apart from the directory their output lands in. The common cases:
-
-- **`ModuleNotFoundError`** — the package isn't in the project's lock.
-  `uv add <package>`, commit, re-run. (Installing it on the host with
-  `pip` changes nothing a recipe sees — that's the point.)
-- **Reading a file outside the project** — declare it as an ASTRA
-  input; declared inputs are readable and their content becomes part
-  of the output's provenance.
-- **Writing outside that directory** — a recipe's product
-  belongs in `{output}`; for true scratch files, use
-  `tempfile.mkdtemp()`, which lands in the writable temp area.
-
-To probe interactively, `lc run <command>` runs any command under
-exactly the isolation a recipe gets — if it works there, it works as a
-recipe.
+Probe imports or a script with `lc run "$CLUSTER" -- COMMAND`. A probe uses
+the same environment and dependency rules, with a broader write scope under
+`results/`. It does not forward interactive input or record result provenance.
+Remove probe files before materialization.
 
 ## Everything shows `behind` after a `uv add`
 
-Not a problem, and nothing was invalidated. `behind` means: the output
-is still exactly what the spec asks for, but the environment has moved
-since it was made. Environment changes deliberately don't trigger
-rebuilds — the manifest records which environment and commit produced
-each output, so nothing is lost by leaving it. When you do want them
-remade under the current environment:
+`behind` means the result still matches its definition and inputs, while the
+environment changed. Lightcone keeps it with its original provenance. To rebuild
+behind results under the current environment:
 
 ```bash
-lc materialize --refresh
+lc materialize "$CLUSTER" --refresh
 ```
-
-See [Core Concepts](concepts.md) for the `stale` / `behind`
-distinction.
 
 ## Everything shows `stale` after a spec edit
 
-`stale` means the spec now defines the output differently than it was
-made — you edited its recipe, a decision, or a declared input's
-content changed. That's the invalidation model working; the next
-`lc materialize` remakes exactly those outputs.
+A result becomes `stale` when its recipe, selected decisions, or declared input
+content changes. Materialization remakes the affected outputs. A committed manual
+edit to a generated output or manifest is also stale.
 
-One edit that deliberately does *not* invalidate: changing your
-analysis code (`src/…`). The recipe *string* is the identity, so if
-you want code changes to cascade, declare the source file as an ASTRA
-input of the outputs it shapes — that choice is yours to make per
-output.
+Changing a script does not automatically invalidate its outputs. Declare the
+source file as an ASTRA input when its content should trigger a rebuild.
+See [Core concepts](concepts.md#what-makes-an-output-current).
 
 ## "the content is not in this clone"
 
-```
-data/points.csv: the content is not in this clone — git-annex holds a
-reference to it, not the data. Fetch it with `git annex get data/points.csv`.
+Git-annex has a reference to a file whose bytes are not present locally.
+Materialization fetches the declared inputs it needs. Read-only commands do not
+transfer data. To inspect a file yourself, fetch it explicitly:
+
+```bash
+git annex get data/points.csv
 ```
 
-The clone has the *pointer* to an annexed file but not its bytes.
-`lc materialize` fetches the declared inputs it needs by itself; the
-read-only verbs (`lc status`, `--check`) never transfer data, so they
-report the fact instead. Fetch by hand only when you want the bytes
-for your own inspection.
+This requires a reachable source that holds the content. A Git remote alone
+does not guarantee that the annexed bytes are available.
 
 ## "fatal: … clean filter 'annex' failed"
 
-```
-git-annex filter-process: line 1: git-annex: command not found
-error: could not read greeting from subprocess 'git-annex filter-process'
-error: initialization for subprocess 'git-annex filter-process' failed
-fatal: data/catalog.fits: clean filter 'annex' failed
-```
-
-Your shell's `PATH` has no `git-annex`, so git could not run the filter
-that turns a large file into an annex pointer. **Nothing was staged**,
-which is the point: without `filter.annex.required=true` — which
-`lc init` sets — git would have exited 0 and committed the raw bytes
-into history instead.
-
-Once a project holds committed annexed content, this is not limited to
-`git add`. Any command that has to run the filter over that content
-stops the same way, `git status`, `git diff` and `git checkout`
-included — so the whole project reads as broken until git-annex is back
-on your `PATH`. That is the intended shape of the failure: a repository
-you cannot use is recoverable in one command, and one that quietly
-absorbed a multi-gigabyte file is not.
-
-`git-annex` ships with `lc`, so a tool install puts both on your `PATH`:
+Git cannot find or run git-annex. This can affect `git add`, `git status`, and
+other commands that use the annex filter. `lc init` marks the filter as required
+so a failure cannot silently put large data files into ordinary Git history.
 
 ```bash
-uv tool install lightcone-cli
 git-annex version
+uv tool update-shell
 ```
 
-If `lc` runs but `git-annex` does not, uv's tool directory is not on
-your `PATH` — run `uv tool update-shell` and open a new shell. Running
-`lc` through `uvx` puts nothing on your `PATH` at all, so a plain
-`git add` cannot work that way.
+If git-annex is missing, follow the [installation guide](install.md) to install
+Lightcone as a uv tool, then open a new shell. A one-off `uvx` invocation does
+not install git-annex onto your shell's `PATH`.
 
-This failure is deliberately loud. `lc init` sets
-`filter.annex.required=true` in every project precisely because
-without it git handles the same situation by printing the error,
-**exiting 0, and staging your data's raw bytes into git history** —
-committing a multi-gigabyte dataset into git proper, silently, where
-every clone carries it forever. A refused `git add` costs you one
-`lc init`; the silent version costs you the repository.
+## Selecting compute from a login shell
 
-## "… and this is a NERSC login node"
-
-`lc materialize` executes recipes, and on centers `lc` recognizes it
-refuses to do that on a shared login node. The refusal prints the
-center's own `salloc` and `sbatch` spellings — copy one, run the same
-command inside the allocation. `lc status`, `lc materialize --check`,
-`lc build` and `lc run` work anywhere. See
-[Running on a Cluster](cluster.md).
+Use your facility's Slurm offers in the compute catalog. The development CLI
+does not reject local allocations by inspecting login-node names or site
+markers; allocation choices are explicit. Configure the appropriate offers and
+follow your facility's usage policy. See [Slurm setup](cluster.md#configure-slurm).
 
 ## git doesn't know who you are
 
-Every output is committed, so a machine that has never committed needs
-an identity before the first run — `lc materialize` checks up front,
-before any recipe spends time:
+Set your Git identity before the first result commit:
 
 ```bash
 git config --global user.name "Ada Lovelace"
 git config --global user.email "ada@example.org"
 ```
 
+Use your own name and email.
+
 ## Containerized projects
 
-- **"image absent"** — the declared image hasn't been built and
-  committed yet: `lc build` (announced by materialize too, which
-  builds it as a preflight when missing).
-- **No runtime found** — install [Podman](https://podman.io/) or
-  [Docker](https://docs.docker.com/get-docker/); detection is
-  automatic and there is nothing to configure.
-- **Architecture mismatch** — the committed archive records the
-  architecture it was built for, and a host that can't execute it is
-  refused before the recipe would have died mid-run. Build on a
-  matching host (on NERSC, a login node), commit, push, and pull on
-  the other side.
+| Problem | Next step |
+|---|---|
+| Image absent | Run `lc build`; materialization can also build a missing image as a preflight. |
+| No container runtime | Provide Podman, Docker, or podman-hpc on the machines that need it. |
+| Architecture mismatch | Build the image on a host with the architecture of the execution workers. |
+| Image unavailable on a worker | Make the prepared image available on every worker; the cluster does not distribute node-local image stores automatically. |
+
+See [`lc build`](../cli/build.md) for the image declaration and lifecycle.
+
+## Agent skills or ASTRA validation
+
+If your agent cannot find a skill, check the plugin installation in
+[Using an agent](agents.md). The `lightcone` plugin already bundles the ASTRA
+skill, so a second ASTRA plugin is unnecessary.
+
+Schema and evidence-validation errors come from the external ASTRA tooling.
+Use [Working with ASTRA](astra.md) to find the authoritative schema reference
+and validation commands.
 
 ## Filing a bug
 
-Open an issue at
-[github.com/LightconeResearch/lightcone-cli/issues](https://github.com/LightconeResearch/lightcone-cli/issues).
-Include the output of `lc --version`, the command you ran, and the
-full message — the refusals are designed to be pasted.
+For execution errors, open an issue in
+[lightcone-cli](https://github.com/LightconeResearch/lightcone-cli/issues) with
+the version, command, and complete error message. For plugin behavior, use
+[agent-skills](https://github.com/LightconeResearch/agent-skills/issues).

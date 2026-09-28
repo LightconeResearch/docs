@@ -1,58 +1,36 @@
-# Developer corner
+# Contribute to Lightcone
 
-`lightcone-cli` is a small engine with strong opinions: one way to
-identify an output, one way to store it, one boundary to execute it
-behind. This guide covers everything below the user surface — how the
-engine is put together, what each module owns, and how to get a
-working dev loop.
+Lightcone's documentation, agent skills, and execution tools live in separate
+repositories. Start with the repository that owns the behavior you want to change.
 
-If you're looking for the user-facing docs, the
-[user guide](user/index.md) is the other half of this site.
+| Contribution | Repository | Start here |
+|---|---|---|
+| Guides, installation, navigation, or site design | [LightconeResearch/docs](https://github.com/LightconeResearch/docs) | [Build the documentation](contributing/setup.md#documentation-site) |
+| Agent instructions, plugin packaging, or validation hooks | [LightconeResearch/agent-skills](https://github.com/LightconeResearch/agent-skills) | [Work on agent skills](contributing/setup.md#agent-skills) |
+| Project execution, environments, provenance, or CLI behavior | [LightconeResearch/lightcone-cli](https://github.com/LightconeResearch/lightcone-cli) | [CLI development](contributing/setup.md#lightcone-cli) |
+| Analysis schema or ASTRA tooling | External [ASTRA project](https://astra-spec.org/latest/) | Follow ASTRA's own documentation and contribution process |
 
-## What this covers
+For research work, start with the [user guide](user/index.md). You do not need
+the developer tools below to use Lightcone.
 
-- [Architecture](architecture.md) — the CLI/engine/ASTRA split, the
-  run pipeline, identity, storage, the exec boundary, and the
-  invariants that hold them together.
-- [CLI Reference](cli/index.md) — every `lc` command: flags, JSON
-  report shapes, exit codes.
-- [Engine Internals](api/index.md) — the `lightcone.engine.*`
-  modules: what each owns, its key symbols, and what must stay true
-  of it.
-- [Contributing](contributing/setup.md) — clone, install, run the
-  test suite; [how the suite is shaped](contributing/testing.md); and
-  [where a change belongs](contributing/extending.md).
+## CLI internals
 
-## Get started in three commands
+The [architecture guide](architecture.md) explains how the execution engine
+uses ASTRA, uv, Git, git-annex, and its sandbox. The [engine reference](api/index.md)
+maps responsibilities to modules; it is intended for contributors, rather than
+as a supported Python API for research projects.
 
-!!! tip "Dev loop"
+Read [Testing](contributing/testing.md) before changing the engine and
+[Extending](contributing/extending.md) to find where a change belongs.
+The [CLI reference](cli/index.md) documents the user-facing contract.
 
-    ```bash
-    git clone https://github.com/LightconeResearch/lightcone-cli.git
-    cd lightcone-cli
-    uv sync --group dev && uv run pytest
-    ```
+## Keep the stack consistent
 
-Test, lint (`uv run ruff check src/ tests/`) and type-check
-(`uv run mypy src/`) are the whole loop — there is deliberately no
-task runner in between.
+When changing behavior, update the matching instructions and examples. Check
+installation commands against the version documented by this site and the tool
+pins in the agent-skills repository. Document an external dependency as external;
+ASTRA's schema and validation semantics remain the ASTRA project's responsibility.
 
-## The house rules
-
-A few conventions run through every module; changes are reviewed
-against them:
-
-- **No dead code, no foreshadowing.** Nothing lands before the layer
-  that calls it, and no message names a verb or flag that doesn't
-  exist yet. `lc --help` advertises only what works.
-- **No escape hatches around guarantees.** A feature that enforces
-  something ships without a flag to turn the enforcement off.
-- **Literal behavior over invented convenience.** The current
-  directory is the project; erroring beats walking up or guessing.
-  Nothing prompts — a verb is run by an agent more often than a
-  person, and a prompt is a hang.
-- **One implementation per rule.** Classification, path naming, the
-  run-record subject, tool resolution — each has exactly one spelling,
-  and a second copy is where the two start to disagree.
-- **Honest reporting.** What was enforced, what was skipped, and what
-  a clone can't see are all recorded or said — never assumed.
+Keep errors actionable, record the enforcement actually used, and keep research
+projects independent of the engine's Python internals. Code, tests, and their
+dependencies should land together.

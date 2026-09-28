@@ -97,7 +97,7 @@ Inside `.git`, convergence sets one configuration key — reported as the
 
 That is the only thing `lc init` adds to what `git annex init` wrote.
 How git finds git-annex is still ordinary `PATH` resolution, which is
-why `lc` should be installed with `uv tool install lightcone-cli` — it
+why the [installation guide](../user/install.md) uses `uv tool install` — it
 puts `git-annex` on your `PATH` alongside `lc`. If your `git add` ever
 refuses, see
 [`fatal: … clean filter 'annex' failed`](../user/troubleshooting.md#fatal-clean-filter-annex-failed)
@@ -130,6 +130,14 @@ cd my-analysis
 # decisions — and write the scripts the recipes name.
 uv add numpy               # declare what the scripts import
 git add -A && git commit -m "First analysis"
-lc materialize             # make the outputs
+lc compute launch --cpus 1 --memory 1
+# Copy the cluster ID printed above:
+CLUSTER=PASTE_CLUSTER_ID_HERE
+lc compute status "$CLUSTER" --wait
+lc materialize "$CLUSTER"   # make the outputs
 lc status                  # see where everything stands
+lc compute down "$CLUSTER"  # release the allocation
 ```
+
+See [Compute and clusters](../user/cluster.md) for larger local allocations
+and Slurm setup.

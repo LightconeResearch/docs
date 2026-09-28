@@ -1,78 +1,95 @@
-# Development Setup
+# Development setup
 
-Everything runs through [uv](https://docs.astral.sh/uv/); there is no
-task runner and no other build tooling.
+Choose the repository for the part of the stack you are changing. These are
+contributor instructions; the [installation guide](../user/install.md) is the
+shorter path for researchers.
 
-## Clone & install
+## Documentation site
+
+This site is built in the standalone `LightconeResearch/docs` repository:
+
+```bash
+git clone https://github.com/LightconeResearch/docs.git
+cd docs
+uv sync --locked
+uv run zensical serve
+```
+
+Edit the Markdown in `docs/`, navigation in `zensical.toml`, and styles in
+`docs/stylesheets/extra.css`. Before submitting a change, build the site with
+the same command as CI:
+
+```bash
+uv run zensical build --clean --strict
+```
+
+The build writes `site/`. CI validates pull requests and publishes changes on
+`main` to GitHub Pages. Keep examples aligned with the documented CLI version;
+a working example from a development branch may use commands the installed
+release does not provide.
+
+## Agent skills
+
+```bash
+git clone https://github.com/LightconeResearch/agent-skills.git
+cd agent-skills
+npm run build
+npm test
+```
+
+The generator requires Node.js 18 or newer. Edit canonical files under `skills/`
+and `hooks/`, or plugin composition and tool pins in `skills.config.json`.
+`npm run build` generates the packaged plugins and marketplace manifests; commit
+those generated changes with their sources. Follow that repository's
+[contribution guide](https://github.com/LightconeResearch/agent-skills/blob/main/CONTRIBUTING.md)
+for plugin version bumps and installation smoke tests.
+
+## Lightcone CLI
 
 ```bash
 git clone https://github.com/LightconeResearch/lightcone-cli.git
 cd lightcone-cli
+git switch --detach 835de9e7c2df726722ffff8c6863d6f9b16ee577
 uv sync --group dev
 ```
 
-That resolves the engine and the dev tools (pytest, ruff, mypy,
-datalad, the rocrate validator) into `.venv`. `uv run lc --version`
-runs the checkout's `lc`.
+The checkout above matches this site's compute preview. Create a development
+branch from that revision when making a change, or use the project's current
+development branch and account for any differences from these docs.
 
-You also need `git` on `PATH` (the one tool uv cannot install);
-git-annex arrives as a wheel with the sync.
-
-## The loop
+This installs the engine and its development tools into `.venv`. Run
+`uv run lc --version` to use the checkout's CLI. Git must be available on `PATH`;
+git-annex arrives with the Python dependencies.
 
 ```bash
-uv run pytest                        # the suite
-uv run ruff check src/ tests/        # lint (--fix to apply)
-uv run mypy src/                     # strict mode
+uv run pytest
+uv run ruff check src/ tests/
+uv run mypy src/
 ```
 
-These three are exactly what CI runs (`tests.yml`, `lint.yml`) — green
-locally means green there, modulo the gated suites below.
+The suite includes pure and stubbed tests alongside integration tests that use
+real tools. See [Testing](testing.md) for the boundaries and fixture conventions.
 
-Most of the suite is hermetic: an autouse fixture stubs the engine's
-one subprocess seam, so tests spawn nothing and touch no network. The
-exceptions opt in explicitly — see [Testing](testing.md).
+### Tests that need a real mechanism
 
-### The gated suites
-
-Three suites answer questions only a real mechanism can, and each
-skips where its mechanism is missing — with an environment variable CI
-sets to turn the skip into a hard failure:
+These suites skip if their mechanism is unavailable. CI sets the corresponding
+variable to turn a skip into a failure:
 
 | Variable | Suite | Needs |
 |---|---|---|
-| `LC_SANDBOX_TESTS_REQUIRED=1` | `test_sandbox_enforcement.py` | Landlock (Linux) or Seatbelt (macOS) |
-| `LC_CONTAINER_TESTS_REQUIRED=1` | `test_container_smoke.py` | podman or docker |
-| `LC_CRATE_TESTS_REQUIRED=1` | `test_crate_smoke.py` | nothing beyond dev deps |
+| `LC_SANDBOX_TESTS_REQUIRED=1` | `test_sandbox_enforcement.py` | Landlock on Linux or Seatbelt on macOS |
+| `LC_CONTAINER_TESTS_REQUIRED=1` | `test_container_smoke.py` | Podman or Docker |
+| `LC_CRATE_TESTS_REQUIRED=1` | `test_crate_smoke.py` | The development dependencies |
 
-## Building the docs
+Run the relevant real suite when changing sandbox enforcement, containers, or
+publication metadata.
 
-```bash
-uv sync --group docs
-uv run zensical build        # renders into site/
-uv run zensical serve        # live preview
-```
-
-The site deploys on release (`docs-deploy.yml`), so docs track the
-released CLI, not `main`. A pre-release deploys nothing — the site keeps
-serving the last full release.
-
-## Building the wheel
+### Build the CLI distribution
 
 ```bash
 uv build
 ```
 
-CI runs this only to publish. The version comes from hatch-vcs — the
-git tag for a release, tag-plus-commit for a dev build — which is also
-what lets a run record pin a dev engine by its source commit.
-
-## Pre-PR checklist
-
-1. `uv run pytest` — including, if your change touches the sandbox,
-   containers, or the crate, the relevant gated suite on a host that
-   can run it.
-2. `uv run ruff check src/ tests/` and `uv run mypy src/`.
-3. New behavior lands with its tests, in the same PR.
-4. Read [Extending](extending.md) — it says where each kind of change
-   belongs, and the invariants it must keep.
+The CLI version comes from Git through hatch-vcs: a release tag for a release,
+or a tag plus commit for a development build. Read [Extending](extending.md)
+before adding engine behavior so the change uses the existing interfaces.

@@ -1,73 +1,40 @@
-# Welcome to the user guide
+# Meet the research stack
 
-`lightcone-cli` is a small toolchain that turns a research question into
-a reproducible analysis. You describe what you're trying to learn as a
-precise specification — an `astra.yaml` file following the
-[**ASTRA**][astra] schema — and the `lc` command line keeps the
-resulting code, environments, decisions, and outputs in sync.
+Lightcone connects a research question to a record of how you answered it. You describe the analysis, write the code, and run it; the tools keep track of the methodological choices, inputs, environment, and outputs along the way.
 
-ASTRA specs are plain YAML, designed to be easy for both humans and AI
-assistants to write. However the spec gets written, **you stay in charge
-of the scientific choices** — every methodological decision is declared
-in the open, and `lc` records exactly what produced every result: the
-recipe, the decisions, the input data, the environment, and the commit.
+Start with [installation](install.md) and [your first analysis](getting-started.md). Add the agent plugin if you want an assistant to help you work through the same workflow.
 
-## What this guide covers
+## What each piece does
 
-- [Install](install.md) — get the `lc` command line running on your
-  machine or on a cluster.
-- [Getting Started](getting-started.md) — create your first project,
-  build it end-to-end, and understand what each piece does.
-- [Core Concepts](concepts.md) — the model behind the tool: what the
-  states mean, why everything is committed, and how the two execution
-  modes differ.
-- [Running on a Cluster](cluster.md) — taking your analysis to a SLURM
-  HPC system.
-- [Troubleshooting](troubleshooting.md) — common issues and how to
-  unstick them.
-- [Glossary](glossary.md) — the terms that show up everywhere
-  (universe, decision, manifest, …) explained in plain language.
+| Piece | What you use it for | Where it lives |
+| --- | --- | --- |
+| **Lightcone CLI** (`lc`) | Create a project, run recipes, inspect result status, and record provenance. | [lightcone-cli](https://github.com/LightconeResearch/lightcone-cli) |
+| **Lightcone agent plugin** | Help your coding agent scope a question, maintain a specification, implement recipes, and resume work. Includes the ASTRA skill and validation hooks. | [agent-skills](https://github.com/LightconeResearch/agent-skills) |
+| **ASTRA specification and tools** — external | Describe the analysis in `astra.yaml`; validate its structure and inspect its decisions and evidence with `astra`. | [ASTRA documentation ↗](https://astra-spec.org/latest/) · [astra-tools ↗](https://github.com/LightconeResearch/astra-tools) |
 
-## What you'll do, in a handful of lines
+ASTRA has its own specification, releases, and documentation. Lightcone builds on it. This site covers [how ASTRA fits into your project](astra.md); the external ASTRA documentation is the reference for the schema and its tools.
 
-!!! tip "Quick start"
+The agent plugin is optional. Your specification is ordinary YAML and your recipes run your own scripts, so you can use the same project with or without an assistant.
 
-    === "uv"
-        ```bash
-        uv tool install lightcone-cli
-        lc init my-analysis && cd my-analysis
-        # describe your analysis in astra.yaml, write your scripts,
-        # declare what they import (uv add numpy ...), then:
-        git add -A && git commit -m "First analysis"
-        lc materialize
-        ```
+## From a question to a result
 
-    === "pip"
-        ```bash
-        pip install lightcone-cli
-        lc init my-analysis && cd my-analysis
-        # describe your analysis in astra.yaml, write your scripts,
-        # declare what they import (uv add numpy ...), then:
-        git add -A && git commit -m "First analysis"
-        lc materialize
-        ```
+1. **Describe the work.** Record the question, inputs, expected outputs, and methodological decisions in `astra.yaml`. An [agent can help you scope it](agents.md).
+2. **Implement the analysis.** Write scripts, add dependencies with `uv add`, and connect each output to a recipe in the specification.
+3. **Run and inspect.** Commit your changes, materialize the outputs with `lc`, and inspect their status. Each recorded result carries the information needed to trace how it was produced.
+4. **Compare choices.** Create a *universe* for each combination of decision options you want to study. [Core concepts](concepts.md) explains how those alternatives relate to outputs.
+5. **Communicate the result.** [Write a report](reporting.md) and [prepare the project for sharing](sharing.md), keeping the result connected to its provenance.
 
-That's the shortest possible path. The rest of the guide is the
-unhurried version — and the commit is not ceremony: every output is
-committed together with the code that produced it, which is why a build
-starts from a clean tree.
+You remain responsible for the scientific argument: which alternatives are defensible, whether a method answers the question, and what the results support. A valid specification and a reproducible run make that argument easier to inspect.
 
-## What lightcone-cli is *not*
+## Find the help you need
 
-- **A statistics package.** It runs your code; it doesn't compute
-  things itself.
-- **A workflow language.** Recipes in `astra.yaml` are short shell
-  commands, not a DSL. There's no learning curve beyond what's in
-  [Getting Started](getting-started.md).
-- **An IDE.** `lc` is a command-line tool; write `astra.yaml` and your
-  analysis code with whatever editor or tooling you prefer.
-
-If you'd rather skim the design and architecture, the
-[maintainer docs](../maintainer.md) are the other half of this site.
-
-[astra]: https://astra-spec.org/latest/
+| I want to… | Start here |
+| --- | --- |
+| Get the tools running | [Install](install.md) |
+| Follow a complete example | [Your first analysis](getting-started.md) |
+| Start or resume with a coding agent | [Work with an agent](agents.md) |
+| Understand decisions, universes, and output status | [Core concepts](concepts.md) |
+| Run on an HPC system | [Run on a cluster](cluster.md) |
+| Resolve an error | [Troubleshooting](troubleshooting.md) |
+| Look up a command | [CLI reference](../cli/index.md) |
+| Work on the tools themselves | [Contribute](../maintainer.md) |

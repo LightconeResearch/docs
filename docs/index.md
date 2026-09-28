@@ -1,62 +1,106 @@
-# Lightcone Research Stack
-
-The **Lightcone Research Stack** is [Lightcone Research][lr]'s tooling for research
-analyses described with [**ASTRA**][astra] (Agentic Schema for Transparent Research
-Analysis).  
-You describe an analysis in an `astra.yaml` specification; the stack validates it and
-takes care of the rest — execution, environments, and provenance.
-
-!!! warning "Alpha development"
-    The stack is in **early alpha**. Its tools are still moving — expect breaking
-    changes between minor versions. Bug reports, design challenges, and use cases the
-    tooling doesn't yet cover are exactly what we want to hear at this stage; please
-    open an issue on the [repository](https://github.com/LightconeResearch) of the tool
-    concerned.
-
-## Choose your path to the documentation
-
-<div class="grid cards" markdown>
-
--   __I want to try it out__ – :lucide-rocket:
-
-    ---
-
-    Installation instructions, step-by-step tutorial, and fast tour of the lightcone framework and its workflow capabilities.
-
-    [User Guide](user/index.md){ .md-button .md-button--primary }
-
--   __I want to contribute__ – :lucide-cog:
-
-    ---
-
-    In-depth tour of lightcone-cli's architecture and internals, as well as contribution instructions, aimed at
-    contributors and maintainers.
-
-    [Developer corner](maintainer.md){ .md-button .md-button--primary }
-
-</div>
-
+---
+title: The Lightcone Research Stack
+description: Install Lightcone, work with a research agent, and turn an analysis into reproducible results.
+hide:
+  - navigation
+  - toc
 ---
 
-## Components of the stack
+<div class="lc-home" markdown>
 
-<div class="grid cards" markdown>
+<section class="lc-hero" markdown>
 
--   __lightcone-cli__
+<p class="lc-eyebrow">Lightcone Research · Documentation</p>
 
-    The library that ships the `lc` CLI: project scaffolding, locked environments, sandboxed execution, and the provenance layer. Depends on [**astra-tools**][astra-tools], the SDK for working with ASTRA analysis specifications.
+# From research question<br>to reproducible result.
 
-    [:fontawesome-brands-github: Repository][cli]{ .md-button }
+<p class="lc-lead">A practical toolkit for research you can inspect, reproduce, and build on. Describe your analysis, work with an AI agent, and keep your results connected to the choices that produced them.</p>
 
--   __astra-tools__
+[Install the stack :lucide-arrow-right:](user/install.md){ .md-button .md-button--primary }
+[Run your first analysis](user/getting-started.md){ .lc-text-link }
 
-    The SDK for working with [**ASTRA**][astra] analysis specifications. This library provides the `astra` CLI which handles the [**ASTRA**][astra] lifecycle and validation process (schema, prior insights & findings, evidence verification helpers).
+<p class="lc-hero-note">Open source. Built for researchers. Early alpha.</p>
+<span class="lc-engraving-credit">Uranometria · Bayer · 1603</span>
 
-    [:fontawesome-brands-github: Repository][astra-tools]{ .md-button }
+</section>
+
+<section class="lc-section" markdown>
+
+<p class="lc-eyebrow">The pieces, together</p>
+
+## One research workflow. A few focused tools.
+
+You make the scientific choices. The stack helps you record them, implement them, and follow them through to your results.
+
+<div class="lc-stack" markdown>
+
+<div class="lc-stack-item" markdown>
+
+<span class="lc-step">01 / Describe</span>
+
+### An inspectable analysis
+
+Use **ASTRA** to describe your inputs, outputs, methodological decisions, and supporting evidence in an `astra.yaml` file.
+
+[Meet ASTRA, the external standard :lucide-arrow-up-right:](user/astra.md)
 
 </div>
 
-[lr]: https://lightconeresearch.org/
-[astra]: https://astra-spec.org/latest/
-[astra-tools]: https://github.com/LightconeResearch/astra-tools
-[cli]: https://github.com/LightconeResearch/lightcone-cli
+<div class="lc-stack-item" markdown>
+
+<span class="lc-step">02 / Collaborate</span>
+
+### An agent that knows the workflow
+
+Add the **Lightcone plugin** to your coding agent for help scoping a question, writing the specification, implementing recipes, and understanding results.
+
+[Work with an agent :lucide-arrow-right:](user/agents.md)
+
+</div>
+
+<div class="lc-stack-item" markdown>
+
+<span class="lc-step">03 / Reproduce</span>
+
+### Results with a record
+
+Use the **`lc` command line** to run your analysis in a locked environment and record the inputs, choices, and code behind each output.
+
+[Run your first analysis :lucide-arrow-right:](user/getting-started.md)
+
+</div>
+
+</div>
+
+</section>
+
+<section class="lc-section lc-paths" markdown>
+
+<div markdown>
+
+<p class="lc-eyebrow">Start with your question</p>
+
+## A small first step.
+
+Install the tools, run a complete example, then bring your own data. You can work from a terminal or add an agent when you want help.
+
+[Understand how the stack fits together :lucide-arrow-right:](user/index.md)
+
+</div>
+
+<ol class="lc-reading-list">
+  <li><a href="user/install/"><span>01</span><strong>Install</strong><small>Set up the CLI and your agent.</small><b aria-hidden="true">→</b></a></li>
+  <li><a href="user/getting-started/"><span>02</span><strong>Your first analysis</strong><small>Go from a specification to a result.</small><b aria-hidden="true">→</b></a></li>
+  <li><a href="user/agents/"><span>03</span><strong>Work with an agent</strong><small>Start, resume, and refine a project.</small><b aria-hidden="true">→</b></a></li>
+  <li><a href="user/sharing/"><span>04</span><strong>Share your work</strong><small>Prepare results others can inspect.</small><b aria-hidden="true">→</b></a></li>
+</ol>
+
+</section>
+
+<div class="lc-colophon" markdown>
+
+**Growing with the research community.** Lightcone is in early alpha; commands and formats may change. [Report an issue](https://github.com/LightconeResearch/docs/issues), [contribute](maintainer.md), or visit [Lightcone Research](https://lightconeresearch.org/).
+
+</div>
+
+</div>

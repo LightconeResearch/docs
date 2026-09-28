@@ -7,22 +7,25 @@ its classification walk.
 
 Source: `src/lightcone/engine/materialize.py`.
 
+Recipes are ordinary Dask tasks. Their stdout/stderr is forwarded as bytes to the
+driver's stderr, independently of success or failure, leaving stdout for the report.
+
 ## Key symbols
 
 | Symbol | Role |
 |---|---|
-| `materialize(root, targets, *, refresh)` | The run: guards → converge → plan → fetch → schedule → save/restore loop → crate converge. |
+| `materialize(root, targets, *, cluster_id, refresh)` | The run: guards → converge → plan → fetch → schedule → save/restore loop → crate converge. |
 | `check(root, targets, *, refresh)` | The same classification without executing, committing, or fetching. Exempt from the dirty refusal. |
 | `status(root)` | The report: every output's state and provenance commit, plus the mode/image/sandbox header facts. |
 | `MaterializeReport` / `StatusReport` | The JSON surfaces; `ok` and `up_to_date` first. |
-| `cluster_for_run()` | The venue ladder, and the two-method scheduler seam (`submit`, `completed`). |
+| `cluster_for_run(cluster_id)` | Borrow the cluster; the submit/completed scheduler seam (`submit`, `completed`). |
 | `run_record(...)` / `datalad_run_subject(...)` | The commit message `datalad rerun` replays, and the one spelling of its subject line — shared with the foreign-write comparator, because two strings here would drift. |
 | `_engine_requirement()` | How a record pins its engine: by version for a release, by source commit (hatch-vcs) for a dev build. |
 
 ## The run's order, and why
 
-1. **Login guard first** — the allocation is the remedy with queue
-   latency, so the user submits it before fixing anything else.
+1. **Explicit cluster first** — validate native allocation identity and connect
+   to its scheduler before preparing the project.
 2. **Dirty refusal before the environment converge** — in
    containerized mode the converge can commit an image archive, and
    `dataset.save` commits the whole index; on a dirty tree the user's
@@ -37,9 +40,9 @@ Source: `src/lightcone/engine/materialize.py`.
    — the driver commits as results arrive, so any per-task read could
    answer differently mid-run. Nondeterminism in a provenance field is
    worse than either answer.
-6. **Save on `ok`, restore otherwise, `try/finally` around the loop**
-   — an interrupt restores whatever is still outstanding; the tree
-   ends as clean as it started.
+6. **Save on `ok`, restore reported failures** — unreported outputs are retained
+   after interruption because their tasks may still be writing. Allocation
+   management does not provide concurrent-writer or cancellation guarantees.
 
 ## What must stay true
 
@@ -51,9 +54,9 @@ Source: `src/lightcone/engine/materialize.py`.
 - **`up_to_date` is `ok and not made and not planned`** — a run where
   every recipe failed must not report "nothing to do", and `behind`
   never counts against it.
-- **A read-only verb never tracebacks.** Anything `check`/`status`
-  cannot read classifies as "will be remade" and the real error
-  belongs to the recipe that follows.
+- **Unreadable output state is reportable.** An unreadable manifest or input
+  can classify as "will be remade". An invalid spec, universe, or lock instead
+  raises `ProjectError`, which the CLI presents as a command error.
 - **The run record is genuinely re-runnable**: engine pinned by
   requirement, project environment rebuilt by the worker from the
   rerun commit's own lock, format tested *through datalad's parser*
@@ -69,4 +72,4 @@ Source: `src/lightcone/engine/materialize.py`.
 `tests/test_materialize.py` — real repositories, real recipes, a real
 `LocalCluster` through the seam exactly once, real `datalad rerun` for
 the record's whole claim. `cluster_for_run` is the one monkeypatch
-point for venue-free tests.
+point for allocation-free tests.

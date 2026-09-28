@@ -1,6 +1,11 @@
-# Architecture
+# Execution architecture
 
-How lightcone-cli is put together, for someone about to change it. The
+This page covers the execution layer of the Lightcone research stack.
+Agent skills guide project development and reporting; `lightcone-cli` owns
+execution and provenance; ASTRA supplies an external specification standard.
+For repository ownership, see [Contribute to Lightcone](maintainer.md).
+
+Here is how lightcone-cli is put together, for someone about to change it. The
 [user-guide concepts page](user/concepts.md) covers what the tool
 promises; this page covers how the promises are kept.
 
@@ -20,7 +25,7 @@ exit codes                   how outputs are made          *means*
 - **The engine** owns everything about what a project is and how
   outputs get made. It raises `ProjectError`; the CLI's group class
   translates that into a clean error message, once, for every verb.
-- **ASTRA** owns what a spec means. Scoping, `from:` references,
+- **The external ASTRA project** owns what a spec means. Scoping, `from:` references,
   conditional outputs, universe resolution, and the recipe placeholder
   grammar are all answered by `astra.resolve` and checked by
   `astra.validation` — never re-implemented here. When the spec's
@@ -35,20 +40,24 @@ imports.
 ## One run, end to end
 
 ```text
-lc materialize
-  │  guard: compute node?  tools?  git identity?
+lc materialize "$CLUSTER"
+  │  connect: native identity + Dask readiness
+  │  guard: tools?  git identity?
   │  refuse: dirty tree
-  │  converge: uv.lock ⇄ .venv   (and the image, containerized)
   │  plan: astra validate + resolve  →  Graph of Tasks
   │  fetch: git annex get (declared inputs not in this clone)
-  │  venue: SLURM allocation? → srun workers · else LocalCluster
-  ├─► workers: reset output dir → sandbox → recipe → hash → manifest
+  │  converge: uv.lock ⇄ .venv   (and the image, containerized)
+  ├─► workers: reset output files → sandbox → recipe → hash → manifest
   │            (never raise; return ok/current/behind/failed/blocked)
   └─  driver: consume results in one thread
         ok      → dataset.save   (commit + run record)
         failed  → dataset.restore (tree as clean as it started)
         finally → converge ro-crate-metadata.json (if licensed)
 ```
+
+After interruption, unreported outputs remain in place because their remote
+tasks may still be writing. Stop the allocation and establish that work has
+stopped before repairing those files.
 
 The division of labor is strict and load-bearing:
 
@@ -110,7 +119,7 @@ git history while exiting 0 — so `lc init` sets
 `filter.annex.required=true`, which makes git refuse loudly instead
 (every filtered command, not only `git add`).
 Getting git-annex onto that `PATH` is the install's job, not the
-repository's: `uv tool install lightcone-cli` puts it there alongside
+repository's: the [tool installation](user/install.md) puts it there alongside
 `lc`.
 
 Each output is committed with a **run record** — a `[DATALAD RUNCMD]`
@@ -120,7 +129,7 @@ worker entry point, so `datalad rerun` replays the making of an output
 with the gates, the sandbox, and the manifest intact. Results are
 committed *thin* (hard-linked to their annex object), which is safe
 precisely because lc never writes an output in place — the worker
-resets the directory first.
+removes the output's owned files first, without deleting sibling outputs.
 
 ## The exec boundary
 
@@ -134,9 +143,10 @@ Because every backend is a pure argv rewrite, all of them are testable
 on a host that can't run them, and the manifest's `hermeticity` field
 records what was *actually* enforced — never what should have been.
 
-There is one policy, `exec_policy`: probe and recipe get exactly the
-same thing (tree read-only apart from `results/`), so "works under
-`lc run`" and "works as a recipe" stay the same fact.
+There is one policy builder, `exec_policy`: both probes and recipes get a
+read-only project with a writable output scope. A recipe can write in the
+directory its output lands in; a probe can write throughout `results/`.
+The same environment and dependency rules apply to both.
 
 ## The container hatch
 
@@ -151,16 +161,24 @@ environment sync and each recipe exec, over a read-only rootfs with
 the mount table as the whole policy. Execution pins the archive's
 config-blob id, never a tag.
 
-## Venues
+## Compute allocations
 
-`materialize.cluster_for_run()` is the one place that decides where a
-run executes, and the seam it returns is two methods wide —
-`submit(fn, *args, key=…)` and `completed(handles)`. A SLURM
-allocation (detected by `SLURM_JOB_ID`) gets one worker per node via a
-single `srun`, running the driver's own interpreter so driver and
-workers are the identical installation. Anything else is the local
-machine. Venues are detected, never configured; the only venue config
-that exists is the allocation the user already requested.
+`engine.compute` owns allocation lifecycle through a small provider protocol.
+A visible YAML catalog supplies ordered resource offers and stable native service
+namespaces. When the implicit default file is absent, a built-in local catalog
+provides one CPU and 1 GiB without setup. An explicit catalog replaces that default;
+missing explicit paths and invalid files remain errors. No catalog is written and
+no allocation starts until `compute launch` resolves resources and submits once. Slurm queries
+and validated local OS identities are authoritative for allocations; Dask is the
+authority for connected workers. Private scheduler/TLS files are connection
+material, not a registry.
+
+`compute.connect(CLUSTER_ID)` borrows a standard Dask client and closes only that
+client on exit. Both execution commands require a cluster ID. The materialization
+scheduler keeps its `submit`/`completed` seam. Driver preparation and existing
+task runtime/sandbox checks remain unchanged. Tasks use ordinary Dask scheduling;
+there is no separate worker-selection or preflight layer, or site-marker guard. No execution command implicitly allocates compute.
+See [compute internals](api/compute.md) and [deployment limits](user/cluster.md).
 
 ## The publication view
 
@@ -190,7 +208,7 @@ src/lightcone/              # namespace — NO __init__.py
     ├── worker.py           # making one output; the rerun entry point
     ├── materialize.py      # the driver: gates, Dask, the save/restore loop
     ├── run.py              # what `lc run` is
-    ├── venue.py            # where a run executes
+    ├── compute/            # common allocation API, local and Slurm providers
     ├── sandbox/            # the exec boundary
     └── templates/          # the scaffold's file content, as real files
 ```

@@ -1,38 +1,59 @@
 # Lightcone Research Stack documentation
 
-[![Docs](https://img.shields.io/github/actions/workflow/status/LightconeResearch/docs/docs.yml?branch=main&style=flat&label=docs&color=darkgreen)](https://docs.lightconeresearch.org)
-[![License](https://img.shields.io/badge/License-BSD_3--Clause-426b78.svg?style=flat)](LICENSE)
+User guides and reference material for the [Lightcone Research Stack](https://lightconeresearch.org/): the `lc` execution tools, research agent skills, and their integration with the external [ASTRA specification](https://astra-spec.org/latest/).
 
-The **Lightcone Research Stack** is [Lightcone Research](https://lightconeresearch.org/)'s
-tooling for research analyses described with [ASTRA](https://astra-spec.org/latest/)
-(Agentic Schema for Transparent Research Analysis). You describe an analysis in an
-`astra.yaml` specification; the stack validates it and takes care of the rest —
-execution, environments, and provenance.
+**[Read the documentation →](https://docs.lightconeresearch.org/)**
 
-**→ Read the documentation at <https://docs.lightconeresearch.org>**
+## Start here
 
-## Where to start
+- [Install](https://docs.lightconeresearch.org/user/install/) — one CLI setup, with an optional agent plugin.
+- [Your first analysis](https://docs.lightconeresearch.org/user/getting-started/) — run a complete local example and inspect its provenance.
+- [Work with an agent](https://docs.lightconeresearch.org/user/agents/) — scope, implement, and resume a research project.
+- [Meet the stack](https://docs.lightconeresearch.org/user/) — understand how the tools fit together.
 
-- [Install](https://docs.lightconeresearch.org/user/install/) — uv, git, and the `lc` command
-- [Getting started](https://docs.lightconeresearch.org/user/getting-started/) — your first analysis, from `lc init` to a published result
-- [Core concepts](https://docs.lightconeresearch.org/user/concepts/) — projects, output identity, and how provenance is recorded
-- [Running on a cluster](https://docs.lightconeresearch.org/user/cluster/) — SLURM, containers on HPC, and parallel filesystems
-- [Troubleshooting](https://docs.lightconeresearch.org/user/troubleshooting/) — common errors and how to fix them
+These docs currently target the upcoming explicit compute workflow. The installation guide pins a source revision that includes `lc compute`; the published `0.5.0rc4` release uses an earlier workflow. Keep installation instructions, tutorials, and command reference aligned when moving to a new release.
 
-## Components
+## Build locally
 
-| Component | What it does | Repository |
-| --- | --- | --- |
-| **lightcone-cli** | The `lc` CLI: project scaffolding, locked environments, sandboxed execution, and the provenance layer | [LightconeResearch/lightcone-cli](https://github.com/LightconeResearch/lightcone-cli) |
-| **astra-tools** | The SDK and `astra` CLI for ASTRA specifications: schema, validation, and evidence verification helpers | [LightconeResearch/astra-tools](https://github.com/LightconeResearch/astra-tools) |
+With [uv](https://docs.astral.sh/uv/getting-started/installation/) installed:
 
-## Feedback
+```bash
+uv sync --locked
+uv run zensical serve
+```
 
-The stack is in early alpha, and bug reports, design challenges, and use cases it
-doesn't cover yet are welcome. Report a problem with a tool on that tool's
-repository; report a problem with the documentation itself — a page that is wrong,
-unclear, or out of date — [here](https://github.com/LightconeResearch/docs/issues).
+Before submitting a change:
 
-## License
+```bash
+uv run zensical build --clean --strict
+```
+
+Pull requests run the same strict build. Updates to `main` are deployed through GitHub Pages by [the docs workflow](.github/workflows/docs.yml).
+
+## Where to edit
+
+| Location | Purpose |
+| --- | --- |
+| `docs/index.md` | Stack landing page |
+| `docs/user/` | Installation, tutorials, and task-oriented guides |
+| `docs/cli/` | CLI command reference |
+| `docs/api/`, `docs/architecture.md` | CLI implementation reference |
+| `docs/contributing/`, `docs/maintainer.md` | Contributor guidance |
+| `zensical.toml` | Navigation and site configuration |
+| `docs/stylesheets/extra.css`, `overrides/` | Website-aligned typography, colors, and layout |
+
+The design follows [lightcone-website](https://github.com/LightconeResearch/lightcone-website): Quattrocento headings, Newsreader prose, Alegreya navigation, JetBrains Mono code, parchment surfaces, and antique-gold accents. The landing-page engraving is the same *Uranometria* (Bayer, 1603) asset used by the website.
+
+Check technical claims against the relevant source:
+
+- [lightcone-cli](https://github.com/LightconeResearch/lightcone-cli) — execution and provenance.
+- [agent-skills](https://github.com/LightconeResearch/agent-skills) — plugin installation, skills, and hooks.
+- [ASTRA documentation](https://astra-spec.org/latest/) and [astra-tools](https://github.com/LightconeResearch/astra-tools) — the external specification and validation tools.
+
+Preserve existing page URLs when reorganizing navigation. Keep advanced implementation details in the reference and contributor sections, and put a runnable path before optional setup.
+
+## Feedback and license
+
+Report documentation problems in [this repository's issues](https://github.com/LightconeResearch/docs/issues). Report tool behavior in the relevant tool's repository. The stack is in early alpha and feedback from real analyses is welcome.
 
 BSD 3-Clause — see [LICENSE](LICENSE).

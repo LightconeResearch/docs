@@ -1,151 +1,136 @@
-# Core Concepts
+# Core concepts
 
-The mental model behind `lc`, in one page. Nothing here is required to
-follow [Getting Started](getting-started.md) — come back when you want
-to know *why* the tool behaves the way it does.
+A Lightcone project brings your research question, analysis choices, code, data,
+and results together in one versioned directory. Agent skills help you develop
+and review that project; `lc` runs the analysis and records how each result was
+made. The analysis specification follows **ASTRA, an external standard** with
+its own [documentation and tooling](https://astra-spec.org/latest/).
 
-## A project is three files
+## The project is the research record
 
-A lightcone project is a directory holding an ASTRA spec and a uv
-project:
+| File or directory | What it holds |
+|---|---|
+| `astra.yaml` | Inputs, outputs, recipes, methodological decisions, and evidence |
+| `universes/` | Selections of decision values to evaluate |
+| `pyproject.toml` and `uv.lock` | The analysis dependencies and their resolved versions |
+| `data/` | Input data, with large content stored through git-annex |
+| `results/` | Generated outputs and their provenance manifests |
+| `index.md` and `myst.yml` | The report and its MyST configuration |
 
-- **`astra.yaml`** describes the analysis — inputs, outputs, recipes,
-  methodological decisions. It is the single source of truth: everything
-  `lc` does is downstream of it.
-- **`pyproject.toml` + `uv.lock`** describe the environment — every
-  package a recipe may import, resolved to exact versions. The `.venv`
-  is built *from* the lock and is disposable; the lock is what's real,
-  and it travels in git.
-
-There is no global configuration, no registry, no state outside the
-project. Clone the repository and you have everything except two pieces
-of local machinery (`.venv` and the git-annex initialization), which
-`lc init` rebuilds.
-
-Adding a dependency is a uv operation, not an `lc` one:
+Keep your analysis code in the layout that suits your project, such as `src/`.
+Add its dependencies with uv:
 
 ```bash
 uv add numpy
 ```
 
-That updates `pyproject.toml`, re-locks, and syncs `.venv` in one step.
-Recipes import from the locked environment and nothing else — a stray
-`pip install` on your machine changes nothing they can see.
+The project environment is separate from the installed `lc` tool. Recipes use
+packages from your lock file; installing a package elsewhere does not add it to
+the analysis. After cloning a project, `lc init` reconstructs the local
+environment and initializes git-annex. Annexed data may still need fetching;
+materialization fetches the declared inputs it needs.
 
-## An output has an identity, and three facts about it
+## Decisions become universes
 
-Every materialized output records, in its
-`.<output_id>.manifest.json`:
+A decision records a methodological choice, its defensible options, and your
+reasoning. A universe selects values for those decisions. For example, `baseline`
+might keep all observations while `robust` excludes outliers. Lightcone produces
+separate results for each universe, so you can compare how the choice affects
+your findings.
 
-1. **What it is** — a hash of its recipe and the decision values that
-   shaped it (its *definition*).
-2. **What it was made from** — a content hash of each declared input.
-3. **What it ran under** — a hash of the environment (the lock, the
-   interpreter, the image declaration if any), plus the git commit the
-   run started at.
+ASTRA defines the schema, validation rules, and universe semantics. Lightcone
+uses those definitions to execute recipes. See the [glossary](glossary.md)
+for the individual terms.
 
-Those three facts are deliberately not one fact, because they age
-differently — and that is what the three states mean:
+## Choose compute, then execute
 
-| state | means | what `lc materialize` does |
-|---|---|---|
-| `current` | the output is exactly what the spec asks for, made from these inputs, under this environment | nothing |
-| `stale` | the output **contradicts** the project: the spec now defines it differently, or an input's content changed | remakes it |
-| `behind` | the output is still exactly what the spec asks for — only the **environment** moved since it was made | reports it, leaves it alone |
-
-The line between `stale` and `behind` is contradiction versus
-circumstance. A stale output is mislabelled — keeping it would be a
-lie, so it is remade. A behind output is not wrong in any way: one
-`uv add` for a plotting script rewrites the lock for the whole project,
-and remaking a week of computation over that buys nothing. Its manifest
-records exactly which environment and commit produced it, and that
-commit's own `uv.lock` reconstructs the environment if you ever need
-it.
-
-When you *do* want behind outputs remade — before a release, say —
-that is one flag:
+Compute is separate from the research record. Launch a local or Slurm allocation
+with `lc compute`, then pass its ID to `lc materialize` or `lc run`. A small
+local offer is available without configuration; a user-level catalog exposes
+larger allocations and HPC services.
 
 ```bash
-lc materialize --refresh
+lc materialize "$CLUSTER"
+lc status
+lc compute down "$CLUSTER"
 ```
 
-`--refresh` only ever widens a run: a `current` output stays current
-under it, and there is deliberately no flag in the other direction —
-nothing suppresses the rebuild of a stale output.
+Here `CLUSTER` is the ID returned by `lc compute launch`. A finished command
+leaves the allocation available for reuse until you stop it or its lifetime
+expires. [Compute and clusters](cluster.md) walks through the full lifecycle.
+The project and environment must be visible at the same paths to the driver
+and workers.
 
-One more way an output can be stale: a hand edit. Every output is
-committed by the run that made it, so a file changed by hand and
-committed shows up in history under a commit that is not a run record —
-and the output classifies `stale` everywhere, with `lc status` naming
-the foreign commit.
+## What makes an output current?
 
-## Everything is committed, and the tree stays clean
+Every output has a manifest beside it: `.<output_id>.manifest.json`. It records
+the recipe and selected decisions, input content hashes, the environment, and
+the Git commit at the start of the run.
 
-`lc` versions results in the project's own git repository: git carries
-the history and the small files, git-annex carries the data bytes —
-transparently, behind the ordinary `git add` / `git commit` you already
-type.
+| State | Meaning | Next materialization |
+|---|---|---|
+| `current` | Definition, inputs, and environment match the recorded result | Leaves it alone |
+| `stale` | Definition or input content changed, or a result was committed outside its run record | Remakes it |
+| `behind` | Definition and inputs match, but the environment changed | Leaves it alone unless you use `--refresh` |
 
-That model has two consequences you'll feel:
+Input changes propagate by content. If rebuilding an upstream result produces
+identical bytes, it does not force a downstream rebuild. Changing a dependency
+in `uv.lock` makes existing results `behind`, so an unrelated package update
+does not automatically repeat expensive work. To refresh those results:
 
-- **A run starts from a clean tree.** Every output is committed
-  together with the code that produced it; a run that started from
-  uncommitted edits could not say what that code was. So: commit, then
-  materialize.
-- **A run ends with a clean tree.** Each output is committed as it
-  lands — with its manifest, in a commit whose message is a *run
-  record* that `datalad rerun` can replay. A failed recipe's partial
-  work is rolled back. Your `git log` is the build log.
+```bash
+lc materialize "$CLUSTER" --refresh
+```
 
-`results/` is `lc`'s to write. Don't put files there by hand — a
-hand-placed file has no manifest and no run record, and the foreign
-write check above exists precisely to catch it.
+Source code does not automatically participate in the definition hash. Declare
+scripts as ASTRA inputs when their content should trigger a rebuild. A recipe
+can then refer to a script through its input placeholder.
 
-## Two modes, derived from the project
+## Commit before running
 
-How recipes execute is never configured — it is read off the project:
+Materialization starts from a clean Git tree so each result has a precise code
+revision. Review and commit your edits before running. The driver then commits
+each successful output with its manifest and a replayable run record. Git
+stores the history and small files; git-annex stores the larger data bytes.
 
-- **Direct mode** (the default): recipes run on your machine, in the
-  project's `.venv`, under an OS sandbox — Landlock on Linux, Seatbelt
-  on macOS. The project tree is read-only except each recipe's own
-  directory its output lands in; undeclared tools don't execute.
-- **Containerized mode**: declaring a `[tool.lightcone.image]` table in
-  `pyproject.toml` *is* the switch. Recipes then run inside a
-  content-addressed image built from that declaration — and the image
-  itself is saved into the repository as versioned content, so a clone
-  obtains the exact bytes with no registry and no credentials.
-  `lc status` shows the mode and the image's state.
+A recipe that reports failure has its partial result restored. After a lost
+connection or interrupted command, remote recipes may still be writing. Stop
+the allocation and confirm they have stopped before cleaning `results/`.
+[Execution limits](cluster.md#execution-requirements-and-limits) explain this
+case, including local containers that may require separate termination.
 
-Either way, every manifest records what enforcement actually ran
-(`hermeticity`) — a host with no sandbox mechanism runs the recipe and
-says so, rather than pretending.
+Use one execution command per project at a time. Treat `results/` as generated
+content; keep hand-written analysis and report files outside it.
 
-## Reading and gating are different verbs
+## Two execution environments
 
-- **`lc status`** reports. It always exits 0 — a state is not a
-  failure — runs nothing, and doesn't mind a dirty tree, because the
-  moment you most need it is when things aren't clean. It's also the
-  verb that shows the commit each output was made at.
-- **`lc materialize --check`** gates. It classifies everything without
-  running anything and exits 1 if a run would do work — the thing a
-  script or CI job branches on.
+In **direct mode**, recipes use the project's prepared environment on an
+allocation worker. On supported hosts, filesystem access is constrained by
+Landlock on Linux or Seatbelt on macOS. Recipes may write in their output
+directory and private scratch space.
 
-Both have `--json`; the first two keys of the check report, `ok` and
-`up_to_date`, are the ones to branch on.
+In **containerized mode**, a `[tool.lightcone.image]` table in `pyproject.toml`
+declares the system layer. `lc build` saves that image in the repository through
+git-annex; Python dependencies still come from the project lock. See
+[`lc build`](../cli/build.md) for the declaration and runtime requirements.
 
-## Publication is a license away
+Every manifest records the isolation actually enforced. A host without a
+supported sandbox reports that fact. Network access remains allowed.
 
-Declaring a `license` under `[project]` in `pyproject.toml` is
-declaring the intent to publish. From then on, every `lc materialize`
-maintains `ro-crate-metadata.json` at the project root — an
-[RO-Crate](https://www.researchobject.org/ro-crate/) describing the
-project, its outputs, and the runs that produced them. The repository
-*is* the crate; depositing it is `git archive` on something you already
-have.
+## Inspect results without running them
 
-## Where to next
+`lc status` shows each result's state and provenance commit. A successful report
+exits 0 even if outputs are stale. `lc materialize --check` is the automation
+gate: it exits 1 when work would be needed. Neither command needs a cluster or
+fetches data, and both accept `--json`.
 
-- [Running on a Cluster](cluster.md) — the same model on SLURM.
-- [Troubleshooting](troubleshooting.md) — the refusals quoted, with
-  their remedies.
-- [Glossary](glossary.md) — the terms, one at a time.
+## Reports and publication metadata
+
+Write the research narrative in the project's MyST report and reference the
+outputs that support your findings. Declaring a license under `[project]` in
+`pyproject.toml` also enables maintenance of `ro-crate-metadata.json`, a
+machine-readable description of the project and its provenance.
+
+That metadata helps archives and other tools understand the research record.
+A complete deposit must include the data and result bytes as well as the
+metadata: `git archive` alone does not include git-annex content.

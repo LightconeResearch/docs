@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block extrahead %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+{% endblock %}
+
+{% block footer %}
+  <div class="lc-site-footer">
+    <div class="md-grid lc-site-footer__inner">
+      <a href="https://lightconeresearch.org/" class="lc-site-footer__brand">Lightcone Research <span aria-hidden="true">↗</span></a>
+      <span>Open tools for inspectable, reproducible science.</span>
+    </div>
+  </div>
+  {{ super() }}
+{% endblock %}

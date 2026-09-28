@@ -2,7 +2,7 @@
 
 Report what state each of the analysis's outputs is in. Reads only: it
 runs nothing, commits nothing, transfers no data, does not mind an
-unclean tree, and always exits `0` — a state is not a failure. The
+unclean tree, and exits `0` for a successful report, even when outputs are stale. The
 moment you most need to know where a project stands is when it isn't
 clean, so this verb works there.
 
@@ -17,6 +17,7 @@ lc status [OPTIONS]
 ```text
   mode:    direct
   sandbox: landlock (fs: declared, network: allowed)
+  crate:   not maintained — declare [project].license to enable it
 
   · current  baseline/fit       a3f1f11
   · current  baseline/fit_plot  a3f1f11
@@ -30,6 +31,11 @@ The header is repository facts: which mode the project executes in
 (and, for a containerized project, the image's tag and state), and
 what enforcement a run on this host would get. No runtime and no
 network is needed to answer either.
+
+The sandbox header describes the machine where you inspect the project. A
+remote worker may have different capabilities; each output's manifest records
+the enforcement actually used. The crate line reports publication metadata.
+An invalid project or unreadable specification can still make this command fail.
 
 Then one line per output the spec declares, in dependency order: its
 state, **the commit it was made at**, and — for anything not current —
@@ -67,7 +73,8 @@ eyes, check for exit codes.
   "mode": "direct",
   "image": null,
   "sandbox": "landlock (fs: declared, network: allowed)",
-  "counts": {"current": 4, "behind": 0, "stale": 0},
+  "crate": "not maintained — declare [project].license to enable it",
+  "counts": {"current": 1, "behind": 0, "stale": 0},
   "outputs": [
     {
       "output": "baseline/fit",
@@ -87,4 +94,5 @@ was materialized at and its content identity (both empty if it never
 was), and `foreign_write` — the sha of a hand-edit's commit when one
 was detected, which the prose `why` cannot carry for a machine
 consumer. For a containerized project, `image` is
-`{"tag": ..., "state": "present" | "absent" | "unfetched"}`.
+an object with `tag`, `archive`, and a `state` of `present`, `absent`, or
+`unfetched`.
