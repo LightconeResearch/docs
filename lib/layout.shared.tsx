@@ -1,6 +1,6 @@
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 import { Globe } from 'lucide-react';
-import { appName, websiteUrl } from './shared';
+import { gitConfig, websiteUrl } from './shared';
 
 export function baseOptions(): BaseLayoutProps {
   return {
@@ -8,10 +8,11 @@ export function baseOptions(): BaseLayoutProps {
       title: (
         <>
           <img src="/img/logo-mark-gold.svg" alt="" className="h-6 w-auto" />
-          <span className="text-[0.9375rem] font-normal text-ink">{appName}</span>
+          <span className="text-ink">Lightcone</span>
         </>
       ),
     },
     links: [{ text: 'lightconeresearch.org', url: websiteUrl, icon: <Globe /> }],
+    githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`,
   };
 }
