@@ -8,6 +8,7 @@
     "types:check": "next typegen && tsc --noEmit"
   },
   "dependencies": {
+    "@lightcone-research/brand": "^0.0.4",
     "cn": "^0.3.0",
     "fumadocs-core": "16.15.17",
     "fumadocs-mdx": "15.4.5",

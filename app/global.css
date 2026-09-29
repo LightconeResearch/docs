@@ -1,6 +1,43 @@
 @import 'tailwindcss';
-@import 'fumadocs-ui/css/neutral.css';
+@import './lightcone.css';
 @import 'fumadocs-ui/css/preset.css';
+@import 'fumadocs-ui/css/generated/glass.css';
+
+@theme {
+  --font-sans: var(--lc-font-ui);
+  --font-mono: var(--lc-font-mono);
+}
+
+/* Brand typography: Alegreya, in its small capitals, for the interface;
+   Newsreader for the documentation's text; Quattrocento for titles and
+   headings; the brand's monospace stack for code. */
+@layer base {
+  html {
+    font-variant-caps: small-caps;
+  }
+
+  .prose {
+    font-family: var(--lc-font-body);
+    font-variant-caps: normal;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--lc-font-heading);
+    font-variant-caps: normal;
+  }
+
+  code,
+  kbd,
+  samp,
+  pre {
+    font-variant-caps: normal;
+  }
+}
 
 html {
   scrollbar-gutter: stable;

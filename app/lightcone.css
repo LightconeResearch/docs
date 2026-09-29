@@ -1,0 +1,46 @@
+/*
+ * Lightcone colour preset for Fumadocs.
+ *
+ * Built like Fumadocs' own presets (e.g. fumadocs-ui/css/neutral.css): the
+ * default colours, with every role overridden. Each role points at a semantic
+ * role from @lightcone-research/brand, which already switches with the `dark`
+ * class Fumadocs' theme provider toggles, so one mapping covers both schemes.
+ * The root layout opts <html> into `.lightcone-brand`.
+ */
+@import 'fumadocs-ui/css/lib/default-colors.css';
+@import '@lightcone-research/brand/themes.css';
+
+/* Same specificity as the default `.dark` block and declared after it, so this
+   mapping applies in both schemes. */
+.lightcone-brand {
+  /* White pages, with the brand's parchment for the sidebar, panels and
+     popovers (Docs and Notebook sidebars use the card colour, Glass the
+     popover colour). */
+  --color-fd-background: var(--lc-color-surface);
+  --color-fd-foreground: var(--lc-color-text);
+  --color-fd-muted: var(--lc-color-surface-muted);
+  --color-fd-muted-foreground: var(--lc-color-text-subtle);
+  --color-fd-popover: var(--lc-color-canvas);
+  --color-fd-popover-foreground: var(--lc-color-text);
+  --color-fd-card: var(--lc-color-canvas);
+  --color-fd-card-foreground: var(--lc-color-text);
+  --color-fd-border: var(--lc-color-border);
+  --color-fd-primary: var(--lc-color-accent);
+  --color-fd-primary-foreground: var(--lc-color-accent-contrast);
+  --color-fd-secondary: var(--lc-color-surface-muted);
+  --color-fd-secondary-foreground: var(--lc-color-text);
+  --color-fd-accent: var(--lc-color-mushroom-cap-soft);
+  --color-fd-accent-foreground: var(--lc-color-text);
+  --color-fd-ring: var(--lc-color-focus);
+
+  /* Callouts and diffs use the brand's named colours. */
+  --color-fd-info: var(--lc-color-slate-blue);
+  --color-fd-warning: var(--lc-color-antique-gold);
+  --color-fd-error: var(--lc-color-wax-red);
+  --color-fd-success: var(--lc-color-vert-de-gris);
+  --color-fd-idea: var(--lc-color-mushroom-cap);
+  --color-fd-diff-add: var(--lc-color-vert-de-gris-soft);
+  --color-fd-diff-add-symbol: var(--lc-color-vert-de-gris);
+  --color-fd-diff-remove: var(--lc-color-wax-red-soft);
+  --color-fd-diff-remove-symbol: var(--lc-color-wax-red);
+}
