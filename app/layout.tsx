@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { IBM_Plex_Mono } from 'next/font/google';
 import { Provider } from '@/components/provider';
-import { SiteFooter } from '@/components/site-footer';
 import './global.css';
 
 export const metadata: Metadata = {
@@ -25,10 +24,7 @@ export default function Layout({ children }: LayoutProps<'/'>) {
       suppressHydrationWarning
     >
       <body className="flex flex-col min-h-screen">
-        <Provider>
-          {children}
-          <SiteFooter />
-        </Provider>
+        <Provider>{children}</Provider>
       </body>
     </html>
   );

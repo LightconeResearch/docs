@@ -24,15 +24,6 @@
   --radius-2xl: 0.45rem;
 }
 
-/* The website's small-caps editorial label: eyebrows, group labels. */
-@utility label-caps {
-  font-family: var(--font-sans);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-
 html {
   scrollbar-gutter: stable;
 }
