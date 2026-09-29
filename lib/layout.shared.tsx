@@ -8,7 +8,7 @@ export function baseOptions(): BaseLayoutProps {
       title: (
         <>
           <img src="/img/logo-mark-gold.svg" alt="" className="h-6 w-auto" />
-          <span className="font-heading text-[0.9375rem] font-normal text-ink">{appName}</span>
+          <span className="text-[0.9375rem] font-normal text-ink">{appName}</span>
         </>
       ),
     },
