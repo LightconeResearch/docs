@@ -18,23 +18,19 @@
      popover colour). */
   --color-fd-background: var(--lc-color-surface);
   --color-fd-foreground: var(--lc-color-text);
+  --color-fd-muted: var(--lc-color-surface-muted);
   --color-fd-muted-foreground: var(--lc-color-text-subtle);
   --color-fd-popover: var(--lc-color-canvas);
   --color-fd-popover-foreground: var(--lc-color-text);
   --color-fd-card: var(--lc-color-canvas);
   --color-fd-card-foreground: var(--lc-color-text);
-  /* Fumadocs keeps card, muted and secondary within a few percent of each
-     other (table headers, tab bodies and buttons sit on them). The brand's
-     muted surface is a full step away, and lighter than the page in dark
-     mode, so these panels share the card's parchment instead. */
-  --color-fd-muted: var(--lc-color-canvas);
-  --color-fd-secondary: var(--lc-color-canvas);
-  --color-fd-secondary-foreground: var(--lc-color-text);
   --color-fd-border: var(--lc-color-border);
   /* Antique Gold marks interaction, as on lightconeresearch.org: the active
      page, link underlines. The strong tone keeps it readable as text. */
   --color-fd-primary: var(--lc-color-antique-gold-strong);
   --color-fd-primary-foreground: var(--lc-color-accent-contrast);
+  --color-fd-secondary: var(--lc-color-surface-muted);
+  --color-fd-secondary-foreground: var(--lc-color-text);
   --color-fd-accent: var(--lc-color-mushroom-cap-soft);
   --color-fd-accent-foreground: var(--lc-color-text);
   --color-fd-ring: var(--lc-color-focus);
