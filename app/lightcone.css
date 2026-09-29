@@ -14,13 +14,16 @@
 /* Same specificity as the default `.dark` block and declared after it, so this
    mapping applies in both schemes. */
 .lightcone-brand {
-  --color-fd-background: var(--lc-color-canvas);
+  /* White pages, with the brand's parchment for the sidebar, panels and
+     popovers (Docs and Notebook sidebars use the card colour, Glass the
+     popover colour). */
+  --color-fd-background: var(--lc-color-surface);
   --color-fd-foreground: var(--lc-color-text);
   --color-fd-muted: var(--lc-color-surface-muted);
   --color-fd-muted-foreground: var(--lc-color-text-subtle);
-  --color-fd-popover: var(--lc-color-surface-raised);
+  --color-fd-popover: var(--lc-color-canvas);
   --color-fd-popover-foreground: var(--lc-color-text);
-  --color-fd-card: var(--lc-color-surface);
+  --color-fd-card: var(--lc-color-canvas);
   --color-fd-card-foreground: var(--lc-color-text);
   --color-fd-border: var(--lc-color-border);
   --color-fd-primary: var(--lc-color-accent);
