@@ -5,10 +5,10 @@
 
 @theme {
   /* Brand typography: Alegreya for everything but the documentation's body
-     text, which is set in Newsreader. The brand names IBM Plex Mono for code
-     without bundling it, so the root layout loads it. */
+     text, which is set in Newsreader (see the font utilities below). The
+     brand names IBM Plex Mono for code without bundling it, so the root
+     layout loads it. */
   --font-sans: var(--lc-font-ui);
-  --font-body: var(--lc-font-body);
   --font-mono: var(--font-plex-mono), var(--lc-font-mono);
 
   /* The website's names for the brand colours, following the active scheme. */
@@ -22,6 +22,32 @@
   --radius-lg: 0.25rem;
   --radius-xl: 0.35rem;
   --radius-2xl: 0.45rem;
+}
+
+/* Alegreya is always set in its small capitals. The page inherits Alegreya
+   from the root, so the root carries the small caps; Newsreader and code
+   reset them. */
+@utility font-ui {
+  font-family: var(--lc-font-ui);
+  font-variant-caps: small-caps;
+}
+
+@utility font-body {
+  font-family: var(--lc-font-body);
+  font-variant-caps: normal;
+}
+
+@layer base {
+  html {
+    font-variant-caps: small-caps;
+  }
+
+  code,
+  kbd,
+  samp,
+  pre {
+    font-variant-caps: normal;
+  }
 }
 
 html {

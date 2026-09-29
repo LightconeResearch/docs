@@ -36,7 +36,7 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
       </div>
       {/* Body text in Newsreader, with headings kept in the interface face, and the
           website's link style: slate text on an antique-gold underline. */}
-      <DocsBody className="font-body prose-headings:font-sans [--tw-prose-links:var(--color-slate)] prose-a:decoration-gold/50">
+      <DocsBody className="font-body prose-headings:font-ui [--tw-prose-links:var(--color-slate)] prose-a:decoration-gold/50">
         <MDX
           components={getMDXComponents({
             // this allows you to link to other pages with relative file paths
