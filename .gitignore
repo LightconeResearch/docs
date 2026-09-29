@@ -1,7 +1,0 @@
-# Built site
-/site
-
-# Environment
-.venv/
-__pycache__/
-.cache/
