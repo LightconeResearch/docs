@@ -38,12 +38,15 @@
 /* The documentation's text. The typography plugin colours it through its
    --tw-prose-* variables, declared on .prose in the utilities layer, so this
    rule stays outside the base layer to replace them: gold headings, and the
-   website's slate links (their underline takes the gold primary colour). */
+   website's slate links. Link underlines take the primary colour, which
+   within the text is plain Antique Gold rather than the stronger tone the
+   interface uses for gold text. */
 .prose {
   font-family: var(--lc-font-body);
   font-variant-caps: normal;
   --tw-prose-headings: var(--lc-color-antique-gold);
   --tw-prose-links: var(--lc-color-slate-blue);
+  --color-fd-primary: var(--lc-color-antique-gold);
 }
 
 html {
