@@ -3,12 +3,11 @@
 @import 'fumadocs-ui/css/preset.css';
 
 @theme {
-  /* Brand typography: Alegreya for the interface, Newsreader for prose,
-     Quattrocento for headings. The brand names IBM Plex Mono for code
+  /* Brand typography: Alegreya for everything but the documentation's body
+     text, which is set in Newsreader. The brand names IBM Plex Mono for code
      without bundling it, so the root layout loads it. */
   --font-sans: var(--lc-font-ui);
   --font-body: var(--lc-font-body);
-  --font-heading: var(--lc-font-heading);
   --font-mono: var(--font-plex-mono), var(--lc-font-mono);
 
   /* The website's names for the brand colours, following the active scheme. */

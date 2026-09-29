@@ -62,7 +62,7 @@ export function SiteFooter() {
       <div className="mx-auto grid max-w-[1600px] grid-cols-1 items-start gap-10 px-10 pt-8 pb-6 md:grid-cols-[minmax(0,1.25fr)_minmax(0,2fr)] md:gap-[clamp(2.5rem,6vw,5rem)] md:pt-12">
         <div>
           <div className="mb-5" aria-label="Institutional supporters">
-            <p className="mb-4 font-body text-[1.0625rem] leading-[1.55] text-fd-foreground/85">
+            <p className="mb-4 text-[1.0625rem] leading-[1.55] text-fd-foreground/85">
               An open-source initiative from{' '}
               <strong className="font-semibold text-fd-foreground">UC Berkeley</strong> and{' '}
               <strong className="font-semibold text-fd-foreground">CNRS</strong>, with support

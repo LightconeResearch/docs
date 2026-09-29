@@ -23,10 +23,10 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
 
   return (
     <DocsPage toc={page.data.toc} full={page.data.full}>
-      <DocsTitle className="font-heading font-normal text-ink">
+      <DocsTitle className="font-normal text-ink">
         {page.data.title}
       </DocsTitle>
-      <DocsDescription className="mb-0 font-body text-lg">{page.data.description}</DocsDescription>
+      <DocsDescription className="mb-0 text-lg">{page.data.description}</DocsDescription>
       <div className="flex flex-row gap-2 items-center border-b pb-6">
         <MarkdownCopyButton markdownUrl={markdownUrl} />
         <ViewOptionsPopover
@@ -34,9 +34,9 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
           githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/content/docs/${page.path}`}
         />
       </div>
-      {/* Prose in Newsreader with Quattrocento headings, and the website's
-          link style: slate text on an antique-gold underline. */}
-      <DocsBody className="font-body prose-headings:font-heading [--tw-prose-links:var(--color-slate)] prose-a:decoration-gold/50">
+      {/* Body text in Newsreader, with headings kept in the interface face, and the
+          website's link style: slate text on an antique-gold underline. */}
+      <DocsBody className="font-body prose-headings:font-sans [--tw-prose-links:var(--color-slate)] prose-a:decoration-gold/50">
         <MDX
           components={getMDXComponents({
             // this allows you to link to other pages with relative file paths
