@@ -1,7 +1,6 @@
 @import 'tailwindcss';
 @import './lightcone.css';
 @import 'fumadocs-ui/css/preset.css';
-@import 'fumadocs-ui/css/generated/glass.css';
 
 @theme {
   /* Brand typography: Alegreya for the interface, Newsreader for prose,
