@@ -5,13 +5,12 @@
 
 @theme {
   --font-sans: var(--lc-font-ui);
-  --font-mono: var(--font-plex-mono), var(--lc-font-mono);
+  --font-mono: var(--lc-font-mono);
 }
 
 /* Brand typography: Alegreya, in its small capitals, for the interface;
    Newsreader for the documentation's text; Quattrocento for titles and
-   headings. Code is set in IBM Plex Mono, which the brand names but does not
-   bundle, so the root layout loads it. */
+   headings; the brand's monospace stack for code. */
 @layer base {
   html {
     font-variant-caps: small-caps;
