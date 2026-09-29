@@ -1,6 +1,38 @@
 @import 'tailwindcss';
-@import 'fumadocs-ui/css/neutral.css';
+@import './lightcone.css';
 @import 'fumadocs-ui/css/preset.css';
+@import 'fumadocs-ui/css/generated/glass.css';
+
+@theme {
+  /* Brand typography: Alegreya for the interface, Newsreader for prose,
+     Quattrocento for headings. The brand names IBM Plex Mono for code
+     without bundling it, so the root layout loads it. */
+  --font-sans: var(--lc-font-ui);
+  --font-body: var(--lc-font-body);
+  --font-heading: var(--lc-font-heading);
+  --font-mono: var(--font-plex-mono), var(--lc-font-mono);
+
+  /* The website's names for the brand colours, following the active scheme. */
+  --color-gold: var(--lc-color-antique-gold);
+  --color-ink: var(--lc-color-blue-ink);
+  --color-slate: var(--lc-color-slate-blue);
+
+  /* The website's corner radii: slight rounding rather than pills. */
+  --radius-sm: 0.15rem;
+  --radius-md: 0.2rem;
+  --radius-lg: 0.25rem;
+  --radius-xl: 0.35rem;
+  --radius-2xl: 0.45rem;
+}
+
+/* The website's small-caps editorial label: eyebrows, group labels. */
+@utility label-caps {
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
 
 html {
   scrollbar-gutter: stable;

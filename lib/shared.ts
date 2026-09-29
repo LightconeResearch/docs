@@ -1,6 +1,7 @@
 import { createGetUrl } from 'fumadocs-core/source';
 
 export const appName = 'Lightcone Research Stack';
+export const websiteUrl = 'https://lightconeresearch.org';
 export const docsRoute = '/docs';
 export const docsImageRoute = '/og/docs';
 export const docsContentRoute = '/llms.mdx/docs';

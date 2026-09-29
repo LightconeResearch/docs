@@ -6,7 +6,7 @@ import {
   DocsTitle,
   MarkdownCopyButton,
   ViewOptionsPopover,
-} from 'fumadocs-ui/layouts/docs/page';
+} from 'fumadocs-ui/layouts/glass/page';
 import { notFound } from 'next/navigation';
 import { getMDXComponents } from '@/components/mdx';
 import type { Metadata } from 'next';
@@ -23,8 +23,10 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
 
   return (
     <DocsPage toc={page.data.toc} full={page.data.full}>
-      <DocsTitle>{page.data.title}</DocsTitle>
-      <DocsDescription className="mb-0">{page.data.description}</DocsDescription>
+      <DocsTitle className="font-heading font-normal text-ink">
+        {page.data.title}
+      </DocsTitle>
+      <DocsDescription className="mb-0 font-body text-lg">{page.data.description}</DocsDescription>
       <div className="flex flex-row gap-2 items-center border-b pb-6">
         <MarkdownCopyButton markdownUrl={markdownUrl} />
         <ViewOptionsPopover
@@ -32,7 +34,9 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
           githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/content/docs/${page.path}`}
         />
       </div>
-      <DocsBody>
+      {/* Prose in Newsreader with Quattrocento headings, and the website's
+          link style: slate text on an antique-gold underline. */}
+      <DocsBody className="font-body prose-headings:font-heading [--tw-prose-links:var(--color-slate)] prose-a:decoration-gold/50">
         <MDX
           components={getMDXComponents({
             // this allows you to link to other pages with relative file paths

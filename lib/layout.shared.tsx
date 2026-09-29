@@ -1,12 +1,17 @@
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
-import { appName, gitConfig } from './shared';
+import { Globe } from 'lucide-react';
+import { appName, websiteUrl } from './shared';
 
 export function baseOptions(): BaseLayoutProps {
   return {
     nav: {
-      // JSX supported
-      title: appName,
+      title: (
+        <>
+          <img src="/img/logo-mark-gold.svg" alt="" className="h-6 w-auto" />
+          <span className="font-heading text-[0.9375rem] font-normal text-ink">{appName}</span>
+        </>
+      ),
     },
-    githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`,
+    links: [{ text: 'lightconeresearch.org', url: websiteUrl, icon: <Globe /> }],
   };
 }

@@ -1,13 +1,68 @@
 ---
 title: Components
-description: Components
+description: A sample of the elements documentation pages are built from.
 ---
+
+Running prose sets the tone of every page. It carries [inline links](https://lightconeresearch.org),
+`inline code`, **strong emphasis** and _italics_, so a long paragraph should read
+comfortably from the first line to the last, with a measure that never gets too wide.
+
+## Lists
+
+- Describe the analysis in an `astra.yaml` specification.
+- Validate it with the `astra` CLI.
+- Run it with `lc run`, which records provenance as it goes.
+
+1. Install the stack.
+2. Initialise a project.
+3. Materialise the outputs.
+
+## Callouts
+
+<Callout>A note, for context the reader may want.</Callout>
+
+<Callout type="warn">A warning, for something that can go wrong.</Callout>
+
+<Callout type="error" title="Error">An error, for something that will go wrong.</Callout>
+
+<Callout type="success">A success, for confirming a result.</Callout>
 
 ## Code Block
 
-```js
-console.log('Hello World');
+```python title="analysis.py"
+from pathlib import Path
+
+def load(path: Path) -> list[str]:
+    """Read one record per line."""
+    return path.read_text().splitlines()
 ```
+
+```bash
+lc init my-analysis
+lc run --universe baseline
+```
+
+## Tabs
+
+```bash tab="uv"
+uv tool install lightcone-cli
+```
+
+```bash tab="pip"
+pip install lightcone-cli
+```
+
+## Table
+
+| Command | What it does |
+| --- | --- |
+| `lc init` | Scaffolds a project |
+| `lc run` | Executes the analysis |
+| `lc status` | Shows what is up to date |
+
+### A third-level heading
+
+Headings at every level use the brand's heading face.
 
 ## Cards
 
