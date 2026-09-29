@@ -24,6 +24,12 @@
   h6 {
     font-family: var(--lc-font-heading);
     font-variant-caps: normal;
+  }
+
+  /* The page title; headings in the documentation text take their gold from
+     .prose below, and Fumadocs' own headings (card titles, "On this page")
+     keep their colours. */
+  h1 {
     color: var(--lc-color-antique-gold);
   }
 
