@@ -17,10 +17,9 @@ export default function Layout({ children }: LayoutProps<'/'>) {
   return (
     <html
       lang="en"
-      // Opts the page into the Lightcone brand tokens; the provider keeps the
-      // scheme attribute in sync with the active theme.
+      // Opts the page into the Lightcone brand tokens, whose dark scheme
+      // follows the `dark` class the theme provider toggles.
       className={`lightcone-brand ${plexMono.variable}`}
-      data-lightcone-color-scheme="light"
       suppressHydrationWarning
     >
       <body className="flex flex-col min-h-screen">

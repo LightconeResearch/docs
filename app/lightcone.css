@@ -3,10 +3,9 @@
  *
  * Built like Fumadocs' own presets (e.g. fumadocs-ui/css/neutral.css): the
  * default colours, with every role overridden. Each role points at a semantic
- * role from @lightcone-research/brand, which already switches with the
- * `data-lightcone-color-scheme` attribute, so one mapping covers both schemes.
- * The root layout opts <html> into `.lightcone-brand`, and the theme provider
- * keeps the scheme attribute in sync with Fumadocs' `.dark` class.
+ * role from @lightcone-research/brand, which already switches with the `dark`
+ * class Fumadocs' theme provider toggles, so one mapping covers both schemes.
+ * The root layout opts <html> into `.lightcone-brand`.
  */
 @import 'fumadocs-ui/css/lib/default-colors.css';
 @import '@lightcone-research/brand/themes.css';
