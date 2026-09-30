@@ -7,7 +7,7 @@ export function baseOptions(): BaseLayoutProps {
       title: (
         <>
           <img src="/img/logo-mark-gold.svg" alt="" className="h-6 w-auto" />
-          <span>Lightcone</span>
+          <span>Lightcone Stack</span>
         </>
       ),
     },

@@ -25,7 +25,9 @@
   --color-fd-card: var(--lc-color-canvas);
   --color-fd-card-foreground: var(--lc-color-text);
   --color-fd-border: var(--lc-color-border);
-  --color-fd-primary: var(--lc-color-accent);
+  /* Antique Gold marks interaction, as on lightconeresearch.org: the active
+     page, link underlines. The strong tone keeps it readable as text. */
+  --color-fd-primary: var(--lc-color-antique-gold-strong);
   --color-fd-primary-foreground: var(--lc-color-accent-contrast);
   --color-fd-secondary: var(--lc-color-surface-muted);
   --color-fd-secondary-foreground: var(--lc-color-text);

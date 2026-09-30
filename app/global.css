@@ -9,16 +9,11 @@
 }
 
 /* Brand typography: Alegreya, in its small capitals, for the interface;
-   Newsreader for the documentation's text; Quattrocento for titles and
-   headings; the brand's monospace stack for code. */
+   Newsreader for the documentation's text; Quattrocento, in Antique Gold, for
+   titles and headings; the brand's monospace stack for code. */
 @layer base {
   html {
     font-variant-caps: small-caps;
-  }
-
-  .prose {
-    font-family: var(--lc-font-body);
-    font-variant-caps: normal;
   }
 
   h1,
@@ -31,12 +26,33 @@
     font-variant-caps: normal;
   }
 
+  /* The page title; headings in the documentation text take their gold from
+     .prose below, and Fumadocs' own headings (card titles, "On this page")
+     keep their colours. */
+  h1 {
+    color: var(--lc-color-antique-gold);
+  }
+
   code,
   kbd,
   samp,
   pre {
     font-variant-caps: normal;
   }
+}
+
+/* The documentation's text. The typography plugin colours it through its
+   --tw-prose-* variables, declared on .prose in the utilities layer, so this
+   rule stays outside the base layer to replace them: gold headings, and the
+   website's slate links. Link underlines take the primary colour, which
+   within the text is plain Antique Gold rather than the stronger tone the
+   interface uses for gold text. */
+.prose {
+  font-family: var(--lc-font-body);
+  font-variant-caps: normal;
+  --tw-prose-headings: var(--lc-color-antique-gold);
+  --tw-prose-links: var(--lc-color-slate-blue);
+  --color-fd-primary: var(--lc-color-antique-gold);
 }
 
 html {
