@@ -1,12 +1,11 @@
 ---
 title: lightcone.engine.image & container
-description: The container hatch, from a declared image to an archive in the repository and a runtime that enters it.
+description: Build, archive and run the image declared by a project.
 ---
 
-The container hatch, split down the pure/impure line. `image.py` is what a containerized project
-*declares* and how that becomes an identity: pure, no subprocess anywhere. `container.py` is
-building, storing and entering images: impure, every command through `project._run`. The exec side
-(the mount table) lives with the other backends in `sandbox/oci.py`.
+`image.py` validates an image declaration and computes its identity without subprocesses.
+`container.py` builds, stores and runs images through `project._run`. The runtime mount configuration
+lives in `sandbox/oci.py`.
 
 Sources: `src/lightcone/engine/image.py`, `src/lightcone/engine/container.py`,
 `src/lightcone/engine/sandbox/oci.py`.

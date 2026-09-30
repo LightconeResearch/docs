@@ -27,18 +27,18 @@ policy).
 
 ## What must stay true
 
-- **Nobody is ever asked to run a git-annex command.** `filter=annex` plus the `.gitattributes`
+- **Ordinary commits use git's annex filter.** `filter=annex` plus the `.gitattributes`
   policy make an ordinary `git add` do the right thing; `annex.largefiles=nothing` comes first and
   outputs and data opt out (last match wins), and
   `test_analysis_code_stays_in_git_and_stays_writable` pins it against a real annex.
-- **Manifests stay in git**, exempted back out of the annex, so a bytes-free clone can classify a
-  whole project.
+- **Manifests stay in git**, so a clone can read output provenance without fetching result
+  payloads. Declared input content is still needed to verify its hashes.
 - **An unfetched file exists, in two shapes**: an unlocked pointer file (readable, hashes to the
   wrong thing) and a locked dangling symlink (drops out of naive walks silently).
   `assets.data_version` refuses both with `ContentNotFetchedError`; detection handles both regardless
   of which shape lc writes, because `annex.thin` and `git annex lock` are the researcher's to set.
 - **Thin is per-add and only where lc writes.** Thin's hazard is an in-place write rewriting the
-  annex object under its own key; lc always resets output directories rather than writing in place,
+  annex object under its own key; lc removes the output's own files before writing,
   but `data/` is the researcher's, and their tools (`h5py`, astropy `mode='update'`) do open files
   for update, so the flag never reaches repository config.
 - **`restore` is asymmetric on purpose:** a first materialization has no HEAD version to go back to,
@@ -56,6 +56,5 @@ policy).
 
 ## Tests
 
-`tests/test_dataset.py`, deliberately against **real tools** (`real_tools` fixture): whether bytes
-land in the annex or as a blob in git is not a question a stub can answer, and every bug this seam
-has had was invisible to one.
+`tests/test_dataset.py` uses the `real_tools` fixture to check whether file content is stored in
+the annex or as a git blob.

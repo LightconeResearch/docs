@@ -4,25 +4,16 @@ description: Install Lightcone Lab, open a project and find your way around the 
 icon: Rocket
 ---
 
-This page takes you from installing Lightcone Lab to working on a project with an agent. Each step
-links to the page that covers it in detail.
+Open an ASTRA project in JupyterLab, inspect its outputs and start an agent.
 
 <Steps>
 <Step>
 
 ### Install the extension
 
-Lab installs into the environment that runs JupyterLab 4.5.10 or newer. For the browser-only
-workbench:
-
-```bash
-pip install jupyterlab-lightcone
-```
-
-It creates projects with the Lightcone CLI, so it also needs `lc` on the terminal's `PATH`; see the
-stack's [Installation](/installation#3-the-lightcone-cli). For the features that run on the Jupyter
-server (freshness, provenance, comments, the report preview and Jupyter AI sessions), install
-`jupyterlab-lightcone[full]` instead. [Installation](/lightcone-lab/installation) compares the two.
+Follow [Installation](/lightcone-lab/installation) to choose the workbench-only or full
+installation. Both need JupyterLab 4.5.10 or newer, below 5. Install the extension in the
+environment used by JupyterLab, then restart the server.
 
 </Step>
 <Step>

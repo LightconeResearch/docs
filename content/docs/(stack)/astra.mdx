@@ -1,36 +1,72 @@
 ---
 title: ASTRA
-description: The open specification every Lightcone project is written in.
+description: A research record that connects claims to evidence, methods and the work that follows.
 icon: ScrollText
 ---
 
-ASTRA, the Agentic Schema for Transparent Research Analysis, is an open specification for describing
-a research analysis in a YAML file, `astra.yaml`. Code captures how an analysis runs, but not its
-structure: `astra.yaml` records its inputs, outputs, methodological choices and evidence, so that the
-work is easier to review, reproduce and extend.
+ASTRA stands for **Agentic Schema for Transparent Research Analysis**. It is an open specification
+for recording a research analysis in `astra.yaml`: what you want to learn, which data and methods
+you use, what you produce, and which evidence supports your conclusions.
 
-ASTRA doesn't depend on any tool: agents, workflow runners and people can all read the same file.
-It has its own documentation, schema and releases at [astra-spec.org](https://astra-spec.org/latest/);
-this page covers what you need to know to use it with the Lightcone Stack.
+The aim is to let someone build on a result without having to reconstruct the reasoning behind it.
+A reader should be able to follow a claim to its supporting output, inspect the choices that shaped
+that output, and find the earlier work that informed those choices. The same record should be
+readable by a scientist and by an agent helping with the next analysis.
 
 ## What an analysis records
 
-| Element        | What you record                                                          |
-| -------------- | ------------------------------------------------------------------------ |
-| Inputs         | The datasets, files and upstream analyses you use                        |
-| Outputs        | The metrics, figures, tables and other artifacts you intend to produce   |
-| Recipes        | The command that produces each output from its declared inputs and choices |
-| Decisions      | Methodological choices, their alternatives, and the reasons for them     |
-| Universes      | A selection of one option per decision, to run together                  |
-| Prior insights | Existing knowledge, with its evidence, that informs the approach         |
-| Findings       | Claims supported by the analysis's outputs                               |
+| Element | What you record |
+| --- | --- |
+| Inputs | Datasets, files and references to other analyses |
+| Outputs | The metrics, figures, tables and other artifacts the analysis produces |
+| Recipes | Commands that produce outputs from declared inputs and decisions |
+| Decisions | Methodological choices, their options and the reasons for considering them |
+| Universes | Selections of decision options to evaluate together |
+| Prior insights | Existing claims and evidence that inform the analysis |
+| Findings | Claims made by this analysis, with supporting evidence |
+
+ASTRA describes the work independently of the software that executes or displays it. In the
+Lightcone Stack, the [CLI](/lightcone-cli) runs recipes, [Agent Skills](/agent-skills) help write the
+record, and [Lightcone Lab](/lightcone-lab) displays it. The schema and full reference live at
+[astra-spec.org](https://astra-spec.org/latest/).
+
+## How claims chain together
+
+Consider a measurement of the baryon acoustic oscillation (BAO) distance scale. Earlier studies
+inform a choice of reconstruction method or damping prior. That choice affects a fit, which
+produces a distance table. A finding interprets the table. A later analysis may use those distances
+to constrain a cosmological model.
+
+The connections have different meanings:
+
+1. A **prior insight** records a claim from earlier work and points to its evidence, such as a
+   passage in a paper.
+2. A **decision option** can name the insights that support choosing it.
+3. An **output** declares the inputs and decisions its recipe uses.
+4. A **finding** states what you conclude and points to the output that supports it.
+5. In subsequent work, that conclusion can inform a new decision, or its result file can become
+   an input to another analysis.
+
+Prior insights and findings share the same claim-and-evidence structure. Their placement tells you
+whether the knowledge is being brought into the analysis or reported as a result. Reusing a finding
+still requires checking its scope: a method that worked for one dataset may not suit another.
+
+ASTRA supports nested analyses and inputs that refer to separate ASTRA records. Those are building
+blocks for connecting research across projects and publications. The broader vision from the
+Pittsburgh talk is a paper whose claims open into this record, with links continuing into the work
+it uses and the work that uses it.
+
+<Callout title="What is available today">
+ASTRA can describe these relationships, and MySTRA can render references to them. The Lightcone CLI
+currently executes flat analyses; nested analyses are not yet runnable with `lc`. A browsable network
+across publications is a longer-term goal. ASTRA also does not yet record which individual input
+produced a particular table cell: the dependency record belongs to the output as a whole.
+</Callout>
 
 ## Decisions and universes
 
-Results depend on choices: which data to include, how to treat outliers, which prior to assume. In
-ordinary research code those choices are scattered across scripts, notebooks and memory. ASTRA gives
-each one an explicit place: a **decision** names the options that were considered and why one might
-choose each.
+A decision makes a choice explicit. For example, fitting a relation with ordinary least squares or
+a robust method may change how outliers influence the result:
 
 ```yaml title="astra.yaml (excerpt)"
 outputs:
@@ -50,7 +86,7 @@ outputs:
 decisions:
   fit_method:
     label: Fitting method
-    rationale: The fitting method determines how outliers influence the inferred relation.
+    rationale: Compare the sensitivity of the fit to outliers.
     default: ordinary_least_squares
     options:
       ordinary_least_squares:
@@ -59,66 +95,99 @@ decisions:
         label: Robust linear fit
 ```
 
-Picking one option per decision gives a **universe**, a single runnable configuration. A universe is
-just a small YAML file:
+A **universe** selects an option for each decision. Its name identifies one configuration of the
+analysis; it does not refer to a physical universe.
 
 ```yaml title="universes/baseline.yaml"
 id: baseline
-description: Default configuration for the period-luminosity fit.
-
+description: Ordinary least-squares fit.
 decisions:
   fit_method: ordinary_least_squares
 ```
 
-The set of all universes is the analysis's **multiverse**. Running several of them shows whether a
-result holds when you change a method, a model or a prior.
+Together, the configurations you explore form a **multiverse**. Comparing them helps you assess
+how a conclusion depends on the choices you made. You decide which alternatives are worth testing;
+declaring options does not mean the CLI runs every possible combination.
 
-## Evidence
+## Evidence and its limits [#evidence]
 
-Knowledge comes into an analysis as **prior insights** and goes out as **findings**. Both carry
-their evidence: for a published result, the paper's identifier and the exact quote it rests on.
-ASTRA's tools fetch the paper and check that the quote is really there, so a citation can't be
-invented.
+Evidence can refer to a paper by DOI or to an output of the analysis. For a paper, an exact quote
+and a page location help a reader check the passage supporting the claim. Decision options can
+then refer to the relevant prior insights by ID.
 
-## How the stack uses it
+`astra validate --verify-evidence` checks quoted text against cached source PDFs. A successful match
+means the text was found; you still need to judge whether the passage supports the claim and whether
+it applies to your analysis. Artifact-backed evidence is currently reported as skipped because
+artifact quote verification is not implemented.
 
-- **[Agent Skills](/agent-skills)**: the `astra` skill teaches your agent the format, so it writes and
-  revises `astra.yaml` with you. A hook validates the file each time the agent saves it.
-- **[Lightcone CLI](/lightcone-cli)**: `lc` executes the recipes. Each output that `lc` runs needs a
-  `format`, a `recipe`, and its `inputs` and `decisions` declared; its file lands at
-  `results/<universe>/<output>.<format>`, next to a manifest that records how it was made.
-- **[MySTRA](/mystra)**: the report refers to outputs, decisions and values by their path in
-  `astra.yaml`, rather than copying them.
-- **[Lightcone Lab](/lightcone-lab)**: the workbench shows the analysis as an inventory and a
-  pipeline.
+## Where MyST and MySTRA fit
 
-Keep the `version:` field that `lc init` writes: it is the version of the ASTRA schema, separate from
-the version of any tool.
+[MyST](https://mystmd.org/) is a document engine for scientific writing, with Markdown, equations,
+citations, cross-references and publication formats. You write the argument in MyST and choose what
+the reader sees. [MySTRA](/mystra) is the plugin that brings ASTRA records and result files into that
+document.
+
+For an analysis with a `fit_method` decision, a `fit_params` table and a `fit_plot` figure,
+the report can name the selected method, read the slope and embed the plot:
+
+```markdown title="Report excerpt"
+With {astra:value}`decisions.fit_method`, the fitted slope is
+{astra:value col=slope sig=3}`outputs.fit_params`.
+
+:::{astra} outputs.fit_plot
+:::
+```
+
+These paths refer to records in the analysis. MySTRA resolves them when MyST renders the page.
+After changing the analysis or its results, rebuild the report to update the references. During a
+preview, re-save a Markdown page or restart `myst start` to trigger a render; changes to
+`astra.yaml` alone are not watched. The prose still needs review when results change.
+
+### Explore a paper
+
+This is the DESI DR1 BAO reproduction shown in the Pittsburgh slides. Open a decision or an output
+in the article to see how the narrative connects to its analysis record. The interactive inspection
+comes from the viewer and its theme; MySTRA also works with ordinary MyST themes.
+
+<figure className="not-prose my-6 overflow-hidden rounded-xl border border-fd-border">
+  <iframe
+    src="https://www.mystviewer.org/eiffl/myst_proto"
+    title="DESI DR1 BAO reproduction: an interactive MyST paper with ASTRA references"
+    loading="lazy"
+    referrerPolicy="strict-origin-when-cross-origin"
+    className="block h-[640px] w-full border-0 bg-white sm:h-[760px]"
+  />
+  <figcaption className="flex flex-wrap gap-x-4 gap-y-1 border-t border-fd-border bg-fd-muted px-4 py-3 text-sm">
+    <a href="https://www.mystviewer.org/eiffl/myst_proto" target="_blank" rel="noreferrer noopener" className="underline underline-offset-4">
+      Open the paper in a full window
+    </a>
+    <a href="https://github.com/eiffl/myst_proto" target="_blank" rel="noreferrer noopener" className="underline underline-offset-4">
+      Browse its source
+    </a>
+  </figcaption>
+</figure>
+
+The preview loads from mystviewer.org and needs an internet connection. See
+[MySTRA getting started](/mystra/getting-started) to write a report for your own project.
 
 ## The `astra` command
 
-[astra-tools](https://github.com/LightconeResearch/astra-tools) provides the `astra` command, which
-validates and inspects a specification. You don't need to install it: `uvx` fetches it on first use.
-Run it from your project directory, with the version the current Lightcone CLI expects:
+[astra-tools](https://github.com/LightconeResearch/astra-tools) provides validation and inspection
+commands. Run these from the project directory with the version used by the current Lightcone CLI:
 
 ```bash
 uvx astra-tools@0.2.18 validate
 uvx astra-tools@0.2.18 info
 ```
 
-With no file name, `validate` checks the project's specification and universe files. Add
-`--verify-evidence` to check quotes against their sources:
+With no filename, `validate` checks the project's specifications and universe files. To check
+literature quotes, cache the cited papers with `astra paper add` first, then run:
 
 ```bash
 uvx astra-tools@0.2.18 validate astra.yaml --verify-evidence
 ```
 
-The agent plugin runs the same command with its own pinned version, so you only need it to check
-things yourself.
-
-## Learn more
-
-- [Getting started with ASTRA](https://astra-spec.org/latest/getting-started/): the format on its
-  own, without Lightcone.
-- [Specification reference](https://astra-spec.org/latest/specification/): every element and field.
-- [CLI reference](https://astra-spec.org/latest/cli/): validation, universes, and paper tools.
+Keep the `version:` field written by `lc init`: it identifies the ASTRA schema, separately from the
+tool versions. The [ASTRA CLI reference](https://astra-spec.org/latest/cli/) covers paper caching,
+validation and universe generation; the [astra plugin](/agent-skills/astra) describes how an agent
+uses those commands.

@@ -5,8 +5,8 @@ icon: Wrench
 ---
 
 You need two things on your machine, [uv](https://docs.astral.sh/uv/) and git, plus a coding agent:
-Claude Code or Codex, in the terminal or as a desktop app. Everything else, Python included, is
-installed by uv or ships with the Lightcone CLI.
+Claude Code or Codex. uv can install Python and the CLI's dependencies. Report previews and
+JupyterLab have additional requirements, linked below.
 
 <Callout title="Supported platforms">
   Linux (glibc 2.34 or newer, x86_64 or aarch64) and macOS (14 or newer on Apple silicon, 15 or newer
@@ -22,8 +22,8 @@ separate Python to install:
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-git comes with macOS; on Linux, install it with your package manager (`apt install git`,
-`dnf install git`, and so on).
+Check for git with `git --version`. On macOS, install the Xcode Command Line Tools if needed;
+on Linux, use your package manager.
 
 <Callout title="On an HPC system">
   uv installs into your home directory, so the same command works on clusters that don't provide it,
@@ -62,50 +62,12 @@ data and results of your projects.
 
 ## 4. The agent plugin
 
-The [Agent Skills](/agent-skills) are distributed as a plugin marketplace, registered under the name
-`lightcone-research`. Add the marketplace, then the `lightcone` plugin. It includes the `astra` plugin,
-so don't install that one alongside it.
+Follow [Agent Skills installation](/agent-skills/installation) to add the
+`LightconeResearch/agent-skills` marketplace and install the `lightcone` plugin for your agent.
+It includes ASTRA support.
 
-<Tabs groupId="agent" persist items={['Claude Code', 'Codex', 'Claude app', 'Codex app']}>
-<Tab value="Claude Code">
-
-```bash
-claude plugin marketplace add LightconeResearch/agent-skills
-claude plugin install lightcone@lightcone-research
-```
-
-In a session, call the skill with `/lightcone:lightcone`, or just describe what you want to do.
-
-</Tab>
-<Tab value="Codex">
-
-```bash
-codex plugin marketplace add LightconeResearch/agent-skills
-codex plugin add lightcone@lightcone-research
-```
-
-In a session, call the skill with `$lightcone:lightcone`, or just describe what you want to do.
-
-</Tab>
-<Tab value="Claude app">
-
-Open **Customize → Plugins → Add → Add marketplace → Add from repo** and paste
-`https://github.com/LightconeResearch/agent-skills`. Then, in **Customize → Plugins**, choose
-**lightcone** from the `lightcone-research` marketplace.
-
-</Tab>
-<Tab value="Codex app">
-
-Open **Plugins** from the arrow beside **Create** and add the `LightconeResearch/agent-skills`
-marketplace. Then search for **lightcone** and install it.
-
-</Tab>
-</Tabs>
-
-When a session starts, the plugin checks that `lc` is installed at a version it supports. If it
-isn't, your agent offers to run the install command from step 3; in an interactive session, it never
-installs anything without asking. The plugin runs ASTRA's own `astra` command through `uvx`, which fetches it on first
-use.
+The plugin checks the CLI version at session start. Once both are installed, continue with
+[Start an analysis](/#start-an-analysis).
 
 ## Optional extras
 
@@ -119,24 +81,13 @@ runtime it finds.
 ### Report preview
 
 Each project comes with a MyST report. Previewing it needs [Node.js](https://nodejs.org/) 20 or newer
-and [MyST](https://mystmd.org/); your agent asks before installing them.
+and the MyST CLI. See [MySTRA prerequisites](/mystra/getting-started#prerequisites).
 
 ### Lightcone Lab
 
-[Lightcone Lab](/lightcone-lab) is a JupyterLab extension, installed into the environment that runs
-JupyterLab 4.5.10 or newer. It comes in two forms:
-
-```bash tab="Browser only"
-pip install --user jupyterlab-lightcone
-```
-
-```bash tab="With server features"
-pip install "jupyterlab-lightcone[full]"
-```
-
-The browser-only form needs `lc` on the terminal's `PATH`. The full form also installs the Lightcone
-CLI and the tools the workbench runs on the server, and needs git and uv on the server's `PATH`. See
-the [Lightcone Lab](/lightcone-lab) section for its agents and other requirements.
+Follow [Lightcone Lab installation](/lightcone-lab/installation) to choose a browser-only
+workbench or the full installation with server features. Install it in the environment used by
+your JupyterLab server.
 
 ## Updating
 
@@ -146,9 +97,9 @@ Install the new version by name; it replaces the one you have:
 uv tool install lightcone-cli==<version>
 ```
 
-`uv tool upgrade` doesn't move to a pre-release, so name the version while the release is one. An
-update never invalidates your results: the CLI's version is recorded with every output, but it
-doesn't decide whether an output is up to date, so nothing is rebuilt just because `lc` changed.
+`uv tool upgrade` doesn't move to a pre-release, so name the version while the release is one. The
+CLI version is recorded in provenance but is not part of the output identity, so changing it alone
+does not mark outputs stale. Check release notes for changes to formats and execution behavior.
 
 ## Uninstalling
 

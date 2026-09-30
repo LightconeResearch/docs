@@ -3,10 +3,9 @@ title: lc status
 description: Report the state of every output, and the commit it was made at, without running anything.
 ---
 
-Report what state each of the analysis's outputs is in. Reads only: it runs nothing, commits
-nothing, transfers no data, does not mind an unclean tree, and always exits `0`: a state is not a
-failure. The moment you most need to know where a project stands is when it isn't clean, so this
-verb works there.
+Inspect output states and the commits that produced them. The command works with uncommitted edits
+and does not execute recipes or transfer data. A successful status report exits `0` even when
+outputs are stale; project or command errors can still fail.
 
 ## Synopsis
 
@@ -32,10 +31,8 @@ The header is repository facts: which mode the project executes in (and, for a c
 project, the image's tag and state), and what enforcement a run on this host would get. No runtime
 and no network is needed to answer either.
 
-Then one line per output the spec declares, in dependency order: its state, **the commit it was
-made at**, and, for anything not current, why. The commit column is the verb's reason to exist:
-"which code made this?" has an answer for a current output too, and for a `behind` output that
-commit is where the environment that produced it can be read back.
+Each output appears in dependency order with its state, producing commit and any reason it is not
+current. The commit identifies the code and environment used for that result.
 
 ## States
 
@@ -43,13 +40,12 @@ commit is where the environment that produced it can be read back.
 - `behind`: still what the spec asks for; the environment moved since. Left alone by runs;
   `--refresh` remakes.
 - `stale`: contradicts the project: definition changed, an input's content changed, or the output
-  was edited by hand since it was made (a *foreign write*; the offending commit is named).
+  was changed in a later commit outside its run (a *foreign write*; that commit is named).
 
 ## Report vs gate
 
-`lc status` reports; **`lc materialize --check` gates.** Two verbs answering the same question with
-different exit codes is how a script comes to depend on the wrong one, so the split is sharp: use
-status for eyes, check for exit codes.
+Use `lc status` to inspect the project. Use `lc materialize --check` in scripts that need a
+nonzero exit code when outputs require work.
 
 ## Options
 

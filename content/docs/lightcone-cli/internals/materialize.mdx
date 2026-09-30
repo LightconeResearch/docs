@@ -3,8 +3,8 @@ title: lightcone.engine.materialize
 description: The driver that makes a whole analysis, and the read-only check and status that share its classification walk.
 ---
 
-Making a whole analysis: what runs, in what order, and what gets committed. The driver refuses dirt,
-hands the graph to Dask, and owns git alone, plus the read-only halves (`check`, `status`) that
+Making a whole analysis: what runs, in what order, and what gets committed. The driver requires a clean working tree,
+submits tasks to Dask and commits the results. The read-only `check` and `status` operations
 share its classification walk.
 
 Source: `src/lightcone/engine/materialize.py`.
@@ -59,7 +59,7 @@ independently of success or failure, leaving stdout for the report.
   report "nothing to do", and `behind` never counts against it.
 - **A read-only verb never tracebacks.** Anything `check`/`status` cannot read classifies as "will
   be remade" and the real error belongs to the recipe that follows.
-- **The run record is genuinely re-runnable**: engine pinned by requirement, project environment
+- **The run record must be replayable**: engine pinned by requirement, project environment
   rebuilt by the worker from the rerun commit's own lock, format tested *through datalad's parser*
   and a real `datalad rerun`. A golden test over our own JSON stays green through a silent break.
 - **The crate converge is contained**: it runs after the loop, on the full graph, and a failure

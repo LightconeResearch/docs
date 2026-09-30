@@ -11,7 +11,7 @@ adds what is specific to `lc`.
 ## What the install brings
 
 The published name on PyPI is `lightcone-cli`; the command it provides is `lc`. `lc` uses uv as its
-only environment substrate: projects are `pyproject.toml` + `uv.lock`, and uv manages the Python
+environment manager: projects are `pyproject.toml` + `uv.lock`, and uv manages the Python
 interpreters too, so there is no separate Python install step.
 
 The install also puts `git-annex` on your `PATH`, alongside `lc`. Projects need it there: an
@@ -29,10 +29,8 @@ lc init --help
 Each should print its version or help text.
 
 <Callout title="An existing lc alias">
-Some people have already set a personal shell alias `lc='ls --color'`. If that's you, the alias
-shadows the new command: `type lc` shows which one your shell runs. Remove the alias with
-`unalias lc` (and rebind it, e.g. `alias l='ls --color'`), or call the tool by its full path,
-`$(which lc) --version`.
+Run `type lc` to check whether an alias hides the command. If it does, rename the alias or remove
+it with `unalias lc` before checking `lc --version`.
 </Callout>
 
 ## Installing with pip
@@ -59,14 +57,8 @@ pip puts `lc` and `git-annex` in that Python environment's own `bin` directory, 
 
 ## On NERSC Perlmutter
 
-NERSC doesn't ship uv, but it installs into your home directory with the usual single command:
-
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-
-uv lands under `~/.local/bin`: make sure it's on your `PATH`. git is already on the system. Two
-things differ from a workstation once you run analyses there:
+Install uv as described in [the stack setup](/installation#1-uv-and-git), and ensure
+`~/.local/bin` is on your `PATH`. Two execution details matter on Perlmutter:
 
 - **Local compute is refused on login nodes.** Use a compute node in an interactive allocation, or
   a configured Slurm offer; see [Running on a cluster](/lightcone-cli/cluster#local-allocations).
@@ -75,13 +67,7 @@ things differ from a workstation once you run analyses there:
 
 ## Container runtimes
 
-Only *containerized* projects need a container runtime: a project opts in by declaring
-`[tool.lightcone.image]` in its `pyproject.toml`, and until it does, recipes run directly on your
-machine in the project's own locked environment.
-
-- Local machine: install [Podman](https://podman.io/) (rootless, no daemon) or
-  [Docker](https://docs.docker.com/get-docker/).
-- HPC login node: see [Running on a cluster](/lightcone-cli/cluster).
-
-There is nothing to configure: `lc` detects whichever runtime is available (`podman-hpc`, then
-`podman`, then `docker`, skipping docker if its daemon isn't running).
+For containerized projects, install Podman or Docker as described in
+[stack setup](/installation#container-runtime). Runtime detection tries `podman-hpc`, then
+`podman`, then `docker`, skipping Docker if its daemon is not running. For HPC setup, see
+[Running on a cluster](/lightcone-cli/cluster).

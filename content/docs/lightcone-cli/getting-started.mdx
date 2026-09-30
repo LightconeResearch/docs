@@ -4,8 +4,7 @@ description: Drive lc yourself, from an empty directory to a reproducible analys
 icon: Rocket
 ---
 
-Let's go from nothing on your disk to a working, reproducible analysis. You can read this top to
-bottom without running anything, or follow along: every command is copy-paste ready.
+Build a small analysis that fits a line to noisy data, then compare two ways of handling outliers.
 
 <Callout title="Working with an agent?">
 This tutorial drives `lc` by hand, so that you see what each command does. Most of the time your
@@ -16,7 +15,7 @@ coding agent drives it for you: to start that way, follow
 **What you'll build:** a small two-output analysis that fits a line to a noisy dataset and sweeps
 one methodological decision: whether points far from an initial fit are kept or clipped. The result
 is two universes, `baseline` and `robust`, each with its own fitted slope and figure, and a project
-that ends published as an [RO-Crate](https://www.researchobject.org/ro-crate/).
+with metadata for sharing as an [RO-Crate](https://www.researchobject.org/ro-crate/).
 
 Make sure you've finished the [installation](/installation) first.
 
@@ -27,8 +26,8 @@ lc init line-fit-demo
 cd line-fit-demo
 ```
 
-`lc init` converges the directory to a small, opinionated layout and stops; it doesn't ask any
-questions, and it's idempotent: re-running it later only fills in whatever is missing.
+`lc init` creates the project files and environment. Running it again preserves authored files,
+fills missing pieces and repairs managed state such as the lock and environment.
 
 ```text
 line-fit-demo/
@@ -49,18 +48,8 @@ line-fit-demo/
 └── index.md            # template report, to reference the spec from
 ```
 
-Two things are worth registering now:
-
-- **The project is a git repository.** Every output `lc` makes is committed together with the code
-  that produced it; large files ride in git-annex behind the scenes, but you only ever type
-  ordinary `git add` and `git commit`.
-- **The environment is the lock.** `pyproject.toml` + `uv.lock` define exactly what your recipes can
-  import, and `.venv` is built from them. You'll add packages with `uv add` in a moment, never
-  `pip install`.
-
-The file you'll actually work in is **`astra.yaml`**, the single source of truth for your analysis.
-Inputs, outputs, methodological decisions, recipes: everything else lightcone-cli does is
-downstream of this file.
+The project uses git for source and metadata, git-annex for data and results, and uv for its
+Python environment. You will edit `astra.yaml` and add scripts in the following steps.
 
 ## 2. Add the data
 
@@ -68,7 +57,7 @@ A real project starts from a dataset; ours will generate a small one, 200 points
 few outliers thrown far off it:
 
 ```bash
-python3 - <<'EOF'
+uv run python - <<'EOF'
 import random
 random.seed(0)
 rows = ["x,y"]
@@ -91,7 +80,7 @@ your tree, and the repository stays light.
 `astra.yaml` was scaffolded as an empty analysis. Fill it in with ours:
 
 ```yaml title="astra.yaml"
-version: "0.0.13"   # ASTRA schema version — keep what the scaffold wrote
+version: "0.0.14"   # ASTRA schema version — keep what your scaffold wrote
 name: "line_fit"
 description: |
   Fit a straight line to a small synthetic dataset and sweep one
@@ -136,7 +125,7 @@ decisions:
 
 A few things to notice:
 
-- Each output declares its full dependency contract: `fit` depends on the `points` input and the
+- Each output declares its dependencies: `fit` depends on the `points` input and the
   `outliers` decision; `fit_plot` depends on `points` and on the sibling output `fit`. That
   contract is how `lc` orders the build, and how it knows what to rebuild when something changes.
 - Recipes reference those dependencies through placeholders (`{inputs.points}`,
@@ -240,10 +229,11 @@ Both scripts import from the project's locked environment, so declare what they 
 uv add numpy matplotlib
 ```
 
-That one command updates `pyproject.toml`, re-locks `uv.lock`, and syncs `.venv`. It's the only way
-packages reach a recipe: recipes run sandboxed in the locked environment, so a stray `pip install`
-on your machine changes nothing they can see. That's a feature: the lock *is* the record of what
-your results were computed with.
+This updates `pyproject.toml`, `uv.lock` and `.venv`. Recipes use this locked environment.
+
+The example recipes declare their data dependencies. If edits to a script should also trigger a
+rebuild, add it as a file input and include its ID in the corresponding output's `inputs` list.
+See [output states](/lightcone-cli/concepts#an-output-has-an-identity-and-three-facts-about-it).
 
 ## 5. Materialize
 
@@ -269,9 +259,7 @@ git add -A && git commit -m "Line-fit analysis"
 lc materialize "$CLUSTER"
 ```
 
-The commit isn't ceremony: every output is committed together with the code that produced it, so a
-build refuses to start from a tree with uncommitted edits (it wouldn't be able to say what code
-ran). Then:
+Materialization requires a clean working tree so it can record the source commit. The run reports:
 
 ```text
   ✓ made baseline/fit
@@ -285,8 +273,7 @@ ran). Then:
 (We'll come back to that license line in step 7.) Each output landed in
 `results/baseline/<output_id>.<format>` next to a `.<output_id>.manifest.json`, a manifest
 recording the recipe, the decisions, the input hashes, the environment, and the commit, and was
-committed with a run record that `datalad rerun` can replay. Look at `git log`: the build wrote
-history, not just files.
+committed with a run record that `datalad rerun` can replay. Use `git log` to inspect those run records.
 
 Check where things stand any time:
 
@@ -341,14 +328,15 @@ wasn't touched. Your comparison is on disk: with this guide's synthetic dataset,
 points and moves the slope from 2.414 to 2.450, visibly closer to the true 2.5 the data was
 generated with.
 
-If a recipe fails, `lc materialize` reports which output failed and why, and leaves the tree as
-clean as it found it; fix the script or the spec, commit, and rerun: only the affected outputs
-re-execute.
+If a recipe fails, `lc materialize` reports the failure and restores that task's partial output.
+Fix the script or specification, commit and rerun. After a cluster interruption, tasks may still be
+running; follow the [interruption guidance](/lightcone-cli/commands/materialize#the-runs-contract)
+before cleaning result files.
 
 ## 7. Publish
 
-RO-Crate requires a license, so declaring one is how you tell `lc` the project is meant for the
-outside world. Add one line under `[project]` in `pyproject.toml`:
+The CLI maintains RO-Crate metadata when a project declares a license. For this synthetic example,
+add the following under `[project]` in `pyproject.toml`:
 
 ```toml title="pyproject.toml"
 license = "CC-BY-4.0"
@@ -361,10 +349,20 @@ git add -A && git commit -m "Declare a license"
 lc materialize "$CLUSTER"
 ```
 
-Nothing is rebuilt, but `ro-crate-metadata.json` appears at the project root and is committed
-automatically. From here on, every materialize keeps it in line with the repository: the project
-*is* the crate, and depositing it is just `git archive` (or `datalad export-archive`) on a
-repository you already have.
+The outputs are reused, and `ro-crate-metadata.json` is written and committed at the project root.
+Later materializations update this metadata when needed.
+
+To prepare an archive, include the actual data and result files. A plain `git archive` exports
+annex pointers. With [DataLad](https://docs.datalad.org/en/stable/generated/man/datalad-export-archive.html)
+installed separately, you can retrieve the content and export it:
+
+```bash
+git annex get .
+datalad export-archive --missing-content error ../line-fit-demo
+```
+
+This creates `../line-fit-demo.tar.gz`. Inspect it before depositing: it should contain readable data and result files as well
+as `ro-crate-metadata.json`. These commands prepare a local archive; they do not upload it.
 
 Release the allocation when you're finished:
 
@@ -372,32 +370,20 @@ Release the allocation when you're finished:
 lc compute down "$CLUSTER"
 ```
 
-## What just happened
+## Reopen the project [#what-just-happened]
 
-- `astra.yaml` was the only place your analysis was *described*: inputs, outputs, the decision, and
-  the recipes all live there.
-- The scripts take decision values as plain command-line arguments, so nothing methodological is
-  hardcoded.
-- `lc materialize` ran each recipe in the project's locked environment, sandboxed (free to write the
-  directory its output lands in, and nothing else), and committed every output with a manifest and
-  a re-runnable run record.
-- `lc status` and `lc materialize --check` read those manifests. They don't re-execute anything;
-  they just classify. An output is remade when the spec defines it differently than it was made, or
-  when its declared inputs changed; an output whose *environment* has since moved is reported as
-  `behind` and deliberately left alone: the manifest records exactly which environment and commit
-  produced it.
-
-Clone this repository on a fresh machine, run `lc init` (it rebuilds the two pieces of local state
-git doesn't carry: the `.venv` and the annex), then `lc materialize --check`: it reports up to date
-without fetching a single data byte, because the provenance travels in git. The bytes themselves
-follow with `git annex get` whenever you actually need them.
+On a fresh clone, run `lc init` to recreate the environment and initialize git-annex.
+`lc materialize --check` reads output manifests without fetching result files. It still needs to
+hash declared input data; an input that has not been fetched can make an output appear out of date.
+Use `git annex get` to retrieve content, then check again. Materialization fetches declared inputs
+when it needs them.
 
 ## Where to next
 
 - [Core concepts](/lightcone-cli/concepts): the model behind what you just did, from the three
   states and the commit discipline to the two execution modes.
 - [Running on a cluster](/lightcone-cli/cluster): take the same project to Slurm.
-- [Troubleshooting](/lightcone-cli/troubleshooting): when something goes sideways.
+- [Troubleshooting](/lightcone-cli/troubleshooting): diagnose failed runs.
 - [Glossary](/lightcone-cli/glossary): terms like universe, decision, and manifest in plain
   language.
 - [ASTRA](/astra) and the [ASTRA docs](https://astra-spec.org/latest/): the full spec, with

@@ -95,9 +95,7 @@ The hook decides how the agent should handle a problem from whether anyone is th
   the agent runs the command and says in its final message that it did. The hook recognises these
   from the `CLAUDE_CODE_ENTRYPOINT` and `CI` environment variables.
 
-When in doubt, as in a harness that sets neither variable, it assumes a person is present. A
-needless question costs a stalled task; a needless install puts software on someone's machine that
-they never agreed to.
+If neither variable identifies a headless run, the hook treats the session as interactive.
 
 ## When hooks don't run
 

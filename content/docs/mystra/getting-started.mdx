@@ -1,12 +1,11 @@
 ---
 title: Getting started
-description: From an existing ASTRA project to a live, self-updating report in about five minutes.
+description: Configure a MyST report, add ASTRA references, and preview the result.
 icon: Rocket
 ---
 
-This walk-through takes you from an existing ASTRA project to a live, self-updating report in about
-five minutes. You will install the MyST CLI, register the plugin, write your first references, and
-preview the site.
+Start with an ASTRA project and some result files. This guide sets up MyST, adds references to the
+analysis, and builds a report.
 
 If you'd rather see the authoring vocabulary first, jump to the
 [authoring guide](/mystra/authoring).
@@ -43,32 +42,24 @@ referenced by URL.
 
 ## Register the plugin
 
-In your ASTRA project directory, create a `myst.yml` that points at the latest release artifact and
+In your ASTRA project directory, create a `myst.yml` that points at the pinned release artifact and
 lists your pages:
 
 ```yaml title="myst.yml"
 version: 1
 project:
   plugins:
-    - https://github.com/LightconeResearch/MySTRA/releases/latest/download/mystra.mjs
+    - https://github.com/LightconeResearch/MySTRA/releases/download/v0.0.1/mystra.mjs
   toc:
     - file: index.md
 site:
   template: book-theme
 ```
 
-The `…/releases/latest/download/…` URL always tracks the newest release; MyST fetches and caches the
-file on the first build.
-
-<Callout type="idea" title="Pin a version">
-MySTRA is pre-1.0 and the vocabulary may change between releases. For anything you intend to keep
-building, pin a specific version by swapping `latest` for a tag:
-
-```yaml
-- https://github.com/LightconeResearch/MySTRA/releases/download/v0.0.1/mystra.mjs
-```
-
-</Callout>
+MyST downloads and caches the plugin on the first build. The example pins `v0.0.1`;
+check [MySTRA releases](https://github.com/LightconeResearch/MySTRA/releases) when choosing a
+version. Projects created with `lc init` currently use a `latest` URL, which you can replace
+with a tagged release before publication.
 
 ## Project layout
 
@@ -87,13 +78,14 @@ my-analysis/
 
 ## Write your first references
 
-Create an `index.md` and reference the analysis instead of restating it. Everything is addressed by
-a [path](/mystra/authoring/paths) that mirrors `astra.yaml`:
+Create an `index.md` using [paths](/mystra/authoring/paths) to the records in your analysis.
+This example assumes a `fit_method` decision and a `fit_params` table output with a `slope`
+column. Substitute your own IDs and column names:
 
 ```markdown title="index.md"
 # My analysis report
 
-We adopt the {astra}`decisions.fit_method` and find
+With {astra:value}`decisions.fit_method`, we find
 {astra:value col=slope sig=3}`outputs.fit_params`
 for the slope of the relation.
 
@@ -104,12 +96,10 @@ for the slope of the relation.
 :::
 ```
 
-Three surfaces, one vocabulary:
+The example uses two kinds of reference:
 
-- the **`{astra}` role** mentions an element inline —
-  [inline references](/mystra/authoring/inline-references);
-- the **`{astra}` directive** embeds it as a block — [block embeds](/mystra/authoring/block-embeds);
-- the **`{astra:value}` role** interpolates a live number — [live values](/mystra/authoring/live-values).
+- the **`{astra}` directive** embeds a record as a block — [block embeds](/mystra/authoring/block-embeds);
+- the **`{astra:value}` role** reads a measured value or selected option — [live values](/mystra/authoring/live-values).
 
 Everything else — prose, math, figures you author yourself, the table of contents, multi-page
 structure — is ordinary MyST.
@@ -122,9 +112,8 @@ Run the stock MyST CLI from the project directory:
 myst start        # → http://localhost:3000
 ```
 
-That's it — no custom server and no build step of your own. MySTRA reads `astra.yaml` from the
-working directory and delegates full validation, universe selection, and resolution to the SDK. With
-multiple universe files, the SDK selects the first `.yaml` or `.yml` filename in lexical order; with
+MySTRA reads `astra.yaml` from the working directory and uses the ASTRA SDK to validate and
+resolve the project. With multiple universe files, the SDK selects the first `.yaml` or `.yml` filename in lexical order; with
 none, it uses authored defaults.
 
 <Callout title="Editing astra.yaml while the server runs">
@@ -140,12 +129,14 @@ editing `astra.yaml`, re-save any `.md` page (or restart the server) to see the 
 myst build --html
 ```
 
-produces a static site in `_build/html/` that you can host anywhere. All referenced result artifacts
-are copied and hashed by MyST's asset pipeline; the output is fully self-contained.
+This produces a static site in `_build/html/`. Inspect the build diagnostics and preview the
+report before sharing it: unresolved references can still produce a page with fallback text or
+an error message. MyST copies referenced result assets into the build; externally hosted content
+still needs its original host.
 
 ## Next steps
 
-- Learn the full [path grammar](/mystra/authoring/paths) — one idea that drives every surface.
+- Learn the full [path grammar](/mystra/authoring/paths) used by roles and directives.
 - Split a large report into [multiple pages](/mystra/authoring/multi-page) that mirror your
   sub-analyses.
 - Building a theme? See [theming](/mystra/reference/theming) for the classes, canonical paths, and

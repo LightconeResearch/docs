@@ -28,8 +28,8 @@ uv run ruff check src/ tests/        # lint (--fix to apply)
 uv run mypy src/                     # strict mode
 ```
 
-These three are exactly what CI runs (`tests.yml`, `lint.yml`): green locally means green there,
-modulo the gated suites below.
+CI runs these checks in `tests.yml` and `lint.yml`. The gated suites below also need their
+respective runtime or operating-system support.
 
 Most of the suite is hermetic: an autouse fixture stubs the engine's one subprocess seam, so tests
 spawn nothing and touch no network. The exceptions opt in explicitly; see

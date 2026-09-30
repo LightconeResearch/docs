@@ -80,12 +80,9 @@ carries only what *your* analysis imports, added with `uv add`.
 
 Inside `.git`, convergence sets one configuration key, reported as the `annex-filter` item:
 
-- `filter.annex.required=true`, always. Without it, a `git add` whose shell cannot find git-annex
-  prints an error, **exits 0, and stages the raw bytes into git history**: a 2 GB dataset in git
-  proper, on every clone, forever. With it, the same situation is a hard, loud failure and nothing is
-  staged. Once the project holds committed annexed content that refusal covers every command that
-  must run the filter, `git status` and `git diff` included: a project you cannot use until
-  git-annex is back, rather than one that silently absorbed your data.
+- `filter.annex.required=true` makes git fail if it cannot run the annex filter. Without this
+  setting, git can stage the raw data bytes despite a missing git-annex executable. Commands that
+  need the filter, including `git status` and `git diff`, also require git-annex on `PATH`.
 
 That is the only thing `lc init` adds to what `git annex init` wrote. How git finds git-annex is
 still ordinary `PATH` resolution, which is why `lc` should be installed with `uv tool install`, as
@@ -101,8 +98,7 @@ in the troubleshooting guide.
 | `--check` | off     | Report drift without writing; exit 1 if not converged.  |
 | `--json`  | off     | Emit the convergence report as JSON on stdout.          |
 
-There is deliberately nothing else: no `--no-git`, no template selection. The project layout is the
-contract the other verbs rely on.
+`lc init` uses one project layout; it has no template-selection or `--no-git` option.
 
 ## Examples
 

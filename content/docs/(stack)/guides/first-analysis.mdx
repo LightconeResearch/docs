@@ -9,7 +9,7 @@ model of cosmology to 580 Type Ia supernovae from
 [Suzuki et al. 2012](https://arxiv.org/abs/1105.3470). Mechanically, it is a least-squares fit with a
 single free parameter, Ω<sub>Λ</sub>, which runs in seconds on a laptop.
 
-You need the stack installed, as in the [Quick Start](/): uv, git, the Lightcone CLI and the
+You need the stack installed, as described in [Installation](/installation): uv, git, the Lightcone CLI and the
 `lightcone` plugin.
 
 <Callout title="Prompts and commands">
@@ -94,8 +94,7 @@ ls results/baseline
 ```
 
 Each output is a file in `results/baseline/`, named after its `id`, next to a manifest that records
-the recipe, the decisions, the code version and the hashes of everything that went in. One number
-comes back: **Ω<sub>Λ</sub> = 0.722 ± 0.013**.
+the recipe, decisions, source commit and declared input hashes. In the example run, the fit gives: **Ω<sub>Λ</sub> = 0.722 ± 0.013**.
 
 ![Two-panel Union2.1 Hubble diagram: distance modulus against redshift with the best-fit flat ΛCDM curve, and residuals below.](./hubble_two_panel.png)
 
@@ -120,6 +119,7 @@ prior_insights:
     claim: >
       Suzuki et al. (2012) constrain the dark energy density from these supernovae alone,
       in a flat universe, to Omega_Lambda = 0.705 (+0.040, -0.043) including systematic errors.
+    created_at: "2026-09-29T00:00:00Z"
     evidence:
       - id: suzuki_2012_sne_alone_flat_lcdm
         doi: "10.48550/arXiv.1105.3470"
@@ -177,10 +177,10 @@ lc status
 | Ours, statistical and systematic        | **0.714 ± 0.030**      |
 | Suzuki et al. 2012, published           | 0.705 (+0.040, −0.043) |
 
-The value barely moves; the uncertainty more than doubles, and only then is it comparable with the
-paper's, which includes systematics too. A comparison of best-fit values alone would have ranked this
-decision as nearly irrelevant. It is the difference between a number that resembles theirs and a
-number you can put beside theirs.
+In this run, adding systematics changes the central value little but more than doubles the
+uncertainty. The comparison now accounts for systematics on both sides, though it does not reproduce
+every detail of the published analysis. Ask the agent to check the remaining differences before
+drawing a conclusion about agreement.
 
 ## 5. Write it up
 
@@ -190,8 +190,9 @@ the paper's value from astra.yaml instead of copying numbers, and show me a prev
 ```
 
 The report is `index.md`, written in MyST Markdown. With [MySTRA](/mystra), it cites outputs,
-decisions and values by their path in `astra.yaml`, so when the analysis is re-run, the report
-follows. Previewing it needs Node.js and MyST; your agent asks before installing them.
+decisions and values by their path in `astra.yaml`. Rebuild the report after a run to update
+them, and review the prose against the new results. See
+[MySTRA getting started](/mystra/getting-started) for preview requirements and refresh behavior.
 
 ## Going further
 

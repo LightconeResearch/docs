@@ -3,10 +3,9 @@ title: Live values
 description: "Interpolate a real number from the resolved analysis at build time with the {astra:value} role."
 ---
 
-`{astra:value}` interpolates a real number from the resolved analysis at build time, so **no
-measured value is ever hard-typed into prose**. The role body is a [path](/mystra/authoring/paths);
-everything else — which cell, how many digits — is expressed as **role options**, written inside the
-curly braces like MyST inline attributes:
+`{astra:value}` reads a value from the resolved analysis when the page is built. Its body is a
+[path](/mystra/authoring/paths). Options inside the curly braces select a table cell or control
+number formatting:
 
 ```markdown
 {astra:value col=DV_over_rd where="tracer=lrg3_elg1" pm=true}`outputs.bao_distance_table`   → 19.88 ± 0.17
@@ -15,7 +14,7 @@ curly braces like MyST inline attributes:
 {astra:value}`decisions.algorithm`                                                           → MultiGrid
 ```
 
-Edit `astra.yaml` or rerun the analysis, rebuild, and every number in the prose updates itself.
+After editing `astra.yaml` or rerunning the analysis, rebuild the report to update these values.
 
 The neutral text is also self-describing for rich themes: its ASTRA metadata retains the owning
 record path plus the selected decision option, table column/filter, or parsed metric unit when
@@ -28,8 +27,11 @@ available.
 | `col=<column>` | The column to read (required for table outputs). |
 | `where="<key>=<val> …"` | Row filters — space- or comma-separated `key=value` pairs; every pair must match, case-insensitively. |
 | `pm=true` | Also render the uncertainty: `<col>_std` for tables, the metric's own uncertainty for metrics. |
-| `err=<column>` | Explicit uncertainty column (instead of the `<col>_std` convention). |
+| `err=<column>` | Table uncertainty column; also enables uncertainty display without `pm=true`. |
 | `sig=<N>` | Significant figures for the value (default 4; uncertainties render with 2). |
+
+For tables, a missing or empty uncertainty column leaves the value without an uncertainty; check
+that the expected column exists before publishing.
 
 Option values without spaces can be unquoted (`col=alpha`); quote anything with spaces
 (`where="tracer=lrg3 recon=Post"`).
@@ -50,8 +52,10 @@ The LRG3 bin gives $D_V/r_d =$
 {astra:value col=DV_over_rd where="tracer=lrg3" pm=true}`outputs.bao_distance_table`.
 ```
 
-The filter must select **exactly the row you mean** — if no row matches, the role renders an inline
-error naming the filter, so a stale filter is visible in the preview rather than silently wrong.
+MySTRA uses the **first matching row**, or the first row if you omit `where`. It does not reject
+multiple matches, so choose filters that identify the intended row. If no row matches, it reports
+an error and renders an inline error token. Column names are case-sensitive; filter values are
+matched without regard to case.
 
 ## Metric outputs
 
@@ -81,5 +85,4 @@ when the universe does.
 
 A value that cannot be resolved — missing result file, unknown column, no matching row, a
 non-tabular product — renders as a small inline code token describing the problem (e.g.
-``⟨value: no column "alpha2" in "bao_table"⟩``). The page still builds; the broken value is
-impossible to miss.
+``⟨value: no column "alpha2" in "bao_table"⟩``). The plugin also emits a build diagnostic. Review both the diagnostics and the page before publishing.

@@ -3,9 +3,8 @@ title: Extending the codebase
 description: Where each kind of change belongs, what to read first, and the invariant it must keep.
 ---
 
-Where each kind of change belongs, what to read first, and the invariant it must keep. The engine has
-one implementation per rule: most review feedback is some form of "that spelling already exists; use
-it".
+Use this map to locate the implementation and tests for a change. Reuse existing helpers for shared
+rules so command behavior stays consistent.
 
 ## The map
 
@@ -13,7 +12,7 @@ it".
 | ----------------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | What a scaffolded file contains     | `engine/templates/files/*.tmpl` (+ `test_templates.py`)                                | A template gets a function only when a value must be decided or a merge policy held.                                                                                                   |
 | What gets converged                 | `engine/project.py` (+ `test_project.py`)                                              | Everything through `_Converger.item`/`.file`/`.blocked`; repairs only append; only what git can carry.                                                                                 |
-| How a project stores bytes          | `engine/dataset.py` + `gitattributes.tmpl` (+ `test_dataset.py`, real annex)           | Every command through `project._run`; nobody is asked to run git-annex.                                                                                                                |
+| How a project stores bytes          | `engine/dataset.py` + `gitattributes.tmpl` (+ `test_dataset.py`, real annex)           | Every command through `project._run`; ordinary commits use the annex filter.                                                                                                                |
 | How an output is identified         | `engine/identity.py` (+ `test_identity.py`)                                            | Sensitivity both ways: what must move the hash, what must not. Length-framing stays.                                                                                                   |
 | When an output is remade            | `engine/assets.py` (+ `test_assets.py`)                                                | One `classify`; callers differ by one input value, never by logic. Ask first: does the change *contradict* the project (stale) or is it *circumstance* (behind)?                       |
 | How the spec becomes a graph        | `engine/plan.py` (+ `test_plan.py`)                                                    | Ask `astra.resolve`; a missing answer is a PR to astra-tools; ambiguity is a `ProjectError`, never a guess.                                                                            |

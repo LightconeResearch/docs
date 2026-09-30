@@ -1,95 +1,56 @@
 ---
 title: Overview
-description: Plugins that teach coding agents to work with the Lightcone stack.
+description: Instructions and validation hooks for agents working on ASTRA and Lightcone projects.
 icon: CircleQuestionMark
 ---
 
-The Agent Skills are the part of the stack that your coding agent reads. They follow the open
-[Agent Skills](https://agentskills.io) format and are packaged as plugins, hooks included, for
-Claude Code and Codex, in the terminal or in their desktop apps.
+Agent Skills give your coding agent instructions for working on the analysis. They use the open
+[Agent Skills](https://agentskills.io) format and are packaged as plugins for Claude Code and Codex.
 
-A **skill** is a set of instructions that the agent loads when a task calls for it: what an
-`astra.yaml` is, how to drive the Lightcone CLI, when to stop and ask you. A **hook** is a small
-script that the agent's harness runs at a fixed moment, such as the start of a session or the save of
-a file, and whose output goes straight back to the agent.
+A **skill** tells the agent how to approach a task, such as scoping an analysis or writing
+`astra.yaml`. A **hook** runs at a specific event, such as the start of a session or an agent's
+file edit, and reports checks back to the agent.
 
-## The two plugins
+## Choose a plugin
 
-| Plugin      | Skills               | What it adds                                                                                                                                                       |
-| ----------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `lightcone` | `lightcone`, `astra` | A companion for a whole Lightcone project: scoping it with you, running it with `lc`, diagnosing failures, keeping the report in sync, publishing. Includes `astra`. |
-| `astra`     | `astra`              | Support for the [ASTRA](/astra) format: writing, validating and restructuring `astra.yaml`, with a hook that validates the project each time the agent saves it.   |
+| Plugin | Use it for |
+| --- | --- |
+| `lightcone` | Scoping, implementing, running and writing up a Lightcone analysis. Includes the `astra` skill and hooks. |
+| `astra` | Writing and validating ASTRA specifications without the Lightcone CLI. |
 
-<Callout title="Which one to install">
-  Install **`lightcone`** to work on Lightcone projects. It bundles the `astra` plugin, skill and
-  hooks, so don't install `astra` alongside it. Install `astra` on its own only if you write ASTRA
-  specifications without running them with the Lightcone CLI.
-</Callout>
+Install `lightcone` for the full workflow. There is no need to install `astra` alongside it.
+[Installation](/agent-skills/installation) covers both plugins and their requirements.
 
-[Installation](/agent-skills/installation) covers both, for each agent.
+## Call a skill
 
-## Calling a skill
+Agents can load a skill when a task matches its description. You can also request it explicitly:
 
-Skills are namespaced by the plugin they come from: `/<plugin>:<skill>` in Claude and in the Codex
-app, `$<plugin>:<skill>` in the Codex CLI.
+| Installed plugin | Skill | Claude Code, Claude app, Codex app | Codex CLI |
+| --- | --- | --- | --- |
+| `lightcone` | `lightcone` | `/lightcone:lightcone` | `$lightcone:lightcone` |
+| `lightcone` | `astra` | `/lightcone:astra` | `$lightcone:astra` |
+| `astra` | `astra` | `/astra:astra` | `$astra:astra` |
 
-| Installed plugin | Skill       | Claude Code, Claude app, Codex app | Codex CLI              |
-| ---------------- | ----------- | ---------------------------------- | ---------------------- |
-| `lightcone`      | `lightcone` | `/lightcone:lightcone`             | `$lightcone:lightcone` |
-| `lightcone`      | `astra`     | `/lightcone:astra`                 | `$lightcone:astra`     |
-| `astra`          | `astra`     | `/astra:astra`                     | `$astra:astra`         |
+The skills guide the agent to review scientific choices with you, keep them in the specification,
+and use the CLI to produce outputs. They are instructions to the agent; validation hooks check
+files, but do not establish that an analysis is scientifically sound.
 
-You rarely need to. Agents load a skill on their own when the task matches it: the `lightcone` skill
-when you start, resume, run, debug or publish an analysis, or ask to run or fix one in a directory
-that holds an `astra.yaml`; the `astra` skill when the agent reads or writes an ASTRA file.
-
-## How the skills behave
-
-- **The scientific choices stay yours.** A new analysis starts with an interview, not with code.
-  Candidate decisions, findings and evidence are written to `astra.yaml`, where you can review them,
-  and the conversation keeps to a summary.
-- **Nothing is installed without asking.** In an interactive session the agent offers the command
-  and waits for your answer. Only in a headless run, where no one can answer, does it act, and then
-  it says what it changed.
-- **Compute beyond your own machine needs a yes.** The agent starts a local cluster when there is
-  something to run, and tells you. A remote allocation, several nodes or GPUs can spend your hours
-  and queue time, so it shows you the plan first.
-- **Everything runs through `lc`.** The agent never calls the container runtime, the sandbox or a
-  job scheduler itself, so every output carries its run record.
-- **Quotes are checked.** A quote from a paper is verified against the PDF before it enters the
-  specification; one that can't be verified is dropped, not cited.
-
-## Pinned tool versions
-
-The skills drive two command-line tools, each pinned to the version they are written against:
-
-| Tool                                | Pin        | How it is used                                                                                             |
-| ----------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------- |
-| `astra-tools` (the `astra` command) | `0.2.18`   | Run as `uvx astra-tools@0.2.18`, which fetches it on first use. Never a bare `astra` found on your `PATH`. |
-| `lightcone-cli` (the `lc` command)  | `0.5.0rc5` | Installed once, by you. The pin is the minimum the `lightcone` plugin accepts; newer versions are fine.    |
-
-Each plugin update can move these pins. When the `lc` pin moves past the version you have, the
-plugin notices at the start of the next session and your agent offers the install command.
-
-## Where next
+## Guides
 
 <Cards>
-  <Card title="Installation" href="/agent-skills/installation">
-    Add the marketplace and the plugin to your agent, and what the plugins need at runtime.
+  <Card title="Getting started" href="/agent-skills/getting-started">
+    Start an analysis or resume work on an existing project.
   </Card>
   <Card title="The lightcone plugin" href="/agent-skills/lightcone">
-    What the agent does at each phase of a project, from the first interview to publication.
+    Follow the agent's workflow from scoping to publication.
   </Card>
   <Card title="The astra plugin" href="/agent-skills/astra">
-    How the agent writes, validates and cites in `astra.yaml`.
+    Learn how the agent authors specifications and checks evidence.
   </Card>
   <Card title="Hooks" href="/agent-skills/hooks">
-    What each hook checks, and when it fires.
-  </Card>
-  <Card title="Your first analysis" href="/guides/first-analysis">
-    A complete analysis with an agent, from a research question to a report.
+    See which checks run, when they run and how failures are reported.
   </Card>
   <Card title="Contributing" href="/agent-skills/contributing">
-    How the plugins are built from one set of skills, tested and versioned.
+    Build, test and release the plugins.
   </Card>
 </Cards>

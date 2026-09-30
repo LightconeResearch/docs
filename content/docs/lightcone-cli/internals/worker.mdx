@@ -11,8 +11,8 @@ python -m lightcone.engine.worker <universe>/<output_id>
 
 which is what the `[DATALAD RUNCMD]` record in every materialization commit names, behind an
 engine-pinning `uv run --no-project --with …`. It is a module rather than an `lc` verb on purpose:
-it makes the output unconditionally, commits nothing, and leaves the tree dirty by design (precisely
-the state `lc materialize` refuses to start from), so advertising it would hand people a footgun.
+it makes the output unconditionally and leaves committing to the caller. Use `lc materialize`
+for normal execution.
 
 Source: `src/lightcone/engine/worker.py`.
 
@@ -36,9 +36,8 @@ example `CUDA_VISIBLE_DEVICES=0 datalad rerun`. Recipe `time_limit` is explicitl
 
 ## What must stay true
 
-- **The worker never raises**, enforced at the unit boundary, so the contract holds for failure
-  modes nobody enumerated. Raising would make Dask abort every task in flight; reporting all
-  independent failures in one run is most of what owning the loop buys.
+- **Return failures as `TaskResult` values.** The unit boundary catches exceptions so the driver
+  can report failed and blocked outputs while unrelated tasks continue.
 - **Device visibility belongs to each command.** CPU recipes receive an empty
   `CUDA_VISIBLE_DEVICES`; GPU recipes inherit the allocation's whole mask through the sandbox
   policy. Never modify the reusable worker's shared environment. Admission reserves the worker's

@@ -18,10 +18,8 @@ Source: `src/lightcone/engine/identity.py`.
 
 ## What must stay true
 
-- **`env_version` is not part of `definition_version`.** That is the whole shape of the
-  invalidation model: an environment edit stales nothing, it makes outputs *behind*. (The original
-  design nested them; staling every output in every project on an engine upgrade was the bug, not
-  the cost.)
+- **Keep environment and definition hashes separate.** An environment change makes matching
+  outputs `behind`. A definition change makes them `stale`.
 - **Both hashes are length-framed** (label, length, bytes per field), so a boundary shift between
   adjacent fields cannot yield the same digest from different inputs. Mutation-checked in the suite.
 - **The lock is hashed as raw bytes, never parsed.** A comment reflow moves `env_version`,
@@ -34,7 +32,7 @@ Source: `src/lightcone/engine/identity.py`.
   deliberately out of reach (machine state, not project state), and the residue is tracked as
   [issue #176](https://github.com/LightconeResearch/lightcone-cli/issues/176).
 - **The git commit is recorded, never hashed, and never a signal**: one sha covers the whole tree,
-  so hashing it stales everything on a README edit. The honest consequence: editing `src/fit.py`
+  so hashing it stales everything on a README edit. Editing `src/fit.py`
   remakes nothing unless the file is declared as an ASTRA input. Do not add a heuristic that scans
   recipes for repo paths.
 - **The lock scan refuses only what cannot be audited**: path, directory, and editable dependencies

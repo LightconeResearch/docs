@@ -3,10 +3,9 @@ title: lc materialize
 description: Make the analysis's outputs on a cluster, and commit each one as it lands.
 ---
 
-Make the analysis's outputs, and commit each one as it lands. This is the build verb: it validates
-the spec, converges the environment, runs every recipe that needs running (in dependency order, in
-parallel where the graph allows) and commits each result together with its manifest, in a commit
-whose message is a replayable run record.
+Validate the specification, prepare the environment and run the recipes whose outputs need work.
+Independent recipes can run in parallel. Each completed output is committed with its manifest and
+a replayable run record.
 
 ## Synopsis
 
@@ -29,14 +28,12 @@ output and whatever it depends on:
 - `fit`: the output `fit` in every universe that has it.
 - `robust/fit`: exactly one universe's output.
 
-A target that matches nothing is an error listing what exists: quietly making nothing is the least
-useful thing a build tool can do.
+A target that matches nothing produces an error listing the available targets.
 
 ## What gets remade
 
 An output is remade when it is `stale`: the analysis defines it differently than it was made (a
-changed recipe or decision), one of its declared inputs changed content, or it was edited by hand
-since. Inputs are compared by content, so a rebuild that comes out byte-identical stops the cascade
+changed recipe or decision), one of its declared inputs changed content, or it was changed and committed outside its recorded run. Inputs are compared by content, so a rebuild that comes out byte-identical stops the cascade
 there.
 
 An output that is `behind` (still exactly what the spec asks for, but made under an earlier
@@ -91,9 +88,8 @@ for.
 | `--refresh` | off     | Also remake `behind` outputs. Never touches `current` ones.         |
 | `--json`    | off     | Emit the report as JSON on stdout.                                  |
 
-There is deliberately no `--jobs` (task concurrency belongs to the configured cluster), no
-`--force`, and no flag to *skip* a stale output: deleting its file is your own file operation, and
-stronger consent than a flag.
+Task concurrency is controlled by the cluster; there is no `--jobs` option. The command also has
+no `--force` option or option to skip stale outputs.
 
 ## The JSON report
 

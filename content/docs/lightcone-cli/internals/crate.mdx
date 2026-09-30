@@ -1,12 +1,12 @@
 ---
 title: lightcone.engine.crate
-description: The publication view, which describes the repository as a Workflow Run RO-Crate.
+description: Describe the repository and its runs using the Provenance Run Crate profile.
 ---
 
-The publication view: the repository described as a Workflow Run RO-Crate. The project *is* the
-crate: `ro-crate-metadata.json` sits at the root, describes what the repository already holds, and a
-deposit is `git archive`, not an export step. lc's manifests stay the canonical record; the crate is
-the same facts in schema.org vocabulary for archives and viewers that will never run `lc`.
+`crate.py` writes `ro-crate-metadata.json` at the project root, describing the repository using
+the Provenance Run Crate profile. It derives the metadata from the manifests and repository history.
+Packaging for deposit must also include annexed file content; see the
+[publication guide](/lightcone-cli/getting-started#7-publish).
 
 Source: `src/lightcone/engine/crate.py` (converged by `materialize._converge_crate`).
 

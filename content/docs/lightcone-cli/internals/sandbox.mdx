@@ -20,7 +20,7 @@ Source: `src/lightcone/engine/sandbox/` (`model.py`, `policy.py`, `boundary.py`,
 | `Attestation`                             | What was actually enforced, derived from the flags applied, never from what the matrix says should have happened.                                           |
 | `Backend.wrap(policy, argv)`              | The pure rewrite. `contains_prefix` declares whether the uv hop rides inside (a container is a world; a host mechanism trusts host plumbing).               |
 | `exec_policy(...)`                        | Shared policy builder with caller-supplied write scope and `use_gpus` setting. Building it creates a private `$HOME`; `scope()` owns its cleanup.            |
-| `Unavailable`                             | A real backend that wraps to the same argv and attests `fs: open`. Saying so is the caller's job; pretending is nobody's.                                    |
+| `Unavailable`                             | Passes argv through unchanged and records `fs: open`; the caller must report the reduced isolation.                                    |
 | `denial.explain()` / `denial.trailer()`   | Best-guess remedies (allowed to return nothing) and the unconditional trailer on every nonzero sandboxed exit.                                               |
 
 An optional output receiver gets stdout/stderr byte chunks. Capturing output never decodes or

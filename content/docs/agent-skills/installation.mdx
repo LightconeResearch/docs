@@ -10,7 +10,7 @@ which your agent registers as a plugin marketplace. The marketplace is named `li
 that is the `@lightcone-research` suffix in the install commands below.
 
 <Callout title="Setting up the whole stack?">
-  [Installation](/installation) walks through uv, git and the Lightcone CLI as well as the plugin.
+  [Installation](/installation) covers uv, git and the Lightcone CLI.
   This page covers the plugins in more detail.
 </Callout>
 
@@ -148,17 +148,8 @@ The agent never installs uv itself.
 
 ### The Lightcone CLI
 
-The `lightcone` plugin drives the `lc` command, which is not run through `uvx`: you install it once,
-with the exact version, and it stays on your `PATH`:
-
-```bash
-uv tool install lightcone-cli==0.5.0rc5
-```
-
-Keep the version in the command. While the current release is a pre-release, a plain
-`uv tool install lightcone-cli` installs an older stable release, and `uv tool upgrade` refuses to
-move onto a pre-release at all. Installing at an exact version works both ways: it installs when
-nothing is there, and replaces an older install in place.
+Install `lc` using the [stack installation guide](/installation#3-the-lightcone-cli).
+The plugin currently requires `0.5.0rc5` or newer and uses the installed command on your `PATH`.
 
 At the start of every session, the plugin checks the `lc` on your `PATH` against that version, which
 is the minimum it accepts. What your agent offers depends on what it finds:
@@ -184,8 +175,8 @@ to you; the agent never does it for you. See
 
 ### Optional tools
 
-- **Report preview**: [Node.js](https://nodejs.org/) 18 or newer and the MyST CLI
-  (`npm i -g mystmd`). The agent asks before installing them.
+- **Report preview**: Node.js 20 or newer and the MyST CLI. See
+  [MySTRA prerequisites](/mystra/getting-started#prerequisites).
 - **Containers**: Podman or Docker (`podman-hpc` at NERSC), only for projects that declare a system
   layer. The agent confirms with you before switching a project to containers.
 

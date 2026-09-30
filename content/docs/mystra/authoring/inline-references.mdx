@@ -6,8 +6,8 @@ description: "Mention any ASTRA element inside a sentence with the {astra} role,
 The `{astra}` role mentions any addressable element inside a sentence:
 
 ```markdown
-We adopt the {astra}`decisions.algorithm` and report {astra}`outputs.hubble_diagram`,
-which confirms {astra}`findings.signal_detected`.
+We compare the options in {astra}`decisions.algorithm` and show the result in
+{astra}`outputs.hubble_diagram`.
 ```
 
 Each reference renders as a neutral text label — the element's `label:` (or its id, humanised) — so
@@ -70,7 +70,6 @@ Because the citations go through MyST, they participate in the project bibliogra
 
 ## Errors and fallbacks
 
-Inline surfaces degrade gracefully rather than breaking the page: a path that cannot be resolved
-(unknown id, missing scope) still renders a plain label from the path, and a `{astra:cite}` on a
-non-citable path renders a small inline error token — so a typo is visible in the preview without
-hiding the surrounding prose.
+An unresolved `{astra}` path emits a warning and renders a plain label derived from the path.
+That label can look valid, so check build diagnostics as well as the preview. A `{astra:cite}`
+reference to a non-citable path emits an error and shows an inline error token.

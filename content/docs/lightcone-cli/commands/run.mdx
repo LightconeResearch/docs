@@ -64,7 +64,7 @@ has stopped; local containers may require separate termination through their run
   failure looks like a denial, the note names the path and the remedy (`uv add` for a missing
   package, an ASTRA input declaration for data, `results/` or `tempfile.mkdtemp()` for writes).
 
-A probe has no output and writes no manifest: nothing it does is recorded anywhere. Any uv project
+A probe can write files, but it creates no output manifest or committed run record. Any uv project
 works: `lc run` doesn't require an `astra.yaml`, only `pyproject.toml`, `uv.lock` and `.venv` in the
 current directory.
 

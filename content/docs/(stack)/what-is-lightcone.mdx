@@ -1,66 +1,51 @@
 ---
 title: What is the Lightcone Stack
-description: Infrastructure for research that others can verify, reproduce and build on.
+description: Keep the reasoning, code and evidence behind a research result together.
 icon: CircleQuestionMark
 ---
 
-## Why it exists
+A figure rarely tells you which data cuts, assumptions and software versions produced it. Finding
+that out can mean reading scripts, comparing notebooks and asking the author what they remember.
+Working with an AI agent makes it easy to produce more results, but someone still needs to check
+how they were obtained.
 
-AI agents are making research faster: an analysis that took weeks can now take an afternoon. But a
-gap is opening between what gets produced and what can be verified. Trust is needed at every step:
-
-- when a scientist reviews what their agent has just produced;
-- when a reviewer judges an analysis they did not run themselves;
-- when someone later sets out to reproduce the work, or to build on it.
-
-Neither of the usual records answers that. **Code** is executable but opaque: it buries its
-assumptions and says nothing of intent. **A paper** is legible but lossy: the analysis cannot be
-regenerated from it. What is missing between them is the record of the decisions, assumptions,
-evidence and provenance behind each result.
-
-## What it provides
-
-The Lightcone Stack keeps that record as the work happens, so that every result is:
-
-- **Traceable.** Every figure, number and claim ties back to the data, code and decisions that
-  produced it, and can be checked without re-running the analysis.
-- **Observable.** The whole analysis is recorded, including the choices that were made and the
-  alternatives they were weighed against, not just the path that was taken.
-- **Legible.** People and agents can both read the record: what was done, why, and on what
-  evidence.
-
-Each result then becomes a solid foundation for the next: science that compounds.
+The Lightcone Research Stack helps you keep that record while you work. You describe the research
+question and review the methodological choices with your agent. The analysis specification records
+those choices; the execution tools record how the outputs were made; the report refers to those
+outputs when you write up the results.
 
 ## How it fits together
 
 <StackLayers />
 
-- **[ASTRA](/astra)** is the open specification the analysis is written in. `astra.yaml` declares its
-  inputs, outputs and recipes, the decisions that shape it with their alternatives, and the evidence
-  behind its claims.
-- **The [Lightcone CLI](/lightcone-cli)**, `lc`, executes the specification. It runs each recipe in a
-  sandbox, runs every combination of choices you ask for, and commits each output with a record of
-  how it was made.
-- **[Agent Skills](/agent-skills)** teach your coding agent to work this way: to open with an
-  interview, write the specification with you, and drive `lc` to produce the results.
-- **[Lightcone Lab](/lightcone-lab)** brings the project into JupyterLab, where you can browse its
-  inventory, follow its pipeline and inspect the provenance of each result.
-- **[MySTRA](/mystra)** lets the report cite the analysis by path: re-run the analysis and the report
-  follows.
+| Component | Its job | Where to start |
+| --- | --- | --- |
+| [ASTRA](/astra) | Describe inputs, outputs, decisions and the evidence behind claims in `astra.yaml`. | [The research record](/astra#what-an-analysis-records) |
+| [Agent Skills](/agent-skills) | Give Claude Code or Codex instructions for scoping and working on the analysis with you. | [Start or resume a project](/agent-skills/getting-started) |
+| [Lightcone CLI](/lightcone-cli) | Run recipes and record outputs, input hashes, decisions and execution environments. | [Run an analysis by hand](/lightcone-cli/getting-started) |
+| [MySTRA](/mystra) | Read the analysis into a MyST report, including figures and values from result files. | [Write a report](/mystra/getting-started) |
+| [Lightcone Lab](/lightcone-lab) | Browse the project and inspect results in JupyterLab. | [Open the workbench](/lightcone-lab/getting-started) |
 
-## You and your agent
+You can use the CLI without an agent, write ASTRA without Lightcone, or publish a MySTRA report
+without JupyterLab. The [quick start](/) follows the agent-assisted workflow.
 
-The agent does much of the work, but not the judgment:
+## What the record lets you check
 
-- **It starts with questions, not code.** Before anything runs, the agent interviews you and writes
-  the analysis down in the specification, where you can read it.
-- **It never writes a result itself.** The agent describes the analysis and drives the CLI; every
-  output comes out of `lc`, with its provenance, never out of the conversation.
-- **You own the argument.** You make the scientific choices and remain responsible for what the
-  results mean. The record makes those choices visible, to you and to your readers.
+Suppose changing a covariance estimate doubles the uncertainty on a measurement. In ASTRA, that
+choice can be a named decision with two options. Each configuration is a universe. The CLI runs
+both and records which inputs and choices produced each output. A reader can then see which
+uncertainty the report uses and inspect the alternative.
+
+The [first-analysis tutorial](/guides/first-analysis) works through this example with supernova
+data. The longer-term aim is for results to be usable in subsequent research with their evidence
+and assumptions still attached; [ASTRA](/astra#how-claims-chain-together) explains that connection.
+
+These records help you review the work. They do not establish that a model is appropriate, that
+the code implements it correctly, or that a conclusion follows from the results. Those remain
+scientific judgments for you and your collaborators.
 
 ## Status
 
-The stack is in early development. Its pieces are released separately and still change between
-versions, so projects pin the versions they use. It is open source under the BSD 3-Clause license,
-at [github.com/LightconeResearch](https://github.com/LightconeResearch).
+The stack is in early development. Its components have separate releases, so follow the version
+requirements in their installation guides. The code is available under the BSD 3-Clause license at
+[github.com/LightconeResearch](https://github.com/LightconeResearch).

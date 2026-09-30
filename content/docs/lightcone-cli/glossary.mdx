@@ -9,14 +9,12 @@ The terms you'll see all over the docs and the `lc` command output, in plain lan
 
 **A**gentic **S**chema for **T**ransparent **R**esearch **A**nalysis. The schema lightcone-cli is
 built around. ASTRA's job is to capture an analysis's inputs, outputs, and methodological decisions
-in a single file (`astra.yaml`); lightcone-cli's job is to execute that spec reproducibly. ASTRA
-ships separately as the `astra-tools` package, and its `astra` CLI handles the spec itself
-(validation, universe management, evidence verification). See [ASTRA](/astra).
+in `astra.yaml`. The schema is distributed as `astra-spec`; `astra-tools` supplies the Python SDK
+and `astra` command for validation, universe management and evidence checks. See [ASTRA](/astra).
 
 ## astra.yaml
 
-Your project's spec file. The single source of truth: every input, output, recipe, and decision is
-declared here. Sub-analyses can be nested via `analyses:` references.
+The project's specification file, declaring inputs, outputs, recipes and decisions. Sub-analyses can be nested via `analyses:` references.
 
 ## Recipe
 
@@ -63,8 +61,9 @@ The per-output sidecar JSON file, `.<output_id>.manifest.json` beside the output
 what produced the output: the recipe, the decisions, `definition_version`, `env_version`,
 `data_version`, `input_versions`, the git commit the run started at, the engine version, what
 enforcement actually ran (`hermeticity`), and, for containerized runs, the image. Written by the
-run, read by `lc status` and `lc materialize --check`; kept in plain git so a clone can classify a
-whole project without fetching any data.
+run and read by `lc status` and `lc materialize --check`. Manifests stay in plain git, so their
+records are available without result payloads. Checking declared input hashes still requires the
+input content.
 
 ## definition_version
 
@@ -81,7 +80,7 @@ output is `behind`, reported and left alone.
 
 A content hash of an output's bytes (or of a declared input). For a file it is a plain sha256, the
 number `sha256sum` prints, and the one the RO-Crate publishes; a directory-valued declared input is
-hashed tree-wise and framed, so the two can never collide. This is what flows downstream: a
+hashed tree-wise and framed, so file and directory identities use distinct encodings. This is what flows downstream: a
 dependent is remade when an input's `data_version` changed, and a rebuild that comes out
 byte-identical stops the cascade right there.
 
@@ -99,7 +98,7 @@ The three states an output can be in:
 - `behind`: still what the spec asks for; only the environment moved since it was made. Reported,
   left alone; `--refresh` remakes.
 - `stale`: contradicts the project: the spec defines it differently, an input changed, or the
-  output was edited by hand. Remade on the next run.
+  output was changed and committed outside its run. Remade on the next run.
 
 ## Direct mode / containerized mode [#modes]
 
@@ -125,8 +124,7 @@ then `docker` (skipped if its daemon is down).
 The isolation every recipe and every `lc run` command executes under: Landlock on Linux, Seatbelt
 on macOS, the container boundary in containerized mode. The project tree is read-only apart from the
 directory the output being made lands in; undeclared tools don't execute. Each manifest's
-`hermeticity` field records what was actually enforced, and a host with no mechanism says so rather
-than pretending.
+`hermeticity` field records what was actually enforced, and records reduced isolation when no supported mechanism is available.
 
 ## git-annex
 
@@ -144,18 +142,17 @@ build log.
 
 ## RO-Crate
 
-The publication view. Declare a `license` under `[project]` in `pyproject.toml` and every
-materialize maintains `ro-crate-metadata.json`: a machine-readable description of the project, its
-outputs, and the runs that produced them, following the Provenance Run Crate profile. The repository
-is the crate; deposit is `git archive`.
+A machine-readable description of the project, its outputs and the runs that produced them.
+With a project license declared, `lc materialize` maintains `ro-crate-metadata.json` using the
+Provenance Run Crate profile. [Publication](/lightcone-cli/getting-started#7-publish) also requires
+packaging the annexed data and results.
 
 ## Prior insight
 
-A piece of evidence from the literature that informs a decision. Lives in the `prior_insights:`
+An existing claim that informs the analysis, with supporting evidence. Lives in the `prior_insights:`
 section of `astra.yaml`, with a `claim` and verifiable `evidence` (DOI plus exact quote).
 
 ## Finding
 
-A conclusion drawn *from* the analysis (as opposed to a prior insight, which comes *into* it).
-Findings live in the `findings:` section and cite specific outputs as evidence: the bridge between
-materialized results and the eventual paper.
+A claim made by the analysis, recorded under `findings:` with its evidence. See
+[ASTRA](/astra#how-claims-chain-together) for how findings relate to later work.

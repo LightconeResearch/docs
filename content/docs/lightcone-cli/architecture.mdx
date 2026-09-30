@@ -1,13 +1,12 @@
 ---
 title: Architecture
-description: How lightcone-cli is put together, and how it keeps the promises the user guide makes.
+description: The CLI, execution engine and ASTRA interfaces, with the path of a materialization run.
 ---
 
-How lightcone-cli is put together, for someone about to change it. The
-[core concepts](/lightcone-cli/concepts) page covers what the tool promises; this page covers how the
-promises are kept.
+This page describes the modules involved in execution and the constraints to preserve when
+changing them. For user-facing behavior, see [Core concepts](/lightcone-cli/concepts).
 
-## The split that everything else follows
+## Module responsibilities [#the-split-that-everything-else-follows]
 
 ```text
 lc (CLI)                     engine                        ASTRA
@@ -52,11 +51,10 @@ lc materialize "$CLUSTER"
         then    → converge ro-crate-metadata.json (if licensed)
 ```
 
-The division of labor is strict and load-bearing:
+The driver and workers have separate responsibilities:
 
 - **The driver owns git, alone.** Workers execute and return a `TaskResult`; the driver commits as
-  results arrive, in one thread. Concurrent git operations race on the index lock: this split is
-  not a preference.
+  results arrive, in one thread. This avoids concurrent git operations racing on the index lock.
 - **Dask owns the ordering.** Tasks that may execute are submitted with their upstream futures or
   already-current values as arguments; there is no ready-set loop or hand-rolled topological sort on
   the execution path.
@@ -79,15 +77,14 @@ The division of labor is strict and load-bearing:
 `identity.py` computes two digests that deliberately answer different questions:
 
 - **`definition_version`** = hash(rendered recipe ‖ decisions): what the spec says the output *is*.
-  When it moves, the artifact contradicts the spec: **stale**, remade.
+  A change makes the output **stale**, so it is rebuilt.
 - **`env_version`** = hash(lock bytes ‖ interpreter pin ‖ install settings ‖ image document): what
-  the output *ran under*. When it moves, the artifact is merely from another time: **behind**,
-  reported, left alone.
+  the output *ran under*. A change makes the output **behind**;
+  it is reported and left in place unless refreshed.
 
 `assets.classify` is the one implementation of the rule, with two callers: the worker (live input
 digests) and the read-only walk (`None` for anything upstream that will run: "this is going to
-change"). That single value is the entire difference between run and check, which is what keeps
-`--check` honest. `behind` does not propagate; `stale` wins when both apply; and a foreign write (an
+change"). That single value is the entire difference between run and check, so run and check use the same classification rules. `behind` does not propagate; `stale` wins when both apply; and a foreign write (an
 output whose file or manifest was last touched by a commit that is not its own run record)
 classifies stale through the same rule, as one more input value.
 
@@ -112,7 +109,7 @@ Each output is committed with a **run record**: a `[DATALAD RUNCMD]` commit mess
 reconstructs the engine (`uv run --no-project --with lightcone-cli==<v>`) and re-executes the worker
 entry point, so `datalad rerun` replays the making of an output with the gates, the sandbox, and the
 manifest intact. Results are committed *thin* (hard-linked to their annex object), which is safe
-precisely because lc never writes an output in place: the worker resets the directory first.
+precisely because lc never writes an output in place: the worker removes that output's payload and sidecar before writing.
 
 ## The exec boundary
 
@@ -127,7 +124,7 @@ There is one policy builder, `exec_policy`: probes and recipes share environment
 rules, with write scope and GPU visibility supplied by the caller. GPU recipes and supported probes
 inherit the worker's allocation mask; CPU commands get an empty mask.
 
-## The container hatch
+## Containers [#the-container-hatch]
 
 Containerized mode changes the recipe's world and nothing else. `image.py` (pure) turns the
 `[tool.lightcone.image]` declaration into a rendered Containerfile, an identity document, and a
@@ -168,7 +165,7 @@ compute. See [compute internals](/lightcone-cli/internals/compute) and
 
 `crate.py` renders the repository as a Provenance Run Crate: a pure function of repository state
 (sorted iteration, no clock, git injected as a callable), which is what lets `materialize` converge
-`ro-crate-metadata.json` byte-for-byte and commit only differences. Run identity comes free from the
+`ro-crate-metadata.json` byte-for-byte and commit only differences. Run identity comes from the
 manifests' `git_sha` (the driver reads HEAD once per run), so one materialize maps onto one
 `OrganizeAction` with no new manifest field.
 

@@ -3,9 +3,9 @@ title: Testing
 description: How the test suite is shaped, where each question belongs, and how the enforcement suite stays honest.
 ---
 
-The suite's shape follows the engine's: pure modules get pure tests, the subprocess seam gets a
-stub, and the questions only a kernel, a runtime, or a validator can answer get real ones, gated so
-they can't pass by not running.
+Pure modules use unit tests. Most subprocess calls use a shared stub; integration tests use real
+tools to check storage, execution and sandbox enforcement. CI requires the relevant integration
+tests to run.
 
 ## The one seam
 
@@ -24,7 +24,7 @@ price of testing execution.
 | --------------------------- | ----------------------------- | ---------------------------------------------------------------------------------- |
 | Convergence semantics       | `test_project.py`             | stubbed                                                                            |
 | Template content & repair   | `test_templates.py`           | pure                                                                               |
-| Do bytes land in the annex? | `test_dataset.py`             | **real tools**: every bug this seam had was invisible to a stub                    |
+| Do bytes land in the annex? | `test_dataset.py`             | **real tools**: inspect actual git and annex storage                    |
 | Identity sensitivity        | `test_identity.py`            | pure, both directions                                                              |
 | The graph, the gate         | `test_plan.py`                | pure; tests what lc *adds*, never what a spec means (that's astra-tools' suite)    |
 | Classification              | `test_assets.py`              | pure                                                                               |
@@ -42,8 +42,7 @@ price of testing execution.
 
 ## The enforcement suite
 
-`test_sandbox_enforcement.py` is the only file that can tell you the sandbox works, and four
-properties keep it honest:
+`test_sandbox_enforcement.py` checks actual kernel enforcement. It uses:
 
 1. **One suite, both mechanisms**: parameterized by `detect()` alone; a leak only Linux catches is a
    leak, and macOS CI is the sole place the generated SBPL ever executes.
@@ -55,8 +54,7 @@ properties keep it honest:
    failure, and two tests cover the guard itself.
 
 **Mutation-check every denial test**: run the same command through `Unavailable()` and confirm it
-*succeeds*. A denial test that would pass unsandboxed is testing nothing, and the failure mode is
-silent. Two related traps: a write-denial must target a path the OS would let you write (a `/etc`
+*succeeds*. This confirms that the sandbox caused the denial. Two related traps: a write-denial must target a path the OS would let you write (a `/etc`
 write pins nothing), and enforcement fixtures must not live under `/tmp`, which is inside the write
 baseline: the `outside` fixture roots at `$HOME` for exactly this reason.
 

@@ -1,62 +1,37 @@
 ---
 title: Getting started
-description: Install the lightcone plugin and start, or pick up, a project with your agent.
+description: Start or resume an analysis with your agent.
 icon: Rocket
 ---
 
-<Steps>
-<Step>
+Complete the [plugin installation](/agent-skills/installation) first. For a Lightcone analysis,
+install `lightcone`; it includes ASTRA support and needs the
+[Lightcone CLI](/installation#3-the-lightcone-cli).
 
-### Install the plugin
+## Start a project
 
-Register the Lightcone marketplace, then install the `lightcone` plugin, which includes `astra`:
-
-```bash tab="Claude Code"
-claude plugin marketplace add LightconeResearch/agent-skills
-claude plugin install lightcone@lightcone-research
-```
-
-```bash tab="Codex"
-codex plugin marketplace add LightconeResearch/agent-skills
-codex plugin add lightcone@lightcone-research
-```
-
-The plugin drives the Lightcone CLI, so install that too (`uv tool install lightcone-cli==0.5.0rc5`).
-[Installation](/agent-skills/installation) covers the desktop apps, installing `astra` on its own,
-and what the plugins need at runtime.
-
-</Step>
-<Step>
-
-### Start a project
-
-Start your agent in an empty directory and tell it what you want to find out:
+Open your agent in an empty project directory and describe the question:
 
 ```text
 I want to start a new analysis: <your research question>
 ```
 
-The agent interviews you about the question and the structure of the analysis before it writes any
-code, sets the project up with `lc init`, and writes the analysis down in `astra.yaml`. Once you
-agree, it implements the analysis and produces the results with `lc`.
-[The lightcone plugin](/agent-skills/lightcone) describes each stage.
+The agent asks about your data, expected outputs and methodological choices. It sets up the project
+with `lc init` and records the plan in `astra.yaml` for review before implementing it.
+[The lightcone plugin](/agent-skills/lightcone#scoping-a-new-analysis) describes the scoping process.
 
-</Step>
-<Step>
+For a worked example with data and prompts, follow [Your first analysis](/guides/first-analysis).
 
-### Pick up an existing project
+## Resume a project
 
-Start your agent in the project's directory and ask where things stand:
+Open your agent in the project's directory and ask:
 
 ```text
 Where were we?
 ```
 
-The agent checks the state of every output with `lc status` and summarizes it before asking what to
-do next.
+The agent reads the specification and project notes, checks the outputs with `lc status`, and
+summarizes what needs attention. You can then ask for a specific change, another universe, a run,
+or a report update.
 
-</Step>
-</Steps>
-
-For a complete example, from a question to a report, follow
-[Your first analysis](/guides/first-analysis).
+If the skill does not load, use its [explicit invocation](/agent-skills#call-a-skill).
