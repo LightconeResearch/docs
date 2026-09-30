@@ -1,0 +1,123 @@
+---
+title: ASTRA
+description: The open specification every Lightcone project is written in.
+---
+
+ASTRA, the Agentic Schema for Transparent Research Analysis, is an open specification for describing
+a research analysis in a YAML file, `astra.yaml`. Code captures how an analysis runs, but not its
+structure: `astra.yaml` records its inputs, outputs, methodological choices and evidence, so that the
+work is easier to review, reproduce and extend.
+
+ASTRA doesn't depend on any tool: agents, workflow runners and people can all read the same file.
+It has its own documentation, schema and releases at [astra-spec.org](https://astra-spec.org/latest/);
+this page covers what you need to know to use it with the Lightcone Stack.
+
+## What an analysis records
+
+| Element        | What you record                                                          |
+| -------------- | ------------------------------------------------------------------------ |
+| Inputs         | The datasets, files and upstream analyses you use                        |
+| Outputs        | The metrics, figures, tables and other artifacts you intend to produce   |
+| Recipes        | The command that produces each output from its declared inputs and choices |
+| Decisions      | Methodological choices, their alternatives, and the reasons for them     |
+| Universes      | A selection of one option per decision, to run together                  |
+| Prior insights | Existing knowledge, with its evidence, that informs the approach         |
+| Findings       | Claims supported by the analysis's outputs                               |
+
+## Decisions and universes
+
+Results depend on choices: which data to include, how to treat outliers, which prior to assume. In
+ordinary research code those choices are scattered across scripts, notebooks and memory. ASTRA gives
+each one an explicit place: a **decision** names the options that were considered and why one might
+choose each.
+
+```yaml title="astra.yaml (excerpt)"
+outputs:
+  - id: fit_params
+    type: table
+    format: csv
+    description: Slope, intercept and scatter for the fitted relation.
+    inputs: [catalog_data]
+    decisions: [fit_method]
+    recipe:
+      command: >-
+        python src/fit_period_luminosity.py
+        --catalog {inputs.catalog_data}
+        --method {decisions.fit_method}
+        --out {output}
+
+decisions:
+  fit_method:
+    label: Fitting method
+    rationale: The fitting method determines how outliers influence the inferred relation.
+    default: ordinary_least_squares
+    options:
+      ordinary_least_squares:
+        label: Ordinary least squares
+      robust_linear:
+        label: Robust linear fit
+```
+
+Picking one option per decision gives a **universe**, a single runnable configuration. A universe is
+just a small YAML file:
+
+```yaml title="universes/baseline.yaml"
+id: baseline
+description: Default configuration for the period-luminosity fit.
+
+decisions:
+  fit_method: ordinary_least_squares
+```
+
+The set of all universes is the analysis's **multiverse**. Running several of them shows whether a
+result holds when you change a method, a model or a prior.
+
+## Evidence
+
+Knowledge comes into an analysis as **prior insights** and goes out as **findings**. Both carry
+their evidence: for a published result, the paper's identifier and the exact quote it rests on.
+ASTRA's tools fetch the paper and check that the quote is really there, so a citation can't be
+invented.
+
+## How the stack uses it
+
+- **[Agent Skills](/agent-skills)**: the `astra` skill teaches your agent the format, so it writes and
+  revises `astra.yaml` with you. A hook validates the file each time the agent saves it.
+- **[Lightcone CLI](/lightcone-cli)**: `lc` executes the recipes. Each output that `lc` runs needs a
+  `format`, a `recipe`, and its `inputs` and `decisions` declared; its file lands at
+  `results/<universe>/<output>.<format>`, next to a manifest that records how it was made.
+- **[MySTRA](/mystra)**: the report refers to outputs, decisions and values by their path in
+  `astra.yaml`, rather than copying them.
+- **[Lightcone Lab](/lightcone-lab)**: the workbench shows the analysis as an inventory and a
+  pipeline.
+
+Keep the `version:` field that `lc init` writes: it is the version of the ASTRA schema, separate from
+the version of any tool.
+
+## The `astra` command
+
+[astra-tools](https://github.com/LightconeResearch/astra-tools) provides the `astra` command, which
+validates and inspects a specification. You don't need to install it: `uvx` fetches it on first use.
+Run it from your project directory, with the version the current Lightcone CLI expects:
+
+```bash
+uvx astra-tools@0.2.18 validate
+uvx astra-tools@0.2.18 info
+```
+
+With no file name, `validate` checks the project's specification and universe files. Add
+`--verify-evidence` to check quotes against their sources:
+
+```bash
+uvx astra-tools@0.2.18 validate astra.yaml --verify-evidence
+```
+
+The agent plugin runs the same command with its own pinned version, so you only need it to check
+things yourself.
+
+## Learn more
+
+- [Getting started with ASTRA](https://astra-spec.org/latest/getting-started/): the format on its
+  own, without Lightcone.
+- [Specification reference](https://astra-spec.org/latest/specification/): every element and field.
+- [CLI reference](https://astra-spec.org/latest/cli/): validation, universes, and paper tools.

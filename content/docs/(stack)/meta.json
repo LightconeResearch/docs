@@ -3,5 +3,5 @@
   "description": "Quickstart and guides for the whole stack",
   "icon": "Layers",
   "root": true,
-  "pages": ["index", "---Related---", "external:[ASTRA specification](https://astra-spec.org/latest/)"]
+  "pages": ["index", "what-is-lightcone", "astra", "comparisons", "installation", "guides"]
 }

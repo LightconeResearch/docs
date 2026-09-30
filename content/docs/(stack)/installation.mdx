@@ -1,0 +1,159 @@
+---
+title: Installation
+description: Set up the Lightcone Stack on your machine, step by step.
+---
+
+You need two things on your machine, [uv](https://docs.astral.sh/uv/) and git, plus a coding agent:
+Claude Code or Codex, in the terminal or as a desktop app. Everything else, Python included, is
+installed by uv or ships with the Lightcone CLI.
+
+<Callout title="Supported platforms">
+  Linux (glibc 2.34 or newer, x86_64 or aarch64) and macOS (14 or newer on Apple silicon, 15 or newer
+  on Intel). On Windows, use WSL.
+</Callout>
+
+## 1. uv and git
+
+uv manages the Python environments of your projects, and the interpreters themselves, so there is no
+separate Python to install:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+git comes with macOS; on Linux, install it with your package manager (`apt install git`,
+`dnf install git`, and so on).
+
+<Callout title="On an HPC system">
+  uv installs into your home directory, so the same command works on clusters that don't provide it,
+  such as NERSC's Perlmutter. Make sure `~/.local/bin` is on your `PATH`.
+</Callout>
+
+## 2. Tell git who you are
+
+The Lightcone CLI commits every output it makes, so git needs an identity before the first run:
+
+```bash
+git config --global user.name "Ada Lovelace"
+git config --global user.email "ada@example.org"
+```
+
+If you already commit from this machine, you're done.
+
+## 3. The Lightcone CLI
+
+The package is `lightcone-cli` on PyPI; the command it provides is `lc`. Install it with its exact
+version:
+
+```bash
+uv tool install lightcone-cli==0.5.0rc5
+lc --version
+```
+
+The version matters while the current release is a pre-release: without it, uv installs an older
+stable release that the agent plugin doesn't support. The CLI also brings git-annex, which stores the
+data and results of your projects.
+
+<Callout title="An existing lc alias">
+  If your shell already has an alias named `lc` (some people bind it to `ls --color`), it hides the
+  new command. Rename the alias, or run `unalias lc`.
+</Callout>
+
+## 4. The agent plugin
+
+The [Agent Skills](/agent-skills) are distributed as a plugin marketplace, registered under the name
+`lightcone-research`. Add the marketplace, then the `lightcone` plugin. It includes the `astra` plugin,
+so don't install that one alongside it.
+
+<Tabs groupId="agent" persist items={['Claude Code', 'Codex', 'Claude app', 'Codex app']}>
+<Tab value="Claude Code">
+
+```bash
+claude plugin marketplace add LightconeResearch/agent-skills
+claude plugin install lightcone@lightcone-research
+```
+
+In a session, call the skill with `/lightcone:lightcone`, or just describe what you want to do.
+
+</Tab>
+<Tab value="Codex">
+
+```bash
+codex plugin marketplace add LightconeResearch/agent-skills
+codex plugin add lightcone@lightcone-research
+```
+
+In a session, call the skill with `$lightcone:lightcone`, or just describe what you want to do.
+
+</Tab>
+<Tab value="Claude app">
+
+Open **Customize → Plugins → Add → Add marketplace → Add from repo** and paste
+`https://github.com/LightconeResearch/agent-skills`. Then, in **Customize → Plugins**, choose
+**lightcone** from the `lightcone-research` marketplace.
+
+</Tab>
+<Tab value="Codex app">
+
+Open **Plugins** from the arrow beside **Create** and add the `LightconeResearch/agent-skills`
+marketplace. Then search for **lightcone** and install it.
+
+</Tab>
+</Tabs>
+
+When a session starts, the plugin checks that `lc` is installed at a version it supports. If it
+isn't, your agent offers to run the install command from step 3; in an interactive session, it never
+installs anything without asking. The plugin runs ASTRA's own `astra` command through `uvx`, which fetches it on first
+use.
+
+## Optional extras
+
+### Container runtime
+
+Only projects that opt into containers need [Podman](https://podman.io/) or
+[Docker](https://docs.docker.com/get-docker/). Until a project does, its recipes run directly on your
+machine, in the project's own locked environment. There is nothing to configure: `lc` uses whichever
+runtime it finds.
+
+### Report preview
+
+Each project comes with a MyST report. Previewing it needs [Node.js](https://nodejs.org/) 18 or newer
+and [MyST](https://mystmd.org/); your agent asks before installing them.
+
+### Lightcone Lab
+
+[Lightcone Lab](/lightcone-lab) is a JupyterLab extension, installed into the environment that runs
+JupyterLab 4.5.10 or newer. It comes in two forms:
+
+```bash tab="Browser only"
+pip install --user jupyterlab-lightcone
+```
+
+```bash tab="With server features"
+pip install "jupyterlab-lightcone[full]"
+```
+
+The browser-only form needs `lc` on the terminal's `PATH`. The full form also installs the Lightcone
+CLI and the tools the workbench runs on the server, and needs git and uv on the server's `PATH`. See
+the [Lightcone Lab](/lightcone-lab) section for its agents and other requirements.
+
+## Updating
+
+Install the new version by name; it replaces the one you have:
+
+```bash
+uv tool install lightcone-cli==<version>
+```
+
+`uv tool upgrade` doesn't move to a pre-release, so name the version while the release is one. An
+update never invalidates your results: the CLI's version is recorded with every output, but it
+doesn't decide whether an output is up to date, so nothing is rebuilt just because `lc` changed.
+
+## Uninstalling
+
+```bash
+uv tool uninstall lightcone-cli
+```
+
+Your projects are untouched: everything the CLI knows about an analysis lives in the project's own
+repository.

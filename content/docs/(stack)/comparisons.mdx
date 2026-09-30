@@ -1,0 +1,73 @@
+---
+title: Comparisons
+description: How the Lightcone Stack relates to other tools for AI-assisted research.
+---
+
+Many tools now help researchers work with AI agents. What sets the Lightcone Stack apart is the
+record it keeps: the analysis is declared in an open specification before anything runs, its choices
+and their alternatives are explicit, and every result is traced back to them in files you own. This
+page compares it with the tools you are most likely to weigh it against. It was last reviewed in
+September 2026; the other tools move quickly, so check their own documentation too.
+
+## Claude Science
+
+[Claude Science](https://www.anthropic.com/news/claude-science-ai-workbench) is Anthropic's desktop
+"AI workbench for scientists", in beta since June 2026. Claude writes and runs Python, R or shell code
+in a sandbox on your machine, can send jobs to remote servers, draws on data sources through
+connectors, and saves versioned artifacts. Each saved artifact keeps the
+[code, execution log and environment](https://claude.com/docs/claude-science/artifacts) that produced
+it, and a reviewer agent checks claims against what actually ran.
+
+It is a polished, well-supported application, and it already records a great deal. The difference
+lies in what the record is and who owns it:
+
+|                            | Claude Science                                                         | Lightcone Stack                                                                   |
+| -------------------------- | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| **The analysis**           | Reconstructed from what the agent did: code, logs and environment      | Declared up front in `astra.yaml`: inputs, outputs, decisions, evidence           |
+| **Analysis choices**       | Fork a session to compare approaches                                   | Named decisions with their alternatives, run side by side as universes            |
+| **Evidence**               | A reviewer agent checks claims and citations against what ran          | Quotes recorded in the specification and checked against the source paper        |
+| **Where the record lives** | The app's data folder, on one computer                                 | A git repository, with data and results in git-annex                              |
+| **Sharing**                | Manuscripts, figures and code exports                                  | An RO-Crate, and a MySTRA report tied to the analysis                             |
+| **Agents and models**      | Claude, in the Claude Science app, on a paid Claude plan               | Claude Code or Codex                                                              |
+| **Compute**                | Local, remote Linux servers, Slurm, and cloud GPUs through Modal       | Local, or Slurm clusters                                                          |
+| **Openness**               | Proprietary                                                            | Open source (BSD 3-Clause), open specification                                    |
+
+Where Claude Science is ahead: a graphical interface with built-in viewers (for example for protein
+structures and genome tracks), more than sixty connectors and skills with a strong life-sciences
+focus, cloud GPUs, and Anthropic's support.
+
+Where the Lightcone Stack is ahead:
+
+- **The analysis is declared, not reconstructed.** The specification is written, with you, before
+  anything runs; it states the intent, not only the steps that happened to run.
+- **Choices are first-class.** A decision records the alternatives and the reasons, and the multiverse
+  shows whether a result survives changing them.
+- **Claims carry checkable evidence.** Findings and prior insights cite the exact text they rest on,
+  and the tools verify it against the source.
+- **The record is open and portable.** It lives in a repository you own, in open formats that other
+  tools and other agents can read, without any particular application.
+
+The two can also work together: the Lightcone Stack runs inside Claude Code, so you can keep using
+Claude while keeping your analysis in an open, portable record.
+
+## Workflow managers
+
+[Snakemake](https://snakemake.readthedocs.io/), [Nextflow](https://www.nextflow.io/) and
+[DVC](https://dvc.org/) are mature tools for running pipelines and versioning data. The Lightcone CLI
+covers similar ground (running recipes, tracking what is up to date, recording provenance), but its
+input is the scientific structure of the analysis: the decisions and their alternatives, the evidence
+and the findings. And it is built to be driven by an agent: it never prompts, and it reports in JSON.
+
+## Notebooks
+
+Jupyter notebooks are the most common way to explore data interactively, but their hidden state and
+their mix of code, output and prose make an analysis hard to re-run or review.
+[Lightcone Lab](/lightcone-lab) keeps what is good about JupyterLab and adds the project around it:
+the inventory, the pipeline and the provenance of each result.
+
+## Autonomous research agents
+
+Systems such as [Kosmos](https://labs.edisonscientific.com/research/announcing-kosmos/) carry out
+research end to end and hand back a report. The Lightcone Stack takes the opposite approach: the
+agent does the work, but you make the scientific choices, and the specification records them where
+you and your readers can see them.
