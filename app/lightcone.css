@@ -46,3 +46,11 @@
   --color-fd-diff-remove: var(--lc-color-wax-red-soft);
   --color-fd-diff-remove-symbol: var(--lc-color-wax-red);
 }
+
+/* In the dark scheme the brand's canvas is its darkest tone, so the page takes
+   it and the sidebar, panels and popovers sit one step lighter. */
+.lightcone-brand.dark {
+  --color-fd-background: var(--lc-color-canvas);
+  --color-fd-popover: var(--lc-color-surface);
+  --color-fd-card: var(--lc-color-surface);
+}
