@@ -19,7 +19,7 @@
   --color-fd-background: var(--lc-color-surface);
   --color-fd-foreground: var(--lc-color-text);
   --color-fd-muted: var(--lc-color-surface-muted);
-  --color-fd-muted-foreground: var(--lc-color-text-subtle);
+  --color-fd-muted-foreground: var(--lc-color-blue-ink);
   --color-fd-popover: var(--lc-color-canvas);
   --color-fd-popover-foreground: var(--lc-color-text);
   --color-fd-card: var(--lc-color-canvas);
