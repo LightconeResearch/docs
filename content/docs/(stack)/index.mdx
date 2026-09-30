@@ -1,0 +1,38 @@
+---
+title: Introduction
+description: From research question to reproducible result.
+---
+
+import { Bot, FlaskConical, PenLine, Terminal } from 'lucide-react';
+
+The Lightcone Research Stack is Lightcone Research's tooling for research analyses described
+with [ASTRA](https://astra-spec.org/latest/). You describe an analysis in an `astra.yaml`
+specification; the stack runs it, keeps every result tied to the choices that produced it, and
+carries it through to a written report.
+
+<Callout title="Being rebuilt">
+  This site is being reorganised around the whole stack. A quickstart and guides are on their way;
+  until then, each component's section links to its current documentation.
+</Callout>
+
+## Components
+
+Choose a component from the selector at the top of the sidebar, or start here:
+
+<Cards>
+  <Card icon={<Terminal />} title="Lightcone CLI" href="/lightcone-cli">
+    The `lc` command: runs an analysis and records the provenance of every output.
+  </Card>
+  <Card icon={<Bot />} title="Agent Skills" href="/agent-skills">
+    Plugins that teach coding agents to scope, build and run ASTRA analyses.
+  </Card>
+  <Card icon={<FlaskConical />} title="Lightcone Lab" href="/lightcone-lab">
+    A JupyterLab workbench for exploring an ASTRA project.
+  </Card>
+  <Card icon={<PenLine />} title="MySTRA" href="/mystra">
+    Write reports that reference an analysis instead of copying its results.
+  </Card>
+</Cards>
+
+The ASTRA specification and the `astra` command have their own documentation at
+[astra-spec.org](https://astra-spec.org/latest/).

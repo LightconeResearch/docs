@@ -1,0 +1,7 @@
+{
+  "title": "Lightcone CLI",
+  "description": "The lc command: run analyses with provenance",
+  "icon": "Terminal",
+  "root": true,
+  "pages": ["index"]
+}
