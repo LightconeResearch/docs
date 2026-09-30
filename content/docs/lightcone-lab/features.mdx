@@ -1,0 +1,246 @@
+---
+title: Workbench tour
+description: What Lightcone Lab adds to JupyterLab, feature by feature, and how to reach each one.
+---
+
+Lab works on the **current project**: the ASTRA project that holds the file browser's folder. Browse
+into a folder with an `astra.yaml`, or any folder below it, and the launcher tab shows that
+project's Home, the status bar names it, and search looks inside it. Every Lab command is in the
+command palette (<kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd>) under **Lightcone Lab**.
+
+<Callout title="Two installs">
+  Sections marked **Full install** need `jupyterlab-lightcone[full]`; everything else also works in
+  the browser-only workbench. See [Installation](/lightcone-lab/installation).
+</Callout>
+
+| Feature                                   | Where to find it                                                      | Install |
+| ----------------------------------------- | --------------------------------------------------------------------- | ------- |
+| [Project Home](#home)                     | Any launcher tab inside a project                                     | Both    |
+| [New and existing projects](#projects)    | **New Lightcone project** card; **Create project**, **Open project** | Both    |
+| [ASTRA inventory](#inventory)             | Double-click `astra.yaml`; **Open ASTRA** on Home                      | Both    |
+| [Record tabs](#record-tabs)               | Any result, decision, input, finding or paper you open                | Both    |
+| [Pipeline](#pipeline)                     | **Pipeline** on Home; **Show in pipeline** in a record                | Both    |
+| [Papers](#papers)                         | A cited paper in the inventory or a record                            | Both    |
+| [Search](#search)                         | <kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>K</kbd>                             | Both    |
+| [Project updates](#updates)               | A notification when the project changes                               | Both    |
+| [Several projects](#several-projects)     | The status bar and tab labels                                         | Both    |
+| [Themes and Focus Layout](#themes)        | **Settings › Theme**; **Focus Layout** command                        | Both    |
+| [Freshness](#freshness)                   | Home, the inventory and the pipeline                                  | Full    |
+| [Provenance and versions](#provenance)    | An output's record tab                                                | Full    |
+| [Comments](#comments)                     | Click a figure, or select text                                        | Full    |
+| [Report preview](#report)                 | **Open report** on Home                                               | Full    |
+| [Agents](/lightcone-lab/agents)           | The right-hand column of Home                                         | Both    |
+
+## Project Home [#home]
+
+Inside a project, every launcher tab shows the project's Home instead of JupyterLab's launcher. It
+opens wherever a launcher would: the **+** button of the tab bar, **File › New Launcher**,
+<kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd>, the file browser's **+** button, or an
+empty main area. Home tabs follow the file browser, and a reload puts them back where they were.
+**Open Home** in the palette brings forward the Home of the current project.
+
+From top to bottom, Home shows:
+
+- **The title page**: the project's name and description, rendered as Markdown, and a count of its
+  results, decisions, inputs, findings and papers. The pencil buttons rename the project and edit
+  the description; both are saved to `astra.yaml`, keeping its comments and other fields.
+- **Its actions**: **Open ASTRA** opens the [inventory](#inventory); **Open report** appears when the
+  project has a `myst.yml` or `myst.yaml` and the full install can [preview it](#report); **Open
+  terminal** (full install) opens a terminal in the project folder.
+- **Results**: up to eight results as preview plates, figures first. The rest are named on a line
+  below, and **All N results** opens the inventory. The **Pipeline** link opens the
+  [pipeline](#pipeline), and in the full install a line says how many results are
+  [current](#freshness).
+- **Agents**, in a column on the right: **claude**, **codex** and a plain terminal in the
+  browser-only workbench, or a **New session** box and the recent sessions in the full install. See
+  [Agents](/lightcone-lab/agents).
+
+The **Tools** menu in Home's header holds everything JupyterLab's launcher offers, one submenu per
+launcher section (**Notebook**, **Console**, **Other**, and those other extensions add), running in
+the project folder. **Show the full launcher** switches the tab to JupyterLab's own launcher, and
+**Back to Home** switches it back.
+
+Outside a project, the launcher tab is JupyterLab's own launcher, with a **New Lightcone project**
+card under **Lightcone Lab**.
+
+## New and existing projects [#projects]
+
+To start a project, choose **New Lightcone project** in a launcher outside any project, or run
+**Create project** from the palette. The form proposes a `my-project` folder that doesn't exist yet
+(`my-project-2`, `my-project-3` and so on when it does), placed beside the current project when you
+are inside one; change it or **Browse…** for another.
+
+How the folder is set up depends on the install:
+
+- **Workbench only**: the form runs `lc init` in a terminal beside it. Once `lc init` succeeds, the
+  terminal closes and the project opens. If it fails, the terminal stays open so you can read why;
+  closing it ends the wait. Without terminals, the form tells you which command to run. This needs
+  `lc` on the terminal's `PATH`.
+- **Full install**: the server sets the folder up with the Lightcone engine, without a terminal, and
+  accepts absolute paths inside the Jupyter server's folder.
+
+**Open project** asks for a folder and opens its Home, offering setup when the folder holds no
+project. **Finish project setup** completes or retries setup in the file browser's folder. You can
+also just browse into any folder that holds an `astra.yaml`.
+
+## The ASTRA inventory [#inventory]
+
+`astra.yaml` opens in the **Lightcone Lab** viewer by default: a read-only inventory of the analysis,
+with its outputs, decisions, inputs, findings and cited papers, and previews of its figures and
+tables. Analyses nested in the project are listed in a hierarchy you can navigate. Opening the
+inventory starts no kernel and writes nothing.
+
+To edit the YAML itself, right-click `astra.yaml` and choose **Open With › Editor**. The inventory
+follows your edits; while the file doesn't parse, it keeps showing the last valid version with a
+warning.
+
+Reach the inventory from **Open ASTRA** on Home, the **ASTRA Inventory** command, the project's
+launcher card, or by clicking the project's name in the status bar. **Refresh ASTRA Inventory**
+re-reads the project. Result files open in ordinary JupyterLab tabs.
+
+## Record tabs [#record-tabs]
+
+Opening a result, decision, input, finding or paper, from Home, the inventory, the pipeline, search
+or an agent's reply, shows it in a record tab. The tab's header names the project, the sub-analysis
+when there is one, and the universe the record is resolved in.
+
+- **One preview tab per project**: opening another record reuses the project's unpinned record tab.
+  **Pin tab**, in the record's header or the right-click menu of its tab, keeps a record open; the
+  next one opens in a new preview tab. Pinned tabs survive a reload.
+- **Links navigate in place**: following a link inside a record shows the linked record in the same
+  tab. **Back** and **Forward** (<kbd>Alt</kbd>+<kbd>←</kbd> and <kbd>Alt</kbd>+<kbd>→</kbd>) step
+  through what the tab has shown.
+- **New tabs**: **Open in new tab** opens the record beside the current one; so does
+  <kbd>Ctrl</kbd>/<kbd>⌘</kbd>-click or a middle click on a record link.
+- **Beside its source**: the first record opened from a session, the pipeline or a wide tab splits
+  the main area and opens beside it, so both stay in view.
+
+## Pipeline [#pipeline]
+
+The pipeline draws the project as a graph from its inputs to its outputs, with each output marked
+current, behind or stale when the full install can ask `lc status` ([Freshness](#freshness)).
+
+Click a node to open its record and trace its lineage: what it is made from and what is made from
+it. **Show everything**, or <kbd>Esc</kbd>, clears the trace.
+
+Open it from the **Pipeline** link on Home, from **Show in pipeline** in a record (it then opens in
+the column beside the record, already tracing it), or with the **Pipeline** command. Each project
+has one pipeline tab, which a reload restores.
+
+## Papers [#papers]
+
+Cited papers are listed in the inventory, and a finding links to the paper it cites. Open one to
+read it in place, in a PDF viewer; **Locate source passage** scrolls to the passage the evidence
+quotes and highlights it. Where the PDF comes from depends on the install:
+
+- **Workbench only**: cited arXiv papers stream straight from arXiv, at the revision the evidence
+  cites (the latest when it names none). Other papers link to their DOI.
+- **Full install**: papers are read from the ASTRA paper cache on the server, the one the `astra`
+  command uses. A cited paper that isn't in the cache yet can be fetched into it from the paper
+  view.
+
+## Search [#search]
+
+<kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>K</kbd>, or **Search Lightcone project** in the palette, opens a
+search over the current project, in this order:
+
+1. **Sessions** and **In sessions** (the text of their messages), in the full install.
+2. **Results**, **Decisions**, **Inputs**, **Findings** and **Papers**: the records of the analysis.
+3. **Files** of the project, up to four folders deep and 500 files, skipping `.git`, `.venv`,
+   `_build`, `node_modules` and `__pycache__`.
+4. **Commands** of Lightcone Lab.
+
+Choosing a hit opens it where it belongs: a session in the main area, a record in a record tab, a
+file in its usual editor. Outside a project, search offers commands only. <kbd>Esc</kbd> closes it
+and returns focus where it was.
+
+## Project updates [#updates]
+
+When the project changes under you, because you or an agent edited `astra.yaml` or `lc` produced
+new results, Lab groups the changes into one JupyterLab notification. **Review changes** opens a
+list of the records that changed, each linked to its record tab.
+
+## Several projects [#several-projects]
+
+Lab works with several projects at once. The status bar shows **Lightcone ·** and the current
+project's folder name; hover it for the full path, and click it to open the project's inventory. In
+the full install, new sessions and their agents work in this project.
+
+When tabs from two projects would read the same, such as two `astra.yaml` inventories or two Homes,
+each tab also shows its project's folder name.
+
+## Themes and Focus Layout [#themes]
+
+Lab adds two optional JupyterLab themes in the Lightcone brand, **Lightcone Light** and **Lightcone
+Dark**, under **Settings › Theme**. Installing Lab doesn't switch themes, and Lab's own views follow
+whichever theme is active.
+
+**Focus Layout**, in the palette, gives a calmer screen: it collapses the right sidebar and hides
+the status bar. Run it again to restore them as they were.
+
+## Freshness [#freshness]
+
+**Full install.** Lab asks the Lightcone engine for each result's state, the same one `lc status`
+reports, with its reason: **current**, **behind** or **stale**. See
+[Core concepts](/lightcone-cli/concepts) for what each state means. The states appear in the
+inventory, on Home's results line ("All 5 current", or which results are stale or behind) and on the
+pipeline's nodes, and are checked again while those views are visible. They cover the outputs of the
+project's root analysis.
+
+## Provenance and versions [#provenance]
+
+**Full install.** An output's record tab shows how it was made, from the run record `lc` committed
+beside it, in four tabs:
+
+- **Run**: its status, when it finished, the recipe, the commit and the tree it ran from, the engine
+  version, the environment and the sandbox.
+- **Code**: the recipe's script as it ran, compared with the same file now; the current script opens
+  in an editor tab.
+- **Inputs**: the version of each input and upstream output the run used, linked to its record.
+- **Environment**: the packages `uv.lock` pinned for the run, compared with those it pins now.
+
+Above the result, a version bar (for example "v3 of 3 · 2 days ago · a889877") steps through its
+earlier versions. Each version is a git commit that changed the output; older ones stay readable
+while git-annex keeps their content in the repository, and a version held elsewhere names the
+repository that has it. Uncommitted files have no history.
+
+**Compare with previous** sets the shown version against the one before it. Figures can be shown side
+by side, with a swipe between them, or blinking from one to the other; tables and metrics are
+compared side by side.
+
+## Comments [#comments]
+
+**Full install.** Pin notes on what you are looking at, for your agent to act on:
+
+- **On a figure**, in a record tab or an image file: click where the note belongs. A numbered pin
+  marks the spot.
+- **On text**, in a record, a paper, a file (a text editor or a Markdown preview) or a session
+  message: select it and press **Comment**. The quote is marked where it appears.
+
+Type the note and press <kbd>Enter</kbd> to save it (<kbd>Shift</kbd>+<kbd>Enter</kbd> for a new
+line, <kbd>Esc</kbd> to cancel). Click a pin to edit or delete its note. A note on a result is tied
+to the version you are looking at.
+
+Pending notes wait as chips above the input of the project's sessions; click one to jump back to
+what it points at. They go to the agent with your next message: the agent receives them after your
+text, your message stays as you typed it, and the notes show as cards on it. Once sent, their pins
+disappear. Lab keeps comments in the project, in `.lightcone/comments.json`; **Refresh Comments** in
+the palette reloads them.
+
+## Report preview [#report]
+
+**Full install.** When the project has a MyST configuration (`myst.yml` or `myst.yaml`), **Open
+report** on Home shows its [MySTRA](/mystra) report in a tab. So do the **MySTRA Viewer** command,
+the project's launcher card, and **MySTRA Viewer** in the file browser's right-click menu. The
+report reloads when you save its sources; **Restart MySTRA Viewer** starts it again.
+
+The viewer runs `myst start` on the Jupyter server, with the MyST CLI the full install brings, and
+shows the site through JupyterLab. It needs:
+
+- **Node.js 20 or newer** on the server;
+- a report on an ASTRA MyST theme, such as the article theme of the report `lc init` sets up. Stock
+  MyST themes don't work in the viewer;
+- a Linux or macOS server, with the project on its local disk.
+
+Up to five reports can be open at once. The viewer is a stopgap until MyST offers a supported way to
+embed a site in JupyterLab.

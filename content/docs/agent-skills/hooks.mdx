@@ -1,0 +1,107 @@
+---
+title: Hooks
+description: What each plugin hook checks, when it fires, and what it tells your agent.
+---
+
+Hooks are scripts that the agent's harness runs at fixed moments, outside the conversation. What a
+hook prints is added to the agent's context, so the agent learns about a failed validation or a
+missing tool without having to look for it.
+
+The `astra` plugin ships two hooks. The `lightcone` plugin includes both and adds a third:
+
+| Hook                                        | Plugins            | Fires                                                    |
+| ------------------------------------------- | ------------------ | -------------------------------------------------------- |
+| [Validate on save](#validate-on-save)       | astra, lightcone   | After the agent writes or edits a file                   |
+| [ASTRA orientation](#astra-orientation)     | astra, lightcone   | At session start, in a directory with an `astra.yaml`    |
+| [Lightcone CLI check](#lightcone-cli-check) | lightcone          | At every session start                                   |
+
+All three share a few rules:
+
+- **They look at the session's directory.** Each hook reads `./astra.yaml` relative to where the
+  session started, so start your agent at the root of the project.
+- **They never install anything.** A hook runs without a permission prompt, so an install there
+  would change your machine with no chance to say no. Hooks report; the agent acts, asking you
+  first in an interactive session.
+- **They are bounded.** Each hook has a 90-second timeout.
+
+## Validate on save
+
+**Fires** after the agent's Write, Edit or `apply_patch` tool, when the change mentions `astra.yaml`
+or a universe and the session's directory holds an `astra.yaml`. Anything else exits silently. The
+check is deliberately broad: an unrelated edit that happens to match costs one extra validation run.
+
+**Does** validate the whole project, the specification and every universe file, with
+`uvx astra-tools@0.2.18 validate`. Validating `astra.yaml` alone would miss an edit that leaves a
+universe pointing at something that no longer exists, such as a decision the agent just deleted.
+
+**Tells the agent** one of four things:
+
+| Outcome                  | What the agent sees                                                                          |
+| ------------------------ | -------------------------------------------------------------------------------------------- |
+| The project is valid     | That validation passed for the project (`astra.yaml` and universes)                          |
+| The project is invalid   | That validation failed, with the validator's full report, so it can fix what it names        |
+| uv is not installed      | That the file was saved but not validated, and that it should ask you to install uv          |
+| The toolchain failed     | That the file was saved but not validated because the `astra` command itself failed to run: a network or install problem, not a verdict on the specification |
+
+<Callout title="Expected while scoping">
+  While a new analysis is being scoped, the validator reports `MISSING_DECISION` for
+  `universes/baseline.yaml` as soon as the specification gains its first decision. That is expected:
+  the `lightcone` skill regenerates the baseline universe from the decision defaults when scoping is
+  finished.
+</Callout>
+
+## ASTRA orientation
+
+**Fires** at the start of a session whose directory holds an `astra.yaml`. Elsewhere it stays
+silent.
+
+**Does** run `uvx astra-tools@0.2.18 info` and passes the agent the location of the specification,
+a summary of the analysis, and a reminder to use the `astra` skill when working with it. If uv is
+missing, it says so instead and has the agent ask you about installing it. If `astra info` fails,
+it says that too, and points the agent to `astra validate` to tell a toolchain problem from a
+malformed specification.
+
+It deliberately doesn't validate: that belongs to the moment an ASTRA file changes, which is the
+other hook's job.
+
+## Lightcone CLI check
+
+**Fires** at the start of every session, whether or not the directory holds a project. The
+`lightcone` skill's first job is often to create a project from nothing, and a missing or outdated
+CLI blocks that as surely as it blocks a run.
+
+**Does** check the `lc` on your `PATH`:
+
+1. Is it there?
+2. Does `lc --version` report a version?
+3. Is that version at least `0.5.0rc5`, the plugin's pin? Versions are compared in Python's
+   ordering, where a release candidate comes before its final release, so `0.5.0` counts as newer
+   than `0.5.0rc5`.
+
+**Tells the agent** the verdict and the remedy for each problem: the `uv tool install` command to
+install, upgrade or repair the CLI, listed in [Installation](/agent-skills/installation#the-lightcone-cli).
+
+When everything is in order, it says `Lightcone CLI ready: lc <version>`, in exactly those words.
+The `lightcone` skill takes that sentence as its own preflight and skips running `lc --version`
+again. In a project directory, the hook adds a pointer to `lc status`.
+
+### Who runs the fix
+
+The hook decides how the agent should handle a problem from whether anyone is there to answer:
+
+- **Interactive sessions**: the agent asks whether to run the command and waits. It never installs
+  or upgrades the CLI unasked.
+- **Headless runs**: in `claude -p`, an SDK embedding or CI, a question would only stall the run, so
+  the agent runs the command and says in its final message that it did. The hook recognises these
+  from the `CLAUDE_CODE_ENTRYPOINT` and `CI` environment variables.
+
+When in doubt, as in a harness that sets neither variable, it assumes a person is present. A
+needless question costs a stalled task; a needless install puts software on someone's machine that
+they never agreed to.
+
+## When hooks don't run
+
+Hooks depend on the harness: they can be turned off, and a subagent never sees the session start.
+The skills don't rely on them alone. Without the `Lightcone CLI ready` line, the `lightcone` skill
+runs `lc --version` itself before driving `lc`, and the `astra` skill re-validates after every change
+it makes.

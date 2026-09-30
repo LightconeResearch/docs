@@ -1,0 +1,117 @@
+---
+title: Settings and shortcuts
+description: Lightcone Lab's keyboard shortcuts, commands, settings schemas, server configuration and the files it keeps.
+---
+
+## Settings
+
+Lab has no options of its own to set. It ships two settings schemas, which register its keyboard
+shortcuts and its launcher entries:
+
+| Schema                        | Title in the Settings Editor | Registers                                                                                                            |
+| ----------------------------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `jupyterlab-lightcone:search` | Lightcone search             | <kbd>Accel</kbd>+<kbd>K</kbd> for **Search Lightcone project** (`jupyterlab_lightcone:search`)                       |
+| `jupyterlab-lightcone:home`   | Lightcone Home               | <kbd>Accel</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd>, **File › New Launcher** and the file browser's **+** button, for `launcher:create` |
+
+<kbd>Accel</kbd> is <kbd>Ctrl</kbd> on Linux and <kbd>⌘</kbd> on macOS. Change either shortcut as
+you would any JupyterLab shortcut, in **Settings › Settings Editor › Keyboard Shortcuts**.
+
+The Lightcone themes are chosen in **Settings › Theme**: **Lightcone Light** or **Lightcone Dark**.
+
+## Keyboard shortcuts
+
+| Keys                                                            | Where                     | What it does                                            |
+| --------------------------------------------------------------- | ------------------------- | ------------------------------------------------------- |
+| <kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>K</kbd>                        | Anywhere                  | Search the current project                              |
+| <kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd>       | Anywhere                  | Open a launcher tab: Home, inside a project             |
+| <kbd>Alt</kbd>+<kbd>←</kbd>                                      | A record tab              | Back to the record the tab showed before                |
+| <kbd>Alt</kbd>+<kbd>→</kbd>                                      | A record tab              | Forward again                                           |
+| <kbd>Ctrl</kbd>/<kbd>⌘</kbd>-click, or middle click             | A link to a record        | Open the record in a new tab                            |
+| <kbd>Enter</kbd>, <kbd>Shift</kbd>+<kbd>Enter</kbd>              | Home's **New session** box | Start the session; insert a new line                    |
+| <kbd>Enter</kbd>, <kbd>Shift</kbd>+<kbd>Enter</kbd>, <kbd>Esc</kbd> | A comment               | Save it; insert a new line; cancel                      |
+| <kbd>Esc</kbd>                                                   | Search                    | Close it and return focus                               |
+| <kbd>Esc</kbd>                                                   | The pipeline              | Clear the trace                                         |
+
+The first two come from the settings schemas above. <kbd>Alt</kbd>+<kbd>←</kbd> and
+<kbd>Alt</kbd>+<kbd>→</kbd> are registered by the extension itself, for record tabs only.
+
+## Commands
+
+Every command below is in the command palette under **Lightcone Lab**.
+
+| Command                          | ID                                                 | Install |
+| -------------------------------- | -------------------------------------------------- | ------- |
+| Search Lightcone project         | `jupyterlab_lightcone:search`                      | Both    |
+| Open Home                        | `jupyterlab_lightcone:open-home`                   | Both    |
+| New Lightcone project            | `jupyterlab_lightcone:new-project`                 | Both    |
+| Create project                   | `jupyterlab_lightcone:create-project`              | Both    |
+| Open project                     | `jupyterlab_lightcone:open-existing-project`       | Both    |
+| Finish project setup             | `jupyterlab_lightcone:finish-project-setup`        | Both    |
+| ASTRA Inventory                  | `jupyterlab_lightcone:open-inventory`              | Both    |
+| Refresh ASTRA Inventory          | `jupyterlab_lightcone:refresh`                     | Both    |
+| Pipeline                         | `jupyterlab_lightcone:open-pipeline`               | Both    |
+| Back in ASTRA tab                | `jupyterlab_lightcone:element-back`                | Both    |
+| Forward in ASTRA tab             | `jupyterlab_lightcone:element-forward`             | Both    |
+| Open ASTRA record in new tab     | `jupyterlab_lightcone:element-open-new-tab`        | Both    |
+| Pin ASTRA tab                    | `jupyterlab_lightcone:pin-element`                 | Both    |
+| Unpin ASTRA tab                  | `jupyterlab_lightcone:unpin-element`               | Both    |
+| Show the full launcher           | `jupyterlab_lightcone:show-launcher`               | Both    |
+| Back to Home                     | `jupyterlab_lightcone:show-home`                   | Both    |
+| Focus Layout                     | `jupyterlab_lightcone:focus-layout`                | Both    |
+| New session                      | `jupyterlab_lightcone:new-session`                 | Full    |
+| Lightcone Agent                  | `jupyterlab_lightcone:discuss`                     | Full    |
+| Refresh Comments                 | `jupyterlab_lightcone:refresh-comments`            | Full    |
+| MySTRA Viewer                    | `jupyterlab_lightcone:open-mystra`                 | Full    |
+| Restart MySTRA Viewer            | `jupyterlab_lightcone:restart-mystra`              | Full    |
+
+Inside a project, the launcher's **Lightcone Lab** section, which Home's **Tools** menu lists, offers
+**ASTRA Inventory**, and in the full install **Lightcone Agent** and **MySTRA Viewer**. Outside a
+project it offers **New Lightcone project**. **MySTRA Viewer** is also in the file browser's
+right-click menu, and the pin, unpin, back, forward and new-tab commands are in the right-click menu
+of a record tab's title.
+
+Home's buttons and the [agent tools](/lightcone-lab/agents#tools) use a few more commands that the
+palette doesn't list, such as `jupyterlab_lightcone:rename-project`,
+`jupyterlab_lightcone:open-element` and `jupyterlab_lightcone:resolve-preview`.
+
+## Server configuration
+
+Lab's server extension is enabled by a configuration file that the package installs into
+`jupyter_server_config.d`. Nothing else needs configuring.
+
+- **Run browser-only on a full install**: disable the server extension, and the workbench runs as it
+  does in the browser-only install, without uninstalling anything:
+
+  ```bash
+  jupyter server extension disable jupyterlab_lightcone
+  ```
+
+  Or, in a Jupyter server configuration file:
+
+  ```python
+  c.ServerApp.jpserver_extensions.update({"jupyterlab_lightcone": False})
+  ```
+
+- **Jupyter AI**: Lab chooses its own persona manager unless the deployment configured another one.
+  See [Agents](/lightcone-lab/agents#for-deployments).
+
+- **The launcher**: Lab provides JupyterLab's launcher itself, to show Home in it, and disables
+  `@jupyterlab/launcher-extension:plugin` to do so. If a configuration enables that plugin again,
+  Home can't load, and the browser console reports:
+
+  ```text
+  launcher:create is already registered: disable @jupyterlab/launcher-extension:plugin so Lightcone Home can provide the launcher.
+  ```
+
+## Files Lab keeps
+
+In the full install, Lab keeps its state in the project, next to what `lc` writes:
+
+| Path                                 | Holds                                                   |
+| ------------------------------------ | ------------------------------------------------------- |
+| `<project>/chats/`                   | The project's sessions, one `.chat` file each           |
+| `<project>/.lightcone/agent.json`    | The agent the project's messages last went to           |
+| `<project>/.lightcone/comments.json` | Comments, pending and sent                              |
+
+Papers fetched from the paper view go to the ASTRA paper cache, which the `astra` command shares. In
+the browser, JupyterLab's state database keeps Home's unsent drafts and the layout of your tabs.

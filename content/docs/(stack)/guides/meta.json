@@ -1,0 +1,6 @@
+{
+  "title": "Guides",
+  "icon": "Book",
+  "defaultOpen": true,
+  "pages": ["first-analysis"]
+}

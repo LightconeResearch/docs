@@ -1,0 +1,5 @@
+{
+  "title": "Authoring",
+  "defaultOpen": true,
+  "pages": ["index", "paths", "inline-references", "block-embeds", "live-values", "multi-page"]
+}

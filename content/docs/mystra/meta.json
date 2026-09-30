@@ -1,0 +1,15 @@
+{
+  "title": "MySTRA",
+  "description": "Reference ASTRA analyses in MyST reports",
+  "icon": "PenLine",
+  "root": true,
+  "pages": [
+    "---Introduction---",
+    "getting-started",
+    "index",
+    "---[Book]Guides---",
+    "...authoring",
+    "---Reference---",
+    "...reference"
+  ]
+}

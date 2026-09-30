@@ -1,0 +1,114 @@
+---
+title: The astra plugin
+description: Teach your agent the ASTRA format, and validate the project each time it saves.
+---
+
+The `astra` plugin helps an agent write and revise an `astra.yaml`: the machine-readable record of
+an analysis's inputs, outputs and consequential methodological decisions. [ASTRA](/astra) describes
+the format itself; this page covers what the plugin teaches the agent and what it checks.
+
+It comes on its own, for ASTRA work without the Lightcone CLI, or as part of the
+[`lightcone` plugin](/agent-skills/lightcone), which includes it unchanged.
+
+## What the plugin ships
+
+- **The `astra` skill.** Call it as `/astra:astra` in Claude and the Codex app, or `$astra:astra` in
+  the Codex CLI. Installed through the `lightcone` plugin, it is `/lightcone:astra` or
+  `$lightcone:astra`. Agents also load it on their own when they work with an ASTRA file.
+- **A validate-on-save hook.** Whenever the agent saves a change to the specification or a universe
+  file, the whole project is validated again and the result goes straight back to the agent.
+- **A session-start hook.** Starting a session in a directory that contains an `astra.yaml` tells
+  the agent where the specification is and what the analysis contains.
+
+[Hooks](/agent-skills/hooks) describes both hooks in detail.
+
+## What the skill teaches
+
+### The idea behind the format
+
+The skill introduces ASTRA as a layer between code and paper: a record of every consequential
+methodological decision, with its reasoning, at the level needed to make the scientific claims
+verifiable and reproducible. The point is to make the whole decision space explicit, so that other
+defensible choices can be explored as universes instead of being silently baked in.
+
+### One pinned `astra`
+
+The agent always runs the `astra` command through uv, at the version the plugin pins:
+
+```bash
+uvx astra-tools@0.2.18 <command>
+```
+
+It never runs a bare `astra` found on your `PATH`, whose version is unknown. If `uvx` is missing,
+the agent asks you to install uv; it never installs it itself.
+
+### Reading before writing
+
+The skill deliberately keeps the format's details out of its own text. Instead, it sends the agent
+to the pinned CLI, which serves them in sync with the validator:
+
+- **`astra guide`**: the complete briefing on the format, which the agent reads before any
+  substantial authoring or restructuring. It covers the core concepts, worked examples, the
+  authoring workflow and the judgment calls: what deserves to be a decision, when to split a
+  sub-analysis, how to use universes and evidence.
+- **`astra spec`**: the field-level reference. With no argument it prints the map of concepts;
+  `astra spec <term>` prints one concept in full, which is what the agent reaches for while editing.
+
+The agent re-validates after every change, on top of the hook's own validation.
+
+### Citations and evidence
+
+Claims in ASTRA are backed by evidence: prior insights (claims from the literature that motivate
+decisions) and findings (claims the analysis produces) both carry evidence entries. For a paper,
+that is a DOI and a verbatim quote. The skill has the agent handle the literature in three steps:
+
+1. **Cache the paper when citing it**, with `astra paper add <doi>` (adding `--version N` to pin an
+   arXiv revision). The PDF lands in the project's paper cache, so the citation stays checkable.
+2. **Copy quotes verbatim from the cached PDF**, with a short prefix and suffix around each one when
+   the same words occur more than once.
+3. **Verify before finishing**, with `astra paper verify-quotes <doi>` for one paper, or
+   `astra validate astra.yaml --verify-evidence` for every quote in the specification. A quote that
+   doesn't match the PDF fails validation.
+
+Evidence that points at an output of the analysis, typical for findings whose outputs haven't been
+made yet, is reported as skipped rather than failed.
+
+## The `astra` command
+
+`astra` validates and inspects a specification; it never executes recipes. That separation is
+deliberate: the specification stays stable while agents and runners evolve, and the choice of runner
+stays yours. In a Lightcone project, the runner is the [Lightcone CLI](/lightcone-cli).
+
+These are the commands the skill uses, at the plugin's pinned version. You can run them yourself
+from the project directory:
+
+```bash
+uvx astra-tools@0.2.18 init [DIRECTORY]                        # Scaffold an empty analysis
+uvx astra-tools@0.2.18 validate [FILE]                         # Validate the whole project, or one file
+uvx astra-tools@0.2.18 validate astra.yaml --verify-evidence   # Also check quotes against the PDFs
+uvx astra-tools@0.2.18 guide                                   # The agent briefing on the format
+uvx astra-tools@0.2.18 spec [TERM|--full]                      # Schema reference
+uvx astra-tools@0.2.18 info [--decisions|--inputs|--outputs]   # Summary of the analysis, or of one element type
+uvx astra-tools@0.2.18 universe generate -n NAME [-d "desc"]   # Generate a universe from the defaults
+uvx astra-tools@0.2.18 universe check universes/x.yaml         # Check a universe's constraints
+uvx astra-tools@0.2.18 paper add DOI [--version N]             # Cache a paper, resolved from its DOI
+uvx astra-tools@0.2.18 paper list                              # List cached papers
+uvx astra-tools@0.2.18 paper show DOI                          # Show a cached paper's metadata
+uvx astra-tools@0.2.18 paper path DOI [--version N]            # Print the cached PDF's path
+uvx astra-tools@0.2.18 paper verify-quotes DOI                 # Verify quotes, read as JSON from stdin
+```
+
+With no file name, `validate` checks every specification and universe file under the current
+directory.
+
+## Try it
+
+[Your first analysis](/guides/first-analysis) fits the standard cosmological model to 580
+supernovae, with an agent doing the work and ASTRA keeping the record.
+
+## Going further
+
+The full ASTRA documentation lives at [astra-spec.org](https://astra-spec.org/latest/): the
+[specification reference](https://astra-spec.org/latest/specification/), the
+[CLI reference](https://astra-spec.org/latest/cli/), and a ground-up
+[getting started](https://astra-spec.org/latest/getting-started/) guide to the format on its own.

@@ -1,0 +1,24 @@
+{
+  "title": "Lightcone CLI",
+  "description": "The lc command: run analyses with provenance",
+  "icon": "Terminal",
+  "root": true,
+  "pages": [
+    "---Introduction---",
+    "getting-started",
+    "index",
+    "concepts",
+    "installation",
+    "---[Book]Guides---",
+    "cluster",
+    "troubleshooting",
+    "---Reference---",
+    "commands",
+    "glossary",
+    "---Contributing---",
+    "developer-corner",
+    "architecture",
+    "internals",
+    "...contributing"
+  ]
+}

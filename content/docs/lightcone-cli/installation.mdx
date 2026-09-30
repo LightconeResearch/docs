@@ -1,0 +1,87 @@
+---
+title: Installation
+description: Details specific to installing lc, beyond the stack's installation guide.
+icon: Wrench
+---
+
+[Installation](/installation) covers the standard setup: uv and git, a git identity, the pinned
+`uv tool install lightcone-cli==0.5.0rc5`, container runtimes, updating and uninstalling. This page
+adds what is specific to `lc`.
+
+## What the install brings
+
+The published name on PyPI is `lightcone-cli`; the command it provides is `lc`. `lc` uses uv as its
+only environment substrate: projects are `pyproject.toml` + `uv.lock`, and uv manages the Python
+interpreters too, so there is no separate Python install step.
+
+The install also puts `git-annex` on your `PATH`, alongside `lc`. Projects need it there: an
+ordinary `git add` in a project runs git-annex. If `lc` runs but `git-annex` doesn't, uv's tool
+directory is not on your `PATH`; run `uv tool update-shell` and open a new shell.
+
+## Sanity check
+
+```bash
+lc --version                # → lc, version ...
+lc --help
+lc init --help
+```
+
+Each should print its version or help text.
+
+<Callout title="An existing lc alias">
+Some people have already set a personal shell alias `lc='ls --color'`. If that's you, the alias
+shadows the new command: `type lc` shows which one your shell runs. Remove the alias with
+`unalias lc` (and rebind it, e.g. `alias l='ls --color'`), or call the tool by its full path,
+`$(which lc) --version`.
+</Callout>
+
+## Installing with pip
+
+uv is the recommended installer, but `lc` also installs with pip. Keep the exact version, for the
+same reason as with uv:
+
+```bash tab="Install"
+python -m pip install lightcone-cli==0.5.0rc5
+```
+
+```bash tab="Update"
+python -m pip install lightcone-cli==<version>
+```
+
+```bash tab="Uninstall"
+python -m pip uninstall lightcone-cli
+```
+
+pip puts `lc` and `git-annex` in that Python environment's own `bin` directory, so keep it on your
+`PATH` whenever you work in a project. Avoid running `lc` through `uvx`, which puts nothing on your
+`PATH` at all; see
+[the clean filter failure](/lightcone-cli/troubleshooting#fatal-clean-filter-annex-failed).
+
+## On NERSC Perlmutter
+
+NERSC doesn't ship uv, but it installs into your home directory with the usual single command:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+uv lands under `~/.local/bin`: make sure it's on your `PATH`. git is already on the system. Two
+things differ from a workstation once you run analyses there:
+
+- **Local compute is refused on login nodes.** Use a compute node in an interactive allocation, or
+  a configured Slurm offer; see [Running on a cluster](/lightcone-cli/cluster#local-allocations).
+- **uv's cache must move off `$HOME`**, because Perlmutter's compute nodes cannot lock files there.
+  See [Configure Slurm](/lightcone-cli/cluster#configure-slurm).
+
+## Container runtimes
+
+Only *containerized* projects need a container runtime: a project opts in by declaring
+`[tool.lightcone.image]` in its `pyproject.toml`, and until it does, recipes run directly on your
+machine in the project's own locked environment.
+
+- Local machine: install [Podman](https://podman.io/) (rootless, no daemon) or
+  [Docker](https://docs.docker.com/get-docker/).
+- HPC login node: see [Running on a cluster](/lightcone-cli/cluster).
+
+There is nothing to configure: `lc` detects whichever runtime is available (`podman-hpc`, then
+`podman`, then `docker`, skipping docker if its daemon isn't running).

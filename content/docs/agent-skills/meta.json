@@ -1,0 +1,19 @@
+{
+  "title": "Agent Skills",
+  "description": "Plugins that teach coding agents the stack",
+  "icon": "Bot",
+  "root": true,
+  "pages": [
+    "---Introduction---",
+    "getting-started",
+    "index",
+    "installation",
+    "---[Book]Guides---",
+    "lightcone",
+    "astra",
+    "---Reference---",
+    "hooks",
+    "---Contributing---",
+    "contributing"
+  ]
+}

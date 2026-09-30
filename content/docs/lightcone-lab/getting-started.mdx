@@ -1,0 +1,66 @@
+---
+title: Getting started
+description: Install Lightcone Lab, open a project and find your way around the workbench.
+icon: Rocket
+---
+
+This page takes you from installing Lightcone Lab to working on a project with an agent. Each step
+links to the page that covers it in detail.
+
+<Steps>
+<Step>
+
+### Install the extension
+
+Lab installs into the environment that runs JupyterLab 4.5.10 or newer. For the browser-only
+workbench:
+
+```bash
+pip install jupyterlab-lightcone
+```
+
+It creates projects with the Lightcone CLI, so it also needs `lc` on the terminal's `PATH`; see the
+stack's [Installation](/installation#3-the-lightcone-cli). For the features that run on the Jupyter
+server (freshness, provenance, comments, the report preview and Jupyter AI sessions), install
+`jupyterlab-lightcone[full]` instead. [Installation](/lightcone-lab/installation) compares the two.
+
+</Step>
+<Step>
+
+### Start JupyterLab
+
+```bash
+jupyter lab
+```
+
+</Step>
+<Step>
+
+### Open or create a project
+
+Browse the file browser into a folder that holds an `astra.yaml`: the launcher tab becomes the
+project's **Home**. To start a new project, choose **New Lightcone project** in a launcher outside
+any project, or run **Create project** from the command palette. See
+[New and existing projects](/lightcone-lab/features#projects).
+
+</Step>
+<Step>
+
+### Find your way around
+
+Home shows the project's title page, its results and a link to its pipeline. **Open ASTRA** opens
+the inventory of the analysis, and <kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>K</kbd> searches the project.
+The [Workbench tour](/lightcone-lab/features) covers each feature.
+
+</Step>
+<Step>
+
+### Work with an agent
+
+In the browser-only workbench, the **claude** and **codex** buttons on Home start an agent in a
+terminal, in the project folder. With the full install, the **New session** box starts a Jupyter AI
+session instead. Add the [Agent Skills](/agent-skills) plugin so the agent knows how to work on a
+Lightcone project; [Agents](/lightcone-lab/agents) covers the setup.
+
+</Step>
+</Steps>

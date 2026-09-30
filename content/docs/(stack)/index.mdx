@@ -1,0 +1,162 @@
+---
+title: Quick Start
+description: Start a reproducible research analysis with your coding agent.
+icon: Rocket
+---
+
+import { Bot, FlaskConical, PenLine, Terminal } from 'lucide-react';
+
+The Lightcone Research Stack is a set of open-source tools for research you can inspect, reproduce
+and build on. You work through your coding agent: it interviews you about your question, writes the
+analysis down as an [ASTRA](/astra) specification, and runs it with the Lightcone CLI, which records
+how every result was produced. The scientific choices stay yours.
+
+<Cards>
+  <Card icon={<Bot />} title="Agent Skills" href="/agent-skills">
+    Plugins that teach Claude Code and Codex to scope, build and run your analysis.
+  </Card>
+  <Card icon={<Terminal />} title="Lightcone CLI" href="/lightcone-cli">
+    The `lc` command: runs the analysis and records the provenance of every output.
+  </Card>
+  <Card icon={<FlaskConical />} title="Lightcone Lab" href="/lightcone-lab">
+    A JupyterLab workbench for exploring your project.
+  </Card>
+  <Card icon={<PenLine />} title="MySTRA" href="/mystra">
+    A report that references the analysis instead of copying its results.
+  </Card>
+</Cards>
+
+<Callout title="Want to learn more?">
+  Read [What is the Lightcone Stack](/what-is-lightcone) for the ideas behind it.
+</Callout>
+
+## Install
+
+You need Linux or macOS (on Windows, use WSL) and a coding agent: Claude Code or Codex.
+[Installation](/installation) covers each step in more detail.
+
+<Steps>
+<Step>
+
+### Install uv and git
+
+[uv](https://docs.astral.sh/uv/) installs everything else, Python included:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+git comes with macOS; on Linux, install it with your package manager. Every result is committed,
+so git needs to know who you are:
+
+```bash
+git config --global user.name "Ada Lovelace"
+git config --global user.email "ada@example.org"
+```
+
+</Step>
+<Step>
+
+### Install the Lightcone CLI
+
+```bash
+uv tool install lightcone-cli==0.5.0rc5
+```
+
+Keep the exact version: while the current release is a pre-release, a plain
+`uv tool install lightcone-cli` installs an older one.
+
+</Step>
+<Step>
+
+### Add the plugin to your agent
+
+Register the Lightcone marketplace, then install the `lightcone` plugin. It includes the `astra`
+plugin, so there is nothing else to add.
+
+<Tabs groupId="agent" persist items={['Claude Code', 'Codex', 'Claude app', 'Codex app']}>
+<Tab value="Claude Code">
+
+```bash
+claude plugin marketplace add LightconeResearch/agent-skills
+claude plugin install lightcone@lightcone-research
+```
+
+</Tab>
+<Tab value="Codex">
+
+```bash
+codex plugin marketplace add LightconeResearch/agent-skills
+codex plugin add lightcone@lightcone-research
+```
+
+</Tab>
+<Tab value="Claude app">
+
+Open **Customize → Plugins → Add → Add marketplace → Add from repo** and paste
+`https://github.com/LightconeResearch/agent-skills`. Then choose **lightcone** from the
+`lightcone-research` marketplace.
+
+</Tab>
+<Tab value="Codex app">
+
+Open **Plugins** from the arrow beside **Create** and add the `LightconeResearch/agent-skills`
+marketplace. Then search for **lightcone** and install it.
+
+</Tab>
+</Tabs>
+
+</Step>
+</Steps>
+
+## Start your first analysis
+
+Make a directory for the project and start your agent in it:
+
+```bash
+mkdir my-analysis && cd my-analysis
+claude   # or: codex
+```
+
+Then tell it what you want to find out:
+
+```text
+I want to start a new analysis: <your research question>
+```
+
+You can also call the skill by name: `/lightcone:lightcone` in Claude and the Codex app,
+`$lightcone:lightcone` in the Codex CLI. From there, the agent:
+
+1. **Interviews you** about the research question and the structure of the analysis, before it
+   writes any code.
+2. **Sets up the project** with `lc init`: the specification (`astra.yaml`), a uv environment, a git
+   repository whose data and results are stored with git-annex, and a MyST report.
+3. **Writes the analysis down** in `astra.yaml` (its inputs, outputs, decisions and evidence), which
+   is validated each time it is saved, and shows you a summary.
+4. **Implements and runs it** once you agree, with the Lightcone CLI: each step runs in a sandbox, and
+   each output is committed with a record of how it was made.
+
+For a worked example, follow [Your first analysis](/guides/first-analysis).
+
+## Optional: Lightcone Lab
+
+If you work in JupyterLab, [Lightcone Lab](/lightcone-lab) adds a workbench for your project: its
+inventory, its pipeline, the provenance of each result, and the report. See
+[Installation](/installation#lightcone-lab) to add it.
+
+## Learn more
+
+<Cards>
+  <Card title="What is the Lightcone Stack" href="/what-is-lightcone">
+    Why the stack exists, and how its pieces fit together.
+  </Card>
+  <Card title="ASTRA" href="/astra">
+    The specification every Lightcone project is written in.
+  </Card>
+  <Card title="Comparisons" href="/comparisons">
+    How the stack relates to other tools for AI-assisted research.
+  </Card>
+  <Card title="Your first analysis" href="/guides/first-analysis">
+    A complete analysis with an agent, from a question to a report.
+  </Card>
+</Cards>

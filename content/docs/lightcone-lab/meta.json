@@ -1,0 +1,19 @@
+{
+  "title": "Lightcone Lab",
+  "description": "A JupyterLab workbench for ASTRA projects",
+  "icon": "FlaskConical",
+  "root": true,
+  "pages": [
+    "---Introduction---",
+    "getting-started",
+    "index",
+    "installation",
+    "---[Book]Guides---",
+    "features",
+    "agents",
+    "---Reference---",
+    "settings",
+    "---Contributing---",
+    "contributing"
+  ]
+}

@@ -1,0 +1,39 @@
+---
+title: Engine internals
+description: A hand-written tour of the lightcone.engine modules, what each owns, and the invariants a change must keep.
+---
+
+The `lightcone.engine.*` modules, one page each: what the module owns, its key symbols, and the
+invariants a change must keep. These are hand-written tours, not generated API dumps: the engine is
+not a public API (projects don't depend on lightcone-cli), so what matters is responsibility and
+contract, not every signature.
+
+## The map
+
+| Module                                                               | Owns                                                                 | Character     |
+| -------------------------------------------------------------------- | -------------------------------------------------------------------- | ------------- |
+| [`project`](/lightcone-cli/internals/project)                        | What a project is: convergence, discovery, mode, the `_run` seam     | impure        |
+| [`dataset`](/lightcone-cli/internals/dataset)                        | How a project stores: git + git-annex, run records, restore          | impure        |
+| [`identity`](/lightcone-cli/internals/identity)                      | `env_version`, `definition_version`, the lock scan                   | pure          |
+| [`plan`](/lightcone-cli/internals/plan)                              | The spec, read as a graph of tasks (through ASTRA)                   | pure          |
+| [`assets`](/lightcone-cli/internals/assets)                          | One output: its directory, manifest, and state                       | pure          |
+| [`worker`](/lightcone-cli/internals/worker)                          | Making one output; the rerun entry point                             | impure        |
+| [`materialize`](/lightcone-cli/internals/materialize)                | The driver: gates, scheduling, the save/restore loop, status         | impure        |
+| [`compute`](/lightcone-cli/internals/compute)                        | Resource requests, native allocation lifecycle, borrowed Dask clients | impure        |
+| [`execution_resources`](/lightcone-cli/internals/compute)            | Task resource admission                                              | pure          |
+| [`sandbox`](/lightcone-cli/internals/sandbox)                        | The exec boundary: policy, backends, attestation, denials            | mixed         |
+| [`image` & `container`](/lightcone-cli/internals/container)          | The container hatch: declaration → image → archive → runtime         | pure / impure |
+| [`crate`](/lightcone-cli/internals/crate)                            | The publication view: the repo as an RO-Crate                        | pure          |
+
+"Pure" here is a testing fact: pure modules are tested with nothing on disk beyond `tmp_path` and
+nothing spawned; impure ones go through the one subprocess seam (`project._run`) that the suite
+stubs. See [Testing](/lightcone-cli/contributing/testing).
+
+Two files sit outside the engine on purpose:
+
+- **`lightcone/_sandbox_exec.py`**: the Landlock shim. Stdlib-only, zero lightcone imports; it runs
+  on every sandboxed exec, and an engine import there would put click and the astra stack on that
+  path. Pinned by tests.
+- **`lightcone/cli/commands.py`**: the CLI, with its flags, rendering and exit codes. Imports the
+  engine inside callbacks so `lc --help` stays cheap; never contains logic worth testing beyond
+  rendering.
