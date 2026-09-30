@@ -4,11 +4,16 @@
   "icon": "Bot",
   "root": true,
   "pages": [
+    "---Introduction---",
+    "getting-started",
     "index",
     "installation",
+    "---[Book]Guides---",
     "lightcone",
     "astra",
+    "---Reference---",
     "hooks",
+    "---Contributing---",
     "contributing"
   ]
 }

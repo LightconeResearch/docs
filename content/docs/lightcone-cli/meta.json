@@ -4,20 +4,21 @@
   "icon": "Terminal",
   "root": true,
   "pages": [
-    "index",
-    "---Guide---",
-    "installation",
+    "---Introduction---",
     "getting-started",
+    "index",
     "concepts",
+    "installation",
+    "---[Book]Guides---",
     "cluster",
     "troubleshooting",
-    "glossary",
     "---Reference---",
     "commands",
-    "---Internals---",
+    "glossary",
+    "---Contributing---",
     "developer-corner",
     "architecture",
     "internals",
-    "contributing"
+    "...contributing"
   ]
 }

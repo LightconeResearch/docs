@@ -4,13 +4,16 @@
   "icon": "FlaskConical",
   "root": true,
   "pages": [
+    "---Introduction---",
+    "getting-started",
     "index",
-    "---Guide---",
     "installation",
+    "---[Book]Guides---",
     "features",
     "agents",
     "---Reference---",
     "settings",
+    "---Contributing---",
     "contributing"
   ]
 }

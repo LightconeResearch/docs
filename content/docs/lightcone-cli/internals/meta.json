@@ -1,7 +1,6 @@
 {
   "title": "Engine internals",
   "pages": [
-    "index",
     "project",
     "dataset",
     "identity",

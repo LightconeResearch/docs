@@ -3,5 +3,14 @@
   "description": "Quickstart and guides for the whole stack",
   "icon": "Layers",
   "root": true,
-  "pages": ["---Introduction---", "index", "what-is-lightcone", "astra", "comparisons", "installation", "guides"]
+  "pages": [
+    "---Introduction---",
+    "index",
+    "what-is-lightcone",
+    "astra",
+    "comparisons",
+    "installation",
+    "---[Book]Guides---",
+    "...guides"
+  ]
 }
