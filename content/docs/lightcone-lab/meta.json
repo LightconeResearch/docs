@@ -3,5 +3,14 @@
   "description": "A JupyterLab workbench for ASTRA projects",
   "icon": "FlaskConical",
   "root": true,
-  "pages": ["index"]
+  "pages": [
+    "index",
+    "---Guide---",
+    "installation",
+    "features",
+    "agents",
+    "---Reference---",
+    "settings",
+    "contributing"
+  ]
 }

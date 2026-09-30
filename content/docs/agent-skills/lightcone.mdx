@@ -1,0 +1,346 @@
+---
+title: The lightcone plugin
+description: What your agent does at each phase of a Lightcone project, from the first interview to publication.
+---
+
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+
+The `lightcone` skill is a companion for a Lightcone project: an analysis declared in `astra.yaml`,
+executed with the [Lightcone CLI](/lightcone-cli) and written up in a [MySTRA](/mystra) report. It
+covers the whole life of a project: scoping it with you, getting compute, producing outputs,
+diagnosing failures, keeping the report honest and publishing.
+
+The plugin also contains the [`astra` plugin](/agent-skills/astra), whose skill covers the
+`astra.yaml` format itself. The two divide the work: the `lightcone` skill repeats nothing about the
+format, and the `astra` skill says nothing about running an analysis.
+
+This page describes what the agent does, and what it leaves to you. For a complete run through a
+project, follow [Your first analysis](/guides/first-analysis).
+
+## When the agent uses it
+
+The agent loads the skill when you want to start, resume, plan, run, debug, publish or discuss a
+Lightcone project: "new analysis", "where were we", "run the pipeline", "run on GPUs", "publish the
+analysis". It also loads it whenever the working directory holds an `astra.yaml` and you ask to run,
+re-run, fix or interpret the analysis, even if you never mention Lightcone, ASTRA or `lc`.
+
+To call it by name, use `/lightcone:lightcone` in Claude and the Codex app, or `$lightcone:lightcone`
+in the Codex CLI.
+
+## Working with you
+
+- **The specification is where the work is reviewed.** The agent writes to `astra.yaml` as each
+  decision takes shape, rather than in one batch at the end, and keeps the conversation to a summary
+  that names what changed. Candidate decisions and findings belong in the file, where you can read
+  them.
+- **Long jobs are confirmed first.** Before anything long, such as a full multiverse or a first
+  container build, the agent checks the scope with you.
+- **The project keeps its own notes.** The agent keeps the Project Notes in the project's
+  `AGENTS.md` current: what the specification can't hold, and what a later session needs to pick up
+  the work.
+- **Your machine, your call.** The agent never installs or upgrades software unasked, never sets
+  your git identity, and never shuts down a compute allocation it didn't start unless you ask.
+
+## Before it drives `lc`
+
+The skill assumes `lc` version `0.5.0rc5` or newer. If the plugin's
+[session-start check](/agent-skills/hooks#lightcone-cli-check) has already reported that the CLI is
+ready, the agent moves on; if it reported a problem, the agent follows the remedy it named. If
+neither happened, because hooks are off or the agent is a subagent, it runs `lc --version` itself.
+
+Where a person can answer, the agent offers the install command and waits. Where no one can, in a
+headless run or CI, it runs the command and reports what it changed.
+
+## Scoping a new analysis
+
+When a project has no specification yet, or only the empty one `lc init` creates, the agent works
+as a specification agent, not an implementation agent. Until scoping is done, it creates or edits
+only `astra.yaml`, the universe files and `AGENTS.md`, and writes no analysis code.
+
+`lc init` sets up the project: an empty specification, a baseline universe that selects nothing, a
+uv project, a git repository whose `data/` and `results/` are stored with git-annex, and a MyST
+report. It is safe to run again and never overwrites what you wrote.
+
+The interview then goes through four stages, each announced with a banner so you can follow, and
+each ending with a write to `astra.yaml`:
+
+<Steps>
+<Step>
+
+### Research question
+
+The agent asks what you are trying to learn, and sharpens it with you: what would a clear answer
+look like, and why does it matter? "Analyze this data" is not a research question, and it will push
+back until you have one. The answer becomes the analysis's `name`.
+
+</Step>
+<Step>
+
+### Analysis structure
+
+The agent asks you to walk through the analysis: what goes in, what comes out. It records the
+inputs and outputs, keeping to one flat analysis however many stages it has, and one output for each
+metric, figure or table: every output becomes a single file, so it gets a `format` (its file
+extension) as soon as it is declared.
+
+</Step>
+<Step>
+
+### Literature deep dive
+
+Optional, section by section. The agent offers a pass through the literature; if you decline, it
+goes straight to identifying decisions. See [The literature pass](#the-literature-pass).
+
+</Step>
+<Step>
+
+### Finalizing
+
+The agent asks whether anything else should inform the analysis. It then regenerates the baseline
+universe from the decisions' defaults, validates the specification (checking every quote, if any
+were extracted) until it is clean, and writes the analysis's `description` now that the structure is
+stable. It writes `AGENTS.md`: how to work in the project, the commands it uses, and the scoping
+outcome in its Project Notes (the constraints you mentioned, the avenues considered and rejected,
+quirks of the data). It ends with a summary of decisions, outputs and prior insights for you to
+confirm.
+
+</Step>
+</Steps>
+
+Once the specification gains its first decision, validation reports `MISSING_DECISION` for
+`universes/baseline.yaml`. That is expected while decisions are in flux: finalizing regenerates the
+universe.
+
+## The literature pass
+
+The literature pass runs in a fixed order: collect the papers, extract from them, then identify the
+decisions. Decisions identified before the papers are read tend to be the ones the analyst already
+had in mind.
+
+- **Collect.** The agent asks for the papers you already have in mind, then searches for a limited
+  set of directly relevant ones, about two per topic and at most ten per section. You approve,
+  reject or add to the list. It never starts a search while the interview is still running: results
+  arriving mid-conversation interrupt your train of thought, and papers chosen before the structure
+  settles tend to be the wrong ones.
+- **Extract.** The agent caches each approved paper, then reads them with one subagent per paper,
+  in parallel, so the PDFs never fill the main conversation. Each subagent extracts only the claims
+  that bear on the decisions at hand, each with a verbatim quote, its page and the text around it.
+  It verifies every quote against the PDF, corrects and retries up to three times, and drops any
+  quote that still fails, saying which and why. A paper with nothing relevant is a useful answer,
+  not a failure.
+- **Record.** As results land, the agent shows which papers are done, writes the extracted claims
+  to `astra.yaml` as prior insights, links them to the options they bear on, and summarizes them by
+  topic for you. A quote that failed verification is gone: the agent doesn't add it back by hand, and
+  doesn't cite the paper for that claim.
+- **Identify decisions.** From the conversation and the literature, the agent looks for what could
+  be done differently and still be defensible: where papers disagreed or compared alternatives, and
+  where you were uncertain. It probes the choices analysts tend to overlook, such as data exclusion,
+  how variables are defined, and inference criteria, not only the choice of method.
+- **Review.** Candidate decisions go into `astra.yaml` as a batch. You confirm or set each default,
+  and drop any you reject.
+
+## Resuming a project
+
+When you pick up an existing project, the agent runs `lc status`, summarizes where the analysis
+stands, and asks what is next. It doesn't interview you again: `astra.yaml` and the notes in
+`AGENTS.md` already answer the scoping questions.
+
+## Getting compute
+
+`lc run` and `lc materialize` run on a compute allocation named as their first argument; neither
+starts one, and neither falls back to running locally. `lc compute` is the agent's single view of
+your compute, whatever machines and schedulers lie behind it. See the [Lightcone CLI](/lightcone-cli)
+for the commands.
+
+- **Reuse first.** If one of your allocations is already running, the agent uses it.
+- **A local cluster, routinely.** On a workstation, the agent launches the built-in local cluster
+  when there is something to run, and tells you it did. It takes every usable CPU and all the memory
+  of your machine for 30 minutes by default, and at most two hours; the agent sizes the time to the
+  work. Only one runs per user per machine.
+- **Anything else, with your yes.** A remote shape, several nodes or GPUs can spend your allocation
+  hours and queue time, so the agent shows you the launch plan and waits for your answer. When
+  nothing on offer fits the work, it tells you.
+- **Released when done.** The agent shuts down the allocations it launched once the work is done,
+  unless you asked to keep them. It never shuts down one it didn't launch unless you ask: it may be
+  serving another session.
+
+A recipe runs on one worker, so the largest recipe must fit on a single node; more nodes run more
+recipes in parallel, not bigger ones. A recipe that needs several CPUs, a set amount of memory or a
+GPU declares it under `recipe.resources` in `astra.yaml`. Numerical libraries default to one thread
+on every worker, whatever the recipe declares, so the agent sets the thread variables for a recipe
+that should use more.
+
+If a cluster stays unready, the agent relays the reason to you rather than launching another. After
+a launch that failed or timed out, it checks whether an allocation was created anyway before
+retrying.
+
+## Producing outputs
+
+### The loop
+
+For each output, the agent goes through the same four steps, one output at a time while it
+integrates, so each intermediate result can be inspected:
+
+1. **Probe.** It runs the script with `lc run local -- python src/fit.py …`, under exactly the
+   sandbox a recipe gets: what works there works as a recipe.
+2. **Wire.** It gives the output a `format` and a `recipe` in `astra.yaml`, and declares every input
+   and decision the command uses, which is also how dependencies between outputs are declared.
+3. **Commit.** It commits its edits by path, never with `git add -A`.
+4. **Materialize.** It runs `lc materialize local <output>`, which remakes what is stale,
+   dependencies first, and commits each output as it lands.
+
+The work is done when `lc materialize --check` passes. A script that ran well under `lc run` is a
+probe, not a result: nothing counts until `lc materialize` has produced it.
+
+Each output lands at `results/<universe>/<output>.<format>`, a path `lc` composes from the
+specification, next to a manifest that records how it was made. The agent reads those manifests to
+answer how an output came to be; it never writes one.
+
+### Scripts ready to be recipes
+
+The agent writes one script per output. Every decision is a command-line flag, never a value
+written into the code, and the script writes its artifact to exactly the path the recipe hands it.
+A recipe that exits successfully having written a directory, another name or nothing at that path
+has failed.
+
+### The sandbox
+
+A probe and a recipe run under the same boundary. The project tree, the declared inputs, the
+project environment and the operating system are readable; the project tree is read-only. A recipe
+can write only its own `results/<universe>/` directory, a private temporary directory and home that
+are discarded afterwards, and `/tmp`, `/var/tmp` and `/dev/shm`. A probe can write anywhere in
+`results/`, but anything it leaves there has no run record, so the agent removes it before
+committing.
+
+A denied read is the boundary naming an input that wasn't declared, and the agent declares it rather
+than working around it.
+
+The environment changes only through `uv add`, which runs outside the sandbox; `pip install` reaches
+nothing a recipe sees.
+
+### Status
+
+The agent reads `lc` through its `--json` output, and quotes the reason `lc` gives for each output
+rather than inferring one. Each output is in one of three states:
+
+| State     | Means                                                                                   | What happens                                              |
+| --------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| `current` | Matches the specification, made under this environment                                  | Nothing                                                   |
+| `behind`  | Still matches the specification, but the environment has changed                       | Nothing, unless you want it remade                        |
+| `stale`   | Contradicts the specification, or its bytes were changed by something other than its run | The next `lc materialize` remakes it                      |
+
+Every output going `behind` after a `uv add` is normal. Upgrading `lc` invalidates nothing.
+
+### Keeping the specification and the code in step
+
+A decision added in code goes into `astra.yaml` and every universe file; a renamed output gets its
+recipe updated; anything removed is validated again. Editing a script under `src/` doesn't make an
+output stale by itself, since an output's identity is its recipe and decisions: the agent declares a
+script as an input when changes to it should cascade.
+
+## When something fails
+
+`lc` refusals are written to be pasted: each names the problem and its remedy, and the agent follows
+the remedy rather than working around it. A few cases need more than the message says.
+
+<Accordions>
+<Accordion title="Refusals before a run starts">
+
+- **Uncommitted changes**: every output is committed with the code that produced it, so the agent
+  commits its edits. The refusal separates files to commit from stray `results/` files to discard.
+- **Not a Lightcone project**: `lc` acts on the current directory and never looks in parent
+  directories, so the agent moves to the project root. In a fresh clone, it runs `lc init` once.
+- **No git identity**: `lc materialize` needs a committer. Setting it is yours to do, and the agent
+  asks you.
+- **Outputs without a format**: the agent adds each one's file extension in a single edit.
+- **An output id containing a dot**: this also makes nested analyses unbuildable today, so the agent
+  keeps the analysis flat.
+
+</Accordion>
+<Accordion title="A recipe fails">
+
+The sandbox appends a note to the error output whenever a command fails, naming the path or tool it
+blocked, and the agent reads it first.
+
+- **A missing module**: `uv add` the package, commit, run again.
+- **A read outside the project**: declare the path as an input in `astra.yaml`.
+- **Permission denied on a relative path**: the project tree is read-only, so the script must write
+  its artifact to the path it is given, and its scratch files to a temporary directory.
+- **A successful exit that left nothing**: the script wrote another name, or made a directory; it
+  must write the file at exactly the path it was handed.
+- **A missing system tool**: see containers below.
+
+</Accordion>
+<Accordion title="A recipe needs more than Python packages">
+
+When a recipe needs a system library, a compiler or a tool such as LaTeX, the agent declares a system
+layer under `[tool.lightcone.image]` in `pyproject.toml`; it never writes a Containerfile. That
+switches the project to containers: recipes run inside an image that `lc build` builds and commits.
+
+The agent confirms with you first, because containers need Podman or Docker, the first build takes
+minutes, and every existing output goes `behind`.
+
+</Accordion>
+<Accordion title="A surprising status">
+
+An output that is `stale` for a reason naming a commit was written by something other than its own
+run. The agent inspects that commit before remaking the output, in case work is about to be lost.
+
+</Accordion>
+<Accordion title="Interrupted runs and stray files">
+
+Stopping `lc run` or `lc materialize` detaches the client only: the command goes on running on the
+worker. The agent shuts the allocation down by its full id before touching `results/`, and discards
+stray files there only once the allocation has ended. A local container can outlive the allocation,
+so it checks the container runtime too.
+
+</Accordion>
+<Accordion title="Clones and file contents">
+
+`data/` and `results/` are stored with git-annex, already configured by the project, so a plain
+`git add` anywhere does the right thing. A `git add` that fails on a filter means the working tree
+isn't set up: in a fresh clone, `lc init` fixes it, and the agent doesn't commit past the error. A
+file whose content isn't in this clone is fetched by `lc materialize` when a recipe needs it.
+
+</Accordion>
+</Accordions>
+
+## The report
+
+`lc init` creates a MyST report next to the specification, with the [MySTRA](/mystra) plugin
+loaded. MySTRA resolves references against `astra.yaml`, so the report points at the analysis
+instead of restating it.
+
+- **The prose is yours.** The agent asks what you want written, and follows your lead on structure,
+  voice and claims.
+- **Keeping it in sync is the agent's standing job.** An output added, renamed or removed, a decision
+  whose options changed, a finding that gained evidence: each lands in the same change as its
+  reference in the report. The agent never invents prose or writes a claim the analysis doesn't
+  support; if the analysis now contradicts the report, it tells you rather than quietly rewriting
+  your argument.
+- **Numbers are referenced, never typed.** A number typed into the text is right until the next
+  `lc materialize` and silently wrong after it, so the agent interpolates values from the outputs
+  with `{astra:value}` roles.
+- **A report that builds isn't a report that resolved.** A broken reference doesn't fail the build.
+  The agent runs a plain `myst build` and reads its diagnostics, and checks plain `{astra}` references
+  against the specification itself, since a mistyped id renders as ordinary-looking text with no
+  error.
+- **The report shows one universe.** MySTRA reads the alphabetically first file in `universes/`, so
+  a new universe can silently replace the one the report renders. The agent checks which one is
+  active, and materializes before rendering anything you intend to show.
+
+Previewing the report needs Node.js and MyST; the agent asks before installing them.
+
+## Publishing
+
+The project itself is the publishable object: there is no export step. When you want to share,
+archive or cite the analysis, the agent:
+
+1. adds an SPDX license (such as `CC-BY-4.0`) to `pyproject.toml`, and sets authorship in the
+   specification;
+2. commits, then runs `lc materialize`, which remakes nothing but writes and commits
+   `ro-crate-metadata.json`, an [RO-Crate](https://www.researchobject.org/ro-crate/) description of
+   the project rendered from the repository.
+
+It is ready when validation passes, `lc materialize --check` passes, and `ro-crate-metadata.json`
+exists.

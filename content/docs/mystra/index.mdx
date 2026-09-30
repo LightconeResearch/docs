@@ -3,12 +3,167 @@ title: Overview
 description: A MyST plugin for reports that reference an ASTRA analysis instead of copying it.
 ---
 
-MySTRA is a plugin for [MyST](https://mystmd.org/) Markdown. A report written with it refers to
-the parts of an ASTRA analysis, such as its decisions, results and values, by path instead of
-copying them, so the report stays in step with the analysis. Projects created with `lc init` are
-already set up to use it.
+**MySTRA** lets you write publications on top of [ASTRA](/astra) analyses — in plain
+[MyST](https://mystmd.org/) Markdown. You write a normal MyST document and reference ASTRA
+components — decisions, outputs, findings, prior insights, data tables, live numbers — *by
+reference*. The components stay single-sourced in your `astra.yaml`; MySTRA reads it at build time
+and emits standard MyST AST.
 
-<Callout title="Moving here">
-  This section is being migrated. Until then, see the current
-  [MySTRA documentation](https://lightconeresearch.github.io/MySTRA/).
+It runs on the **stock `myst` CLI and themes** — no custom server, no copy-pasted numbers, no figures
+that drift out of sync with the analysis.
+
+```markdown
+We adopt the {astra}`decisions.algorithm.multigrid` and measure
+$\alpha =$ {astra:value col=alpha where="tracer=elg1" pm=true}`outputs.alpha_table`,
+consistent with {astra:cite}`prior_insights.recon_sharpens_bao`.
+
+:::{astra} outputs.bao_fit_plot
+:::
+```
+
+→ the decision links to its full record, the value is interpolated live from the result table
+(uncertainty included), the prior insight renders as a citation, and the figure is pulled from the
+resolved artifact binding. Edit `astra.yaml` and rerun the analysis; the report updates itself.
+
+<Callout type="warn" title="Alpha development">
+MySTRA is in active, **pre-1.0 development**. The plugin vocabulary, publication-carrier contract,
+and public API may change without notice between releases, and there are rough edges. Pin a specific
+release tag in your `myst.yml` rather than tracking `latest`, and expect breaking changes. Feedback
+and issues are very welcome on the [GitHub repo](https://github.com/LightconeResearch/MySTRA/issues).
 </Callout>
+
+## In the Lightcone Stack
+
+Projects created with `lc init` are already set up for MySTRA: their `myst.yml` registers the
+plugin and uses the ASTRA article theme, and `index.md` is the report, ready to write. The
+[Lightcone CLI](/lightcone-cli) commits each output to `results/<universe>/<output>.<format>`, which
+is where MySTRA finds the figures, tables and values it places in the report. For an agent writing
+one up, see the last step of [Your first analysis](/guides/first-analysis#5-write-it-up).
+
+MySTRA is intentionally a **publication adapter**, not a project viewer. It does not emit a
+whole-project inventory, graph application, or host-specific UI, so reports remain normal, portable
+MyST documents. To explore a project interactively, use [Lightcone Lab](/lightcone-lab).
+
+## Why MySTRA?
+
+ASTRA already holds the *truth* of an analysis — every decision, the inputs and outputs of each
+step, the findings, and the materialised result products. A write-up usually re-types all of that
+into prose, where it immediately starts to rot: a number gets stale, a figure is from an old run, a
+stated assumption no longer matches the spec.
+
+MySTRA removes the duplication. The report references the analysis instead of restating it, so there
+is **one source of truth for the data** and the prose can focus on the argument.
+
+| Concern | Single source of truth |
+|---|---|
+| **Data** — what a decision/output/finding *is* | `astra.yaml` (+ `universes/`, `results/`) |
+| **Composition** — what appears, where, in what order | your `index.md` |
+| **Presentation** — how it looks | the MyST theme |
+
+The plugin is a pure **projector** between data and document: it renders the elements you place,
+fills in the numbers, and makes no authoring or styling decisions of its own.
+
+## At a glance
+
+One name — `astra` — drives every surface, the MyST way (just as `{math}` is both a role and a
+directive). You address any part of the analysis with a [path](/mystra/authoring/paths) that mirrors
+`astra.yaml`:
+
+<Tabs items={['Report (index.md)', 'Analysis (astra.yaml)', 'Run it (myst.yml)']}>
+<Tab value="Report (index.md)">
+
+```markdown
+# BAO from the ELG sample
+
+We adopt the {astra}`decisions.algorithm.multigrid` and measure
+$\alpha =$ {astra:value col=alpha where="tracer=elg1" pm=true}`outputs.alpha_table`,
+consistent with {astra:cite}`prior_insights.recon_sharpens_bao`.
+
+:::{astra} outputs.bao_fit_plot
+:caption: The post-reconstruction BAO fit.
+:::
+
+:::{astra} findings.bao_detected
+:compact:
+:::
+```
+
+</Tab>
+<Tab value="Analysis (astra.yaml)">
+
+```yaml
+version: "1.0"
+name: BAO from the ELG sample
+
+outputs:
+  - id: alpha_table
+    type: table
+    format: csv
+    description: Best-fit BAO dilation parameters per tracer.
+  - id: bao_fit_plot
+    type: figure
+    format: png
+    description: Correlation function and best-fit model.
+
+decisions:
+  algorithm:
+    label: Reconstruction algorithm
+    default: multigrid
+    options:
+      multigrid: { label: MultiGrid }
+      iterative_fft: { label: Iterative FFT }
+
+findings:
+  bao_detected:
+    claim: The BAO feature is detected at high significance.
+    created_at: "2026-01-15T00:00:00Z"
+    evidence: []
+```
+
+</Tab>
+<Tab value="Run it (myst.yml)">
+
+```yaml
+version: 1
+project:
+  plugins:
+    - https://github.com/LightconeResearch/MySTRA/releases/latest/download/mystra.mjs
+  toc:
+    - file: index.md
+site:
+  template: book-theme
+```
+
+```bash
+myst start        # → http://localhost:3000
+```
+
+</Tab>
+</Tabs>
+
+## What MyST handles for you
+
+MySTRA writes only the ASTRA→AST bridge and leans on the stock `myst` engine for everything else:
+building, serving, asset hashing and copying, live reload of Markdown, numbering, cross-references,
+and search. Citations are delegated to MyST too — DOI evidence renders as a `doi.org` link, and a
+linked reference list comes for free once a project bibliography is wired.
+
+## Where to go next
+
+<Cards>
+  <Card title="Getting started" href="/mystra/getting-started">
+    From an ASTRA project to a live, self-updating report in about five minutes.
+  </Card>
+  <Card title="Authoring guide" href="/mystra/authoring">
+    Paths, inline references, block embeds, live values and multi-page reports.
+  </Card>
+  <Card title="Reference" href="/mystra/reference/configuration">
+    Configuration, and the contract for theme authors.
+  </Card>
+  <Card title="GitHub" href="https://github.com/LightconeResearch/MySTRA">
+    Source code, releases and issues.
+  </Card>
+  <Card title="ASTRA specification" href="https://astra-spec.org/">
+    The format MySTRA reads, documented at astra-spec.org.
+  </Card>
+</Cards>

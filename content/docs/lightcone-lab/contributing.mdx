@@ -1,0 +1,220 @@
+---
+title: Contributing
+description: Set up a development install of Lightcone Lab, run its checks and tests, and publish a release.
+---
+
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+
+Lightcone Lab is developed at
+[LightconeResearch/jupyterlab-lightcone](https://github.com/LightconeResearch/jupyterlab-lightcone)
+under the BSD 3-Clause license. It is a JupyterLab extension with a TypeScript frontend in `src/` and
+a Jupyter server extension in `jupyterlab_lightcone/`, shipped together as one Python package.
+
+## Development install
+
+You need Python 3.11 or newer and [Node.js](https://nodejs.org/en/download), preferably its latest
+LTS release. Use `jlpm`, JupyterLab's pinned version of [yarn](https://yarnpkg.com/), for every
+JavaScript command; don't mix in `npm` or another lockfile.
+
+```bash
+git clone https://github.com/LightconeResearch/jupyterlab-lightcone.git
+cd jupyterlab-lightcone
+
+# A virtual environment, active in every terminal you use
+python -m venv .venv
+source .venv/bin/activate
+
+# The package with the full install's dependencies, JupyterLab and jlpm
+pip install --editable ".[dev,test]"
+jlpm install
+
+# Link the development frontend into JupyterLab, and enable the server extension
+jupyter-builder develop . --overwrite
+jupyter server extension enable --sys-prefix jupyterlab_lightcone
+
+# Build the frontend
+jlpm build
+```
+
+Run `jlpm build` again after every change to the TypeScript sources, or keep a watcher running in
+one terminal and JupyterLab in another:
+
+```bash
+jlpm watch   # rebuilds on every saved change
+jupyter lab  # in a second terminal
+```
+
+Refresh the browser to load a rebuilt frontend; restart JupyterLab after changing Python code.
+`jlpm build` writes source maps for the extension; `jupyter lab build --minimize=False` adds them for
+JupyterLab's own extensions.
+
+<Accordions>
+<Accordion title="Removing a development install">
+
+```bash
+jupyter server extension disable --sys-prefix jupyterlab_lightcone
+pip uninstall jupyterlab_lightcone
+```
+
+Then remove the `jupyterlab-lightcone` symlink that `jupyter-builder develop` created in JupyterLab's
+`labextensions` folder; `jupyter labextension list` shows where that folder is.
+
+</Accordion>
+</Accordions>
+
+## Checks and tests
+
+Before a pull request, run:
+
+```bash
+jlpm exec tsc --noEmit   # type check
+jlpm lint:check          # Prettier, ESLint and Stylelint
+jlpm test --runInBand    # frontend tests (Jest)
+pytest                   # server tests
+```
+
+- **Server tests** use [pytest](https://docs.pytest.org/). With coverage:
+  `pytest -vv -r ap --cov jupyterlab_lightcone`. After reinstalling the Python package, run
+  `jupyter-builder develop . --overwrite` again to restore the frontend link.
+- **Frontend tests** use [Jest](https://jestjs.io/): `jlpm test`.
+- **Integration tests** use [Playwright](https://playwright.dev/docs/intro) with JupyterLab's
+  [Galata](https://github.com/jupyterlab/jupyterlab/tree/main/galata) helper, against the installed
+  extension in a running JupyterLab:
+
+  ```bash
+  jlpm build:prod
+  cd ui-tests
+  jlpm install
+  jlpm playwright install   # once
+  jlpm playwright test
+  ```
+
+  The report viewer's test runs only when `MYSTRA_TEST_TEMPLATE` names a built ASTRA MyST theme. See
+  [`ui-tests/README.md`](https://github.com/LightconeResearch/jupyterlab-lightcone/blob/main/ui-tests/README.md)
+  for that, for updating snapshots and for recording new tests.
+- **Endpoint authentication**: every method of every server handler must carry
+  `@tornado.web.authenticated`, or an explicit `@allow_unauthenticated` or `@ws_authenticated` from
+  `jupyter_server.auth.decorator` for a public endpoint. The build workflow checks it with
+  `python .github/scripts/check_auth.py`.
+
+## Both installs
+
+The default install is the frontend alone, and has to work on a JupyterLab nobody can configure; the
+`full` extra adds the server routes. Keep both working:
+
+- Add Python dependencies to the `full` extra in `pyproject.toml`, never to `dependencies`.
+- Before calling a server route, check `hasLightconeServer()`, or `serverReadsProject()` for a
+  per-project read, from `src/server-features.ts`. Without the server, leave the feature out or say
+  which install it needs; never fail with an error.
+- Register a plugin that needs the routes, Jupyter AI or Jupyter Chat in `serverPlugins` in
+  `src/index.ts`. Plugins in `browserPlugins` must not require anything only those provide.
+- Test both: frontend suites run browser-only by default, and `withLightconeServer()` from
+  `src/__tests__/server-fixtures.ts` runs a suite or a `describe` block as the full install.
+
+To try the browser-only workbench from a development install, start JupyterLab with a configuration
+file that holds:
+
+```python
+c.ServerApp.jpserver_extensions.update({"jupyterlab_lightcone": False})
+```
+
+## How the code is organised
+
+`src/index.ts` registers the plugins, split between those that run in the browser alone and those
+that need the server; `src/commands.ts` owns the core commands. ASTRA itself is read through the
+published `@astra-spec/sdk` and drawn with `@astra-spec/ui`, and the brand's tokens come from
+`@lightcone-research/brand`: every dependency resolves from a published package, so no other
+repository is needed to build the extension. On the server, `jupyterlab_lightcone/` holds the routes
+for papers, project setup, status, run records, versions, sessions and comments.
+
+The report viewer (`src/mystra/` and `jupyterlab_lightcone/mystra/`) is a temporary, self-contained
+stopgap: nothing else imports it, and it takes bug fixes only.
+
+Where Lab works around a missing hook in JupyterLab, Jupyter AI or another dependency, the
+workaround is recorded in
+[`docs/workarounds.md`](https://github.com/LightconeResearch/jupyterlab-lightcone/blob/main/docs/workarounds.md),
+with what would let it go. The repository's
+[`AGENTS.md`](https://github.com/LightconeResearch/jupyterlab-lightcone/blob/main/AGENTS.md) holds its
+coding conventions.
+
+## Releasing
+
+Releases are published to PyPI from GitHub; nothing is published to npm. The wheel carries the
+prebuilt frontend and the server extension.
+
+<Steps>
+<Step>
+
+### Check the commit
+
+Wait for the **Build** and **Check Release** workflows to pass on the commit to release. **Check
+Release** validates the packaging with Jupyter Releaser; it publishes nothing.
+
+</Step>
+<Step>
+
+### Draft a GitHub release
+
+In **Releases › Draft a new release**, create a tag at that commit named after the version:
+`MAJOR.MINOR.PATCH`, optionally prefixed with `v` (tag `0.0.2` or `v0.0.2` publishes `0.0.2`). For a
+pre-release, add `-alpha.N`, `-beta.N` or `-rc.N`, as in `v0.1.0-rc.1`. No version-bump commit is
+needed.
+
+</Step>
+<Step>
+
+### Publish it
+
+Write or generate the notes and click **Publish release**; a draft or a pushed tag alone publishes
+nothing. The **Publish to PyPI** workflow sets the version from the tag, builds and checks the wheel
+and the source distribution, and uploads both. Approve the `release` environment if it requires a
+reviewer.
+
+</Step>
+<Step>
+
+### Verify
+
+In an activated environment with Python 3.11 or newer and JupyterLab 4.5.10 or newer (below 5):
+
+```bash
+python -m pip install --upgrade jupyterlab-lightcone
+jupyter labextension list
+jupyter server extension list
+```
+
+Restart JupyterLab and check that it opens an `astra.yaml` in Lab.
+
+</Step>
+</Steps>
+
+If the workflow fails before uploading, fix the cause and rerun the failed jobs when the tagged source
+doesn't need to change; otherwise publish a new version from a new tag, since PyPI doesn't let you
+replace a file already uploaded. The version committed on `main` never changes: the workflow sets it
+in its own checkout only.
+
+<Accordions>
+<Accordion title="One-time setup for maintainers">
+
+1. In the repository's **Settings › Environments**, create an environment named `release`. If you
+   restrict deployment branches and tags, allow the release tags.
+2. Add a [PyPI trusted publisher](https://docs.pypi.org/trusted-publishers/adding-a-publisher/) with
+   these values:
+
+   | Setting           | Value                  |
+   | ----------------- | ---------------------- |
+   | PyPI project      | `jupyterlab-lightcone` |
+   | GitHub owner      | `LightconeResearch`    |
+   | Repository        | `jupyterlab-lightcone` |
+   | Workflow filename | `publish-release.yml`  |
+   | Environment       | `release`              |
+
+No PyPI token or other secret is needed: the publish job authenticates to PyPI with GitHub's OIDC
+identity, and the build runs in a separate job without publishing credentials.
+
+A conda-forge package is optional and needs its own feedstock; see conda-forge's
+[new package guide](https://conda-forge.org/docs/maintainer/adding_pkgs.html). Once it exists, its
+bot proposes each new PyPI release.
+
+</Accordion>
+</Accordions>

@@ -1,0 +1,248 @@
+---
+title: Contributing
+description: How the agent-skills repository turns one set of skills into plugins, and how to test and version them.
+---
+
+The [agent-skills](https://github.com/LightconeResearch/agent-skills) repository is the source of
+truth for the skills. It is not an application: it packages `SKILL.md`-based skills, with their
+hooks, for three install targets from one canonical source: the `npx skills` CLI, the Claude Code
+plugin marketplace, and Codex plugins.
+
+The golden rule: **edit the source, then regenerate.** Never edit a generated file by hand.
+
+## Repository layout
+
+| Path                                                               | Role                                                    | Edit it?  |
+| ------------------------------------------------------------------ | ------------------------------------------------------- | --------- |
+| `skills/<name>/SKILL.md`, with `references/`, `scripts/`, `assets/`, `templates/` | The canonical skills                        | Yes       |
+| `agents/*.md`                                                      | Claude subagents, for a plugin that ships any           | Yes       |
+| `hooks/<plugin>/hooks.json`, `hooks/<plugin>/scripts/*.sh`         | Each plugin's own hooks                                 | Yes       |
+| `skills.config.json`                                               | How skills compose into plugins                         | Yes       |
+| `scripts/*.mjs`                                                    | The generator, the validator and the test runners       | Yes       |
+| `tests/<plugin>.yaml`                                              | End-to-end hook tests, one spec per plugin              | Yes       |
+| `.claude-plugin/marketplace.json`                                  | The Claude Code marketplace manifest                    | Generated |
+| `.agents/plugins/marketplace.json`                                 | The Codex marketplace manifest                          | Generated |
+| `plugins/**`                                                       | One self-contained directory per plugin, tool pins filled in | Generated |
+| `manifest.json`                                                    | The registry of skills and plugins                      | Generated |
+
+After changing a skill, a hook or the configuration, regenerate and check:
+
+```bash
+npm run build   # regenerate every generated file
+npm test        # validate the sources and check that nothing drifted
+```
+
+Commit the regenerated files together with your source change. The generator uses only Node 18
+built-ins, so there is no `npm install` step.
+
+## Why a generator
+
+The install targets disagree on layout. Codex, in particular, wants a directory per plugin with its
+own `skills/` and, for a plugin that ships hooks, its own `hooks/`. Maintaining those by hand against
+one set of skills is exactly what drifts silently, so `skills.config.json` and `skills/` are the only
+sources and everything per target is generated and checked.
+
+If a manifest looks wrong, the bug is in `skills.config.json` or in `scripts/lib.mjs`, not in the
+output. `lib.mjs` is the engine: it loads the configuration, parses each skill's frontmatter, works
+out which skills, hooks and agents each plugin contains, and returns every file the targets need.
+`build.mjs` writes them; `validate.mjs` regenerates them in memory and compares them with what is on
+disk, so the generator and the checker agree by construction.
+
+Two choices are deliberate:
+
+- **No dependencies.** `lib.mjs` parses YAML frontmatter itself instead of pulling in a library, so
+  the generator runs in a fresh checkout and in CI with no setup step. The parser only needs to
+  handle `name` and `description`; adding a dependency would give that up.
+- **Real files, not symlinks.** Plugin installers archive the plugin directory and don't follow
+  symlinks back to `skills/` or `hooks/`, in every harness. The generator therefore copies each
+  plugin's full contents into `plugins/<name>/`, and the validator compares every copy byte for
+  byte, executable permissions included, with its source.
+
+## `skills.config.json`
+
+The marketplace and each plugin are declared here:
+
+```json title="skills.config.json (excerpt)"
+{
+  "name": "lightcone",
+  "version": "0.0.5",
+  "skills": ["lightcone"],
+  "hooks": "hooks/lightcone/hooks.json",
+  "tools": { "lightcone-cli": "0.5.0rc5" },
+  "dependencies": ["astra"]
+}
+```
+
+| Field          | Meaning                                                                                                                                                                                  |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `version`      | The plugin's own version, independent of every other plugin. See [Versions](#versions).                                                                                                  |
+| `skills`       | The skills the plugin owns directly.                                                                                                                                                     |
+| `dependencies` | Other plugins it **bundles**. Their skills, hooks and agents, and theirs in turn, are copied into the plugin's directory, so it is self-contained and installs the same way everywhere. |
+| `requires`     | Other plugins it depends on **without** bundling them. Documentation only: the user installs them separately.                                                                          |
+| `hooks`        | The path to the plugin's own `hooks.json`. A plugin owns at most one.                                                                                                                    |
+| `tools`        | The versions of the command-line tools its skills and hooks run. See [Tool pins](#tool-pins).                                                                                            |
+| `agents`       | Paths to Claude subagent files.                                                                                                                                                          |
+
+When a plugin bundles another that ships hooks, as `lightcone` bundles `astra`, the generator merges
+their `hooks.json` files: hook groups are concatenated per event, and scripts are copied side by
+side into one `hooks/scripts/` directory. Script names must therefore be unique across plugins.
+
+## Adding a skill
+
+<Steps>
+<Step>
+
+### Write the skill
+
+Create `skills/<name>/SKILL.md` with its frontmatter:
+
+```yaml
+---
+name: <name>            # lowercase letters, digits and hyphens; must equal the directory name
+description: >          # at most 1024 characters: what it does, and when to use it
+  ...
+---
+```
+
+The `description` is what an agent reads to decide whether to load the skill, so say what it does
+and when to use it, with the words a user would say. Keep the body under about 500 lines, and move
+detail into `skills/<name>/references/`, which the agent loads on demand.
+
+</Step>
+<Step>
+
+### Call tools through a pin
+
+If the skill runs a command-line tool such as `astra`, invoke it through the pinned `uvx` form with
+the literal placeholder, `uvx astra-tools@x.y.z <command>`, and open the skill with a
+**Prerequisites** check, following `skills/astra/SKILL.md`: confirm the pinned tool resolves, point to
+uv's installation docs if `uvx` is missing, and discover the syntax with `--help` rather than
+guessing it.
+
+</Step>
+<Step>
+
+### Add it to a plugin
+
+List the skill under `skills` for the relevant plugins in `skills.config.json`.
+
+</Step>
+<Step>
+
+### Build and test
+
+Run `npm run build && npm test`, then commit the source and the regenerated files together.
+
+</Step>
+</Steps>
+
+## Writing hooks
+
+- Reference the plugin root as `${CLAUDE_PLUGIN_ROOT:-$PLUGIN_ROOT}`. `CLAUDE_PLUGIN_ROOT` is the one
+  root variable every harness defines; the fallback covers older versions.
+- Always spell script paths as `hooks/scripts/<name>.sh`, since the build flattens every bundled hook
+  tree into that one directory.
+- Keep scripts self-contained: the existing hooks source nothing and avoid `jq`, `sed` and `awk`.
+- Never install anything from a hook. It runs without a permission prompt, so it reports and leaves
+  the action to the agent.
+
+[Hooks](/agent-skills/hooks) describes what the current hooks do.
+
+## Tool pins
+
+Skills and hooks that run a command-line tool do it at a pinned version, and the version is filled
+in by the build, never written by hand:
+
+- **Sources use the literal placeholder `x.y.z`**, as in `uvx astra-tools@x.y.z validate astra.yaml`.
+  A concrete version under `skills/` or `hooks/` is an error.
+- **Pins are declared per plugin**, in its `tools` map. A plugin's effective pins merge over the
+  plugins it bundles, its own entries winning, so a plugin bundling `astra` inherits its pin unless
+  it declares one.
+- **`npm run build` fills in the pins** in the generated `plugins/<name>/` copies. The sources are
+  never rewritten.
+- **An unpinned placeholder fails the build.** If a skill runs `sometool@x.y.z` and no plugin
+  bundling it pins `sometool`, both `npm run build` and `npm test` fail and name the invocation.
+- **To bump a version**, edit the one number in `skills.config.json`, run `npm run build`, and
+  commit. No other file changes.
+
+Pin only the tool itself, never the packages it depends on: `astra-spec` is deliberately unpinned,
+and the `astra-tools` release resolves it.
+
+The `lightcone-cli` pin works differently from `astra-tools`. The CLI isn't run through `uvx`: the
+user installs it once, so its pin is both the version the install commands name (in the
+`lightcone-cli==x.y.z` form) and the minimum that the session-start hook and the skill accept.
+Newer versions are fine, so nobody is downgraded. Keep the `==` form: while the current line is a
+pre-release, a bare `uv tool install lightcone-cli` resolves to an older stable release. Bump the pin
+with each release the skill is rewritten against.
+
+## Tests
+
+### `npm test`
+
+`npm test` runs the validator (`scripts/validate.mjs`, also `npm run validate`) and the hook tests
+(`scripts/test-hooks.mjs`). The validator checks that:
+
+- every skill's `name` is lowercase with hyphens and matches its directory;
+- every `description` is present and at most 1024 characters;
+- plugins refer only to skills, agents, hooks and dependencies that exist;
+- the sources use the `x.y.z` placeholder, with no concrete versions and no `astra-spec` pin, and
+  every placeholder is pinned by the plugins that bundle it;
+- the generated manifests and `plugins/` copies match what the current sources produce.
+
+The hook tests run the hook scripts against stand-ins for `uvx` and `lc`, with no network access,
+and check what they print: the validation reports, every state of the `lc` check, and the choice
+between asking and acting.
+
+### Smoke tests
+
+The smoke suite installs each plugin into a throwaway environment and checks that it loads. It
+needs `claude`, `codex` and `tmux` on your `PATH`, and makes no model or API calls:
+
+```bash
+npm run smoke            # CLI install in both harnesses, and an interactive install in Claude Code
+npm run smoke -- --cli   # CLI installs only, with isolated configuration directories
+```
+
+### End-to-end hook tests
+
+`npm run e2e` runs real headless Claude Code and Codex sessions against plugins installed from the
+marketplace, and checks that the hooks actually fire. Each plugin is covered by a declarative spec
+in `tests/<plugin>.yaml`: to cover a new plugin, add a spec; the runner needs no changes.
+
+```bash
+npm run e2e                           # every spec, both harnesses
+node scripts/e2e-hooks.mjs --claude   # one harness only
+node scripts/e2e-hooks.mjs --codex
+```
+
+The sessions need credentials in the environment: `ANTHROPIC_API_KEY` or `CLAUDE_CODE_OAUTH_TOKEN`
+for Claude Code, `CODEX_API_KEY` or `OPENAI_API_KEY` for Codex. Locally, a harness without a binary
+or a key is skipped. The `e2e-hooks` workflow runs the suite on pull requests and on `main` with the
+latest release of both harnesses, and there every skip is a failure; pull requests from forks fail
+it, since GitHub doesn't expose secrets to them.
+
+## Testing the install paths locally
+
+```bash
+# Claude Code, against your local checkout
+claude plugin marketplace add ./           # or /plugin marketplace add ./ in a session
+claude plugin install astra@lightcone-research
+
+# Validate the Claude plugin and marketplace manifests
+claude plugin validate .
+claude plugin validate ./plugins/astra
+
+# npx skills, from the repository
+npx skills add ./ --list
+```
+
+## Versions
+
+Each plugin's `version` in `skills.config.json` is what harnesses use to resolve updates: Claude Code
+skips `claude plugin update` when the version matches its cache, and Codex uses it as the install
+cache key. A change shipped without a new version may never reach people who already have the
+plugin.
+
+In a pull request, **bump the version of every plugin whose generated `plugins/<name>/` directory
+changes**, including plugins that only bundle a changed dependency (a change to `astra` also bumps
+`lightcone`), and leave the others alone.

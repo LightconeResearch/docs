@@ -1,0 +1,188 @@
+---
+title: Agents
+description: Work with Claude Code or Codex beside your project, in a terminal or in Jupyter AI sessions tied to the project.
+---
+
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+
+Lab starts coding agents in the project folder, so that they, and `lc`, find its `astra.yaml`. Where
+they run depends on the install:
+
+|                   | Workbench only                                  | Full install                                               |
+| ----------------- | ----------------------------------------------- | ---------------------------------------------------------- |
+| The agent runs in | a JupyterLab terminal                           | a Jupyter AI session, in a chat tab                        |
+| Start it from     | the **claude** and **codex** buttons on Home    | the **New session** box on Home, or **New session**        |
+| It gets           | the project folder                              | the project root, your comments, and tools to show records |
+| You need          | the agent installed and signed in               | the agent and its adapter (Node.js 22 or newer)            |
+
+## In a terminal [#terminal]
+
+In the browser-only workbench, Home's right-hand column holds an **Agents** card with two buttons:
+**claude** starts [Claude Code](https://code.claude.com/docs/en/setup) and **codex** starts
+[Codex](https://developers.openai.com/codex/cli). Each opens a new terminal beside Home, in the
+project folder, and runs the command there. **Open a plain terminal** opens one without an agent.
+When Home is too narrow for the card, the same buttons sit in its header.
+
+The agent is the ordinary CLI, so install it and sign in where the server's terminals run, and add
+the [Agent Skills](/agent-skills) plugin so it knows how to work on a Lightcone project. The same
+terminals need the [Lightcone CLI](/installation#3-the-lightcone-cli) for the agent to run the
+analysis.
+
+The full install replaces this card with Jupyter AI sessions. Its **Open terminal** button, on
+Home's title page, still opens a terminal in the project folder, where you can run `claude` or
+`codex` yourself.
+
+## In Jupyter AI [#jupyter-ai]
+
+**Full install.** Jupyter AI connects to coding agents through adapters, and none comes bundled.
+For each agent you want:
+
+<Steps>
+<Step>
+
+### Install the agent and sign in
+
+On the server, where JupyterLab runs.
+
+</Step>
+<Step>
+
+### Add its adapter
+
+The adapters need [Node.js](https://nodejs.org/) 22 or newer.
+
+</Step>
+<Step>
+
+### Restart JupyterLab
+
+The agent then appears in the agent picker.
+
+</Step>
+</Steps>
+
+<Tabs groupId="agent" persist items={['Claude Code', 'Codex']}>
+<Tab value="Claude Code">
+
+Install [Claude Code](https://code.claude.com/docs/en/setup), then run `claude` once to sign in. Then
+add the adapter:
+
+```bash
+npm install -g @agentclientprotocol/claude-agent-acp
+```
+
+</Tab>
+<Tab value="Codex">
+
+Install the [Codex CLI](https://developers.openai.com/codex/cli), then sign in with `codex login`.
+Then add the adapter:
+
+```bash
+npm install -g @agentclientprotocol/codex-acp
+```
+
+</Tab>
+</Tabs>
+
+### Start a session
+
+- **From Home**: in the **New session** box, pick an agent, describe what you want to do and press
+  **Start** (or <kbd>Enter</kbd>; <kbd>Shift</kbd>+<kbd>Enter</kbd> for a new line). The session opens
+  in the main area with your message sent. The picker starts on the agent the project used last,
+  and an unsent draft survives a reload.
+- **From the palette**: **New session** starts one in the current project.
+- **Lightcone Agent**, in the palette and in the project's section of the launcher (under **Tools** on
+  Home), brings forward a session of the project that is already open, or starts one.
+
+Home lists the project's six most recent sessions, each marked while its agent is **working** or
+**needs your input**. [Search](/lightcone-lab/features#search) finds sessions by title and by the
+text of their messages.
+
+### Where sessions live
+
+A session is a Jupyter Chat document in the project's `chats/` folder. It is named after its first
+message, and its tab shows that message. Chats you create with Jupyter Chat's own menus land in the
+file browser's folder instead; those beside `astra.yaml` are sessions of the project too, and a chat
+created outside every project joins the current one when it first opens.
+
+Wherever the chat file is, its agent starts at the project root. Lab also records the agent each
+project last used, in `.lightcone/agent.json`, so a chat that is reopened, reloaded or moved to the
+side panel keeps talking to the same agent.
+
+<Callout type="warn" title="Keep chats out of git">
+  `lc materialize` won't start while the repository has uncommitted changes, and sessions change
+  with every message. Projects set up by `lc init` from lightcone-cli 0.5.0rc3 on ignore `chats/`
+  and `.lightcone/`, but not a chat saved elsewhere, such as beside `astra.yaml`. Add `*.chat` to
+  the project's `.gitignore` if you keep chats outside `chats/`, and add `chats/` and `.lightcone/`
+  to an older project's. Lab never edits a project's git configuration.
+</Callout>
+
+## What the agent can show you [#tools]
+
+In the full install, Lab gives agents two tools, through Jupyter's MCP server
+(`jupyter-server-mcp`, part of the full install), so that they can show you records in JupyterLab
+instead of describing them:
+
+| Tool                                | What it does                                                                                                                                                                      |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `lightcone_preview_element(target)` | Shows a record as a card in the chat: a figure, table or other result, a decision, an input, a finding. Clicking the card opens its record tab. An output's card keeps the committed version it showed. |
+| `lightcone_open_element(target)`    | Opens a record in its own tab beside the chat, reusing the project's unpinned record tab. Tabs you pinned stay open.                                                              |
+
+`target` is the record's path in the project's `astra.yaml`, such as `outputs.fit` or
+`clustering.decisions.method`. Neither tool runs a recipe or downloads a paper, and both act in the
+browser that sent the prompt, for the project the chat belongs to. Lab also gives the MCP server
+instructions that tell agents when to use them: to prefer a card over a file path or a description
+of an image, and to open a tab only when you ask for one.
+
+## Replies
+
+- **Cards**: records the agent shows appear as cards; click one to open its record tab.
+- **Links**: file links and images the agent writes as paths on the server open in JupyterLab.
+- **What changed**: the last message of each reply lists the results that changed while the agent
+  answered, each opening the version it committed beside the session, and the files it edited.
+
+## Point the agent at things
+
+- **References**: type `@` in the session's input to insert a record of the project, an output with
+  its version, and `#` to insert another session. The reference goes into your message as visible
+  text, so the agent reads exactly what you see; nothing else is attached.
+- **Comments**: pin notes on figures and text, and they reach the agent with your next message. See
+  [Comments](/lightcone-lab/features#comments).
+
+## For deployments
+
+<Accordions>
+<Accordion title="How Lab hooks into Jupyter AI">
+
+When the server starts, Lab sets Jupyter AI's `persona_manager_class` to its own subclass of Jupyter
+AI's persona manager, which starts agents at the project root, adds pending comments to the prompt
+and remembers each project's agent. It keeps the upstream class name, so existing
+`c.PersonaManager` settings, such as `c.PersonaManager.default_persona_id`, still apply.
+
+A deployment that configures another persona manager class keeps it. Agents then start in the chat's
+own folder, and the composer appends pending comments visibly to the message text instead.
+
+The server log says which applies:
+
+```text
+Jupyter AI agents start in the ASTRA project that owns their chat.
+Jupyter AI uses a configured persona manager; agent folders are unchanged.
+```
+
+</Accordion>
+<Accordion title="When the tools are missing">
+
+The tools are registered through the `jupyter_server_mcp.tools` entry point and need Jupyter's MCP
+server to be running. The server log says whether agents received the instructions:
+
+```text
+Agents are told when to use Lightcone's MCP tools.
+Jupyter's MCP server is not running; agents get no instructions for Lightcone's tools.
+```
+
+A tool called with no browser attached, or from a chat that belongs to no project, returns an error
+that asks the user to send a message from the browser first, or to open a project folder and start a
+new chat.
+
+</Accordion>
+</Accordions>

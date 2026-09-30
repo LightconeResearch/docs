@@ -1,0 +1,155 @@
+---
+title: Installation
+description: Install Lightcone Lab as a browser-only workbench or with its server features, and check that it loaded.
+---
+
+Lightcone Lab is a Python package, `jupyterlab-lightcone`, that carries a prebuilt JupyterLab
+extension. Install it into the Python environment that runs JupyterLab, for example from JupyterLab's
+own terminal (**File › New › Terminal**), then restart JupyterLab. There is no separate
+`jupyter labextension install` step and nothing to build.
+
+<Callout title="Setting up the whole stack?">
+  [Installation](/installation) covers uv, git and the Lightcone CLI, which Lab relies on. This page
+  covers Lab itself.
+</Callout>
+
+## Choose an install
+
+|                                 | Workbench only                               | Full                                           |
+| ------------------------------- | -------------------------------------------- | ---------------------------------------------- |
+| For                             | a JupyterLab you cannot configure (JupyterHub) | a JupyterLab you run yourself                  |
+| Command                         | `pip install --user jupyterlab-lightcone`    | `pip install "jupyterlab-lightcone[full]"`     |
+| Installs                        | the prebuilt frontend only                   | also Jupyter AI, the Lightcone engine and their tools |
+| Home, inventory, pipeline, papers, search, themes | yes                         | yes                                            |
+| Agents                          | Claude Code or Codex in a terminal           | Jupyter AI sessions                            |
+| Freshness, provenance, versions, comments, report | no                         | yes                                            |
+| Project setup                   | `lc init` in a terminal                      | by the server                                  |
+
+[Features](/lightcone-lab/features) marks each feature that needs the full install. You can start
+with the workbench only and add the full install later: install the extra and restart.
+
+## Requirements
+
+Both installs need:
+
+- **JupyterLab 4.5.10 or newer**, below 5.
+- **Python 3.11 or newer**, up to 3.14.
+
+The full install also needs, on the server:
+
+- **Linux or macOS.**
+- **git** and **[uv](https://docs.astral.sh/uv/getting-started/installation/)** on the server's
+  `PATH`, for the Lightcone engine that runs inside the server. See
+  [Installation](/installation#1-uv-and-git).
+- **Node.js 20 or newer**, only to preview the project's report.
+- **Node.js 22 or newer**, only for the adapters that connect Claude Code and Codex to Jupyter AI.
+  See [Agents](/lightcone-lab/agents#jupyter-ai).
+
+## Workbench only [#workbench-only]
+
+For a JupyterLab whose environment you cannot change, such as a JupyterHub at a computing center,
+install into your user site:
+
+```bash
+pip install --user jupyterlab-lightcone
+```
+
+This installs the prebuilt frontend and nothing the server runs. On Linux it lands in
+`~/.local/share/jupyter/labextensions`, where JupyterLab 4.5.10 and newer looks for your own
+extensions. Restart your server to load it; on JupyterHub, choose **File › Hub Control Panel › Stop
+My Server**, then start it again.
+
+In an environment you own, the same package installs without `--user`:
+
+```bash
+pip install jupyterlab-lightcone
+```
+
+The workbench runs in the browser, on JupyterLab's own file and terminal services. Two things it
+starts run in JupyterLab's terminals, so install them where those terminals can find them:
+
+- **The Lightcone CLI**, `lc`, to set up new projects (**New Lightcone project** runs `lc init` in a
+  terminal) and to run the analysis. See [Installation](/installation#3-the-lightcone-cli).
+- **Claude Code or Codex**, installed and signed in, for the **claude** and **codex** buttons on
+  Home. See [Agents](/lightcone-lab/agents#terminal).
+
+## Full [#full]
+
+For a JupyterLab you run yourself:
+
+```bash
+pip install "jupyterlab-lightcone[full]"
+```
+
+The `full` extra adds what the server features need:
+
+| Package                                                        | What it is for                                              |
+| -------------------------------------------------------------- | ----------------------------------------------------------- |
+| `lightcone-cli` (0.5.x)                                        | The Lightcone engine: project setup, `lc status`, run records |
+| `astra-tools`                                                  | The ASTRA paper cache                                       |
+| `jupyter-ai`, `jupyter-ai-persona-manager`, `jupyterlab-chat`  | Agent sessions                                              |
+| `jupyter-server-mcp`, `jupyterlab-commands-toolkit`            | The tools agents use to show records in JupyterLab          |
+| `dulwich`, `git-annex`                                         | Reading committed versions of results                       |
+| `mystmd`                                                       | The MyST CLI behind the report preview                      |
+
+None of these includes a coding agent: install Claude Code or Codex and its adapter as
+[Agents](/lightcone-lab/agents#jupyter-ai) describes, then restart JupyterLab.
+
+<Callout type="warn" title="Keep the quotes">
+  Quote `"jupyterlab-lightcone[full]"`: some shells, such as zsh, read the square brackets as a
+  pattern.
+</Callout>
+
+## Check the install
+
+List the extensions JupyterLab loads:
+
+```bash
+jupyter labextension list
+jupyter server extension list
+```
+
+`jupyterlab-lightcone` should be listed as enabled and OK among the lab extensions, and
+`jupyterlab_lightcone` as an enabled server extension. Both installs register the server extension;
+in the workbench only, it just notes in the server log that Lab runs in the browser only.
+
+Then restart JupyterLab and browse into a folder that holds an `astra.yaml`:
+
+- the launcher tab shows the project's **Home**;
+- the status bar shows **Lightcone ·** followed by the project folder's name;
+- double-clicking `astra.yaml` opens the inventory;
+- **Settings › Theme** lists **Lightcone Light** and **Lightcone Dark**.
+
+In the full install, Home also shows a **New session** box beside the results.
+
+### Full install, but no server features? [#browser-only-fallback]
+
+When a package the server features need is missing, Lab falls back to the browser-only workbench and
+the server extension says why in the Jupyter server log:
+
+```text
+Lightcone Lab runs in the browser only: <package> is not installed. Agents, run history, freshness and the paper cache need pip install 'jupyterlab-lightcone[full]'.
+```
+
+Install the extra into the environment that runs the Jupyter server, not another one, and restart
+JupyterLab.
+
+## Upgrading
+
+```bash
+pip install --upgrade jupyterlab-lightcone
+```
+
+Keep `[full]` (`pip install --upgrade "jupyterlab-lightcone[full]"`) on a full install, and `--user`
+on a workbench-only one, then restart JupyterLab. Pre-releases, when there are any, install with
+`pip install --pre jupyterlab-lightcone`.
+
+## Uninstalling
+
+```bash
+pip uninstall jupyterlab-lightcone
+```
+
+Restart JupyterLab afterwards. Your projects are untouched. In the full install, the workbench keeps
+its own state inside each project: sessions in `chats/`, and the last agent and the comments in
+`.lightcone/`. Delete those folders if you no longer want them.

@@ -3,5 +3,5 @@
   "description": "Reference ASTRA analyses in MyST reports",
   "icon": "PenLine",
   "root": true,
-  "pages": ["index"]
+  "pages": ["index", "getting-started", "authoring", "reference"]
 }

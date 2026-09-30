@@ -3,5 +3,12 @@
   "description": "Plugins that teach coding agents the stack",
   "icon": "Bot",
   "root": true,
-  "pages": ["index"]
+  "pages": [
+    "index",
+    "installation",
+    "lightcone",
+    "astra",
+    "hooks",
+    "contributing"
+  ]
 }

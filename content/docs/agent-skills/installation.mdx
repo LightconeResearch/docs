@@ -1,0 +1,206 @@
+---
+title: Installation
+description: Add the Lightcone marketplace and plugins to Claude Code, Codex or their desktop apps.
+---
+
+The plugins are distributed from the
+[LightconeResearch/agent-skills](https://github.com/LightconeResearch/agent-skills) repository,
+which your agent registers as a plugin marketplace. The marketplace is named `lightcone-research`:
+that is the `@lightcone-research` suffix in the install commands below.
+
+<Callout title="Setting up the whole stack?">
+  [Installation](/installation) walks through uv, git and the Lightcone CLI as well as the plugin.
+  This page covers the plugins in more detail.
+</Callout>
+
+## Before you start
+
+- **A coding agent**: Claude Code or Codex, in the terminal or as a desktop app.
+- **uv**, for either plugin: the plugins run the `astra` command through `uvx`, which installs
+  everything else it needs on first use. See [Installation](/installation#1-uv-and-git).
+- **The Lightcone CLI**, for the `lightcone` plugin only, at version `0.5.0rc5` or newer. See
+  [below](#the-lightcone-cli).
+
+## 1. Add the marketplace
+
+This is a one-time step for each agent.
+
+<Tabs groupId="agent" persist items={['Claude Code', 'Codex', 'Claude app', 'Codex app']}>
+<Tab value="Claude Code">
+
+```bash
+claude plugin marketplace add LightconeResearch/agent-skills
+```
+
+</Tab>
+<Tab value="Codex">
+
+```bash
+codex plugin marketplace add LightconeResearch/agent-skills
+```
+
+</Tab>
+<Tab value="Claude app">
+
+Open **Customize → Plugins → Add → Add marketplace → Add from repo** and paste
+`https://github.com/LightconeResearch/agent-skills`.
+
+</Tab>
+<Tab value="Codex app">
+
+Open **Plugins** from the arrow beside **Create** and add the `LightconeResearch/agent-skills`
+marketplace.
+
+</Tab>
+</Tabs>
+
+## 2. Install the lightcone plugin
+
+The `lightcone` plugin includes the `astra` plugin, its skill and its hooks, so this is the only
+plugin you need.
+
+<Tabs groupId="agent" persist items={['Claude Code', 'Codex', 'Claude app', 'Codex app']}>
+<Tab value="Claude Code">
+
+```bash
+claude plugin install lightcone@lightcone-research
+```
+
+In a session, call the skill with `/lightcone:lightcone`, or just describe what you want to do.
+
+</Tab>
+<Tab value="Codex">
+
+```bash
+codex plugin add lightcone@lightcone-research
+```
+
+In a session, call the skill with `$lightcone:lightcone`, or just describe what you want to do.
+
+</Tab>
+<Tab value="Claude app">
+
+In **Customize → Plugins**, choose **lightcone** from the `lightcone-research` marketplace. Call the
+skill with `/lightcone:lightcone`.
+
+</Tab>
+<Tab value="Codex app">
+
+Open **Plugins** from the arrow beside **Create**, then search for **lightcone** and install it.
+Call the skill with `/lightcone:lightcone`.
+
+</Tab>
+</Tabs>
+
+## ASTRA only
+
+If you write ASTRA specifications without running them with the Lightcone CLI, install the `astra`
+plugin instead. It needs only uv.
+
+<Callout type="warn" title="Not both">
+  Install `astra` **or** `lightcone`, not both: `lightcone` already contains everything in `astra`.
+</Callout>
+
+<Tabs groupId="agent" persist items={['Claude Code', 'Codex', 'Claude app', 'Codex app']}>
+<Tab value="Claude Code">
+
+```bash
+claude plugin install astra@lightcone-research
+```
+
+Then call `/astra:astra` in a session.
+
+</Tab>
+<Tab value="Codex">
+
+```bash
+codex plugin add astra@lightcone-research
+```
+
+Then call `$astra:astra` in a session.
+
+</Tab>
+<Tab value="Claude app">
+
+In **Customize → Plugins**, choose **astra** from the `lightcone-research` marketplace, then call
+`/astra:astra`.
+
+</Tab>
+<Tab value="Codex app">
+
+Open **Plugins** from the arrow beside **Create**, then search for **astra** and install it. Call
+`/astra:astra`.
+
+</Tab>
+</Tabs>
+
+## What the plugins need at runtime
+
+### uv
+
+Both plugins run the `astra` command as `uvx astra-tools@0.2.18`. The first call downloads that
+version; uv caches it, so later calls are fast. Nothing else needs installing for the `astra`
+plugin.
+
+If uv is missing, the plugin's hooks tell the agent, which asks whether you'd like to install it.
+The agent never installs uv itself.
+
+### The Lightcone CLI
+
+The `lightcone` plugin drives the `lc` command, which is not run through `uvx`: you install it once,
+with the exact version, and it stays on your `PATH`:
+
+```bash
+uv tool install lightcone-cli==0.5.0rc5
+```
+
+Keep the version in the command. While the current release is a pre-release, a plain
+`uv tool install lightcone-cli` installs an older stable release, and `uv tool upgrade` refuses to
+move onto a pre-release at all. Installing at an exact version works both ways: it installs when
+nothing is there, and replaces an older install in place.
+
+At the start of every session, the plugin checks the `lc` on your `PATH` against that version, which
+is the minimum it accepts. What your agent offers depends on what it finds:
+
+| It finds                                  | What it means                                                  | The command it offers                                   |
+| ----------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------- |
+| No `lc`                                   | The CLI was never installed                                    | `uv tool install lightcone-cli==0.5.0rc5`               |
+| A version older than `0.5.0rc5`           | The commands and status vocabulary have changed since          | `uv tool install lightcone-cli==0.5.0rc5`               |
+| `0.5.0rc5` or newer                       | Nothing to do                                                  | None                                                    |
+| An `lc` that reports no version           | A broken install, or another `lc` (such as an alias) hiding it | `uv tool install --force lightcone-cli==0.5.0rc5`       |
+| No `lc` right after installing            | uv put it in `~/.local/bin`, which is not on your `PATH`       | `uv tool update-shell`, or check `type lc` for an alias |
+
+In an interactive session, the agent asks whether to run the command and waits for your answer: it
+never installs or upgrades the CLI unasked, since you may be running other projects against the
+version you have. In a headless run, such as `claude -p`, an SDK embedding or CI, no one can answer,
+so the agent runs the command and says in its final message that it did.
+
+### A git identity
+
+`lc materialize` commits every output it makes, so git needs to know who you are. Setting it is up
+to you; the agent never does it for you. See
+[Installation](/installation#2-tell-git-who-you-are).
+
+### Optional tools
+
+- **Report preview**: [Node.js](https://nodejs.org/) 18 or newer and the MyST CLI
+  (`npm i -g mystmd`). The agent asks before installing them.
+- **Containers**: Podman or Docker (`podman-hpc` at NERSC), only for projects that declare a system
+  layer. The agent confirms with you before switching a project to containers.
+
+## Check that it works
+
+Start your agent in any directory. In Claude Code, `claude plugin list` shows
+`lightcone@lightcone-research` as installed and enabled, and the `/lightcone:lightcone` command is
+available in a session.
+
+The plugin's session-start check runs whether or not the directory holds a project, so the agent
+already knows whether `lc` is ready: ask it. Started in a project directory, the agent is also told
+where the specification is and what the analysis contains. [Hooks](/agent-skills/hooks) describes
+each check.
+
+## Updates
+
+Each plugin has its own version number, which your agent's plugin manager uses to decide whether
+there is an update. When an update raises the `lc` pin above the version you have, the next session
+start reports it, and the agent offers the install command from the table above.

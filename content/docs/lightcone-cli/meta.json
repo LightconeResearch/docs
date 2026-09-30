@@ -3,5 +3,21 @@
   "description": "The lc command: run analyses with provenance",
   "icon": "Terminal",
   "root": true,
-  "pages": ["index"]
+  "pages": [
+    "index",
+    "---Guide---",
+    "installation",
+    "getting-started",
+    "concepts",
+    "cluster",
+    "troubleshooting",
+    "glossary",
+    "---Reference---",
+    "commands",
+    "---Internals---",
+    "developer-corner",
+    "architecture",
+    "internals",
+    "contributing"
+  ]
 }

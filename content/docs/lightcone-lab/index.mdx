@@ -1,16 +1,84 @@
 ---
 title: Overview
-description: A JupyterLab workbench for exploring and working on ASTRA projects.
+description: Lightcone Lab turns JupyterLab into a workbench for exploring and working on ASTRA projects.
 ---
 
-Lightcone Lab is a JupyterLab extension that turns JupyterLab into a workbench for ASTRA projects:
-a project home, an inventory of the analysis and its pipeline, provenance and version comparison,
-comments, project-aware agents, and a viewer for the project's MySTRA report.
+import { Bot, Compass, Download, Keyboard } from 'lucide-react';
 
-It runs as a browser-only workbench, or with its `full` extra for the features that need the
-Jupyter server, such as running the Lightcone CLI and agents.
+Lightcone Lab is a JupyterLab extension, published on PyPI as `jupyterlab-lightcone`. It turns an
+[ASTRA](/astra) project into a place to work: explore the analysis, trace every result back to the
+run that made it, and work alongside an agent that knows the project. The
+[Lightcone CLI](/lightcone-cli) does the execution and records the provenance underneath; Lab shows
+what it recorded.
 
-<Callout title="Moving here">
-  This section is being written. Until then, see the
-  [Lightcone Lab README](https://github.com/LightconeResearch/jupyterlab-lightcone).
+Lab works on the project the file browser is in. Browse into a folder that holds an `astra.yaml` and
+the launcher tab becomes that project's Home: its title and description, its latest results, and a
+way to start an agent.
+
+## What it shows
+
+Lab comes in two installs. The **workbench only** runs in the browser, on JupyterLab's own file and
+terminal services, so it installs into a JupyterLab you cannot configure, such as a JupyterHub at a
+computing center. The **full** install adds the parts that run on the Jupyter server.
+
+In both installs:
+
+- **[Project Home](/lightcone-lab/features#home)**: the title, description and latest results in
+  every launcher tab inside a project, with a terminal in the project folder one click away.
+- **[ASTRA inventory](/lightcone-lab/features#inventory)**: the outputs, decisions, inputs, findings
+  and cited papers of the analysis, with figure and table previews.
+- **[Pipeline](/lightcone-lab/features#pipeline)**: what feeds a result, and what depends on it.
+- **[Papers](/lightcone-lab/features#papers)**: cited papers, read in place at the quoted passage.
+  The workbench only reads arXiv papers straight from arXiv.
+- **[Search](/lightcone-lab/features#search)**: <kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>K</kbd> across
+  records, files and commands.
+- **[Themes](/lightcone-lab/features#themes)**: optional **Lightcone Light** and **Lightcone Dark**
+  themes, and a distraction-free **Focus Layout**.
+
+The full install adds:
+
+- **[Project-aware agents](/lightcone-lab/agents)**: Jupyter AI sessions that start at the project
+  root, show results as cards and list what each reply changed. Home starts them and lists the
+  recent ones, and search finds them.
+- **[Freshness](/lightcone-lab/features#freshness)**: each result's `lc status`, live in the
+  inventory.
+- **[Provenance and versions](/lightcone-lab/features#provenance)**: the code, inputs and locked
+  environment behind each result; browse its committed versions and compare them side by side.
+- **[Comments](/lightcone-lab/features#comments)**: notes pinned on figures, text, papers and
+  messages, which reach the agent with your next message.
+- **[Paper cache and report](/lightcone-lab/features#report)**: fetch any cited paper into the ASTRA
+  paper cache, and preview the project's [MySTRA](/mystra) report.
+- **[Project setup](/lightcone-lab/features#projects)** by the server, without a terminal.
+
+## How it fits the stack
+
+- **[ASTRA](/astra)**: Lab reads the project's `astra.yaml` and shows it as an inventory and a
+  pipeline. Opening a project starts no kernel and changes no file.
+- **[Lightcone CLI](/lightcone-cli)**: new projects are set up with `lc init`, and the freshness,
+  run records and versions Lab shows are the ones `lc` recorded. Lab itself never runs a recipe:
+  you or your agent run `lc`.
+- **[Agent Skills](/agent-skills)**: the **claude** and **codex** buttons on Home start the agent
+  CLIs in a terminal in the project folder, where the `lightcone` plugin works as it does in any
+  terminal.
+- **[MySTRA](/mystra)**: in the full install, Lab previews the project's report in a tab.
+
+<Callout title="Early development">
+  Lab is at version 0.0.x on PyPI and still changes between releases.
 </Callout>
+
+## Next steps
+
+<Cards>
+  <Card icon={<Download />} title="Installation" href="/lightcone-lab/installation">
+    Choose between the workbench only and the full install, and check that it loaded.
+  </Card>
+  <Card icon={<Compass />} title="Workbench tour" href="/lightcone-lab/features">
+    Every feature, and how to reach it.
+  </Card>
+  <Card icon={<Bot />} title="Agents" href="/lightcone-lab/agents">
+    Claude Code and Codex in a terminal or in Jupyter AI, and the tools Lab gives them.
+  </Card>
+  <Card icon={<Keyboard />} title="Settings and shortcuts" href="/lightcone-lab/settings">
+    Keyboard shortcuts, commands and server configuration.
+  </Card>
+</Cards>
