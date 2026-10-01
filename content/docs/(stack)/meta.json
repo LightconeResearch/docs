@@ -5,8 +5,8 @@
   "root": true,
   "pages": [
     "---Introduction---",
-    "what-is-lightcone",
     "index",
+    "quickstart",
     "astra",
     "comparisons",
     "installation",
