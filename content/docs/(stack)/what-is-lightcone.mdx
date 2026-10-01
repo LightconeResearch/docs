@@ -4,6 +4,8 @@ description: Infrastructure for research that others can verify, reproduce and b
 icon: CircleQuestionMark
 ---
 
+import { Bot, FlaskConical, PenLine, Terminal } from 'lucide-react';
+
 ## Why it exists
 
 AI agents are making research faster: an analysis that took weeks can now take an afternoon. But a
@@ -47,6 +49,21 @@ Each result then becomes a solid foundation for the next: science that compounds
   inventory, follow its pipeline and inspect the provenance of each result.
 - **[MySTRA](/mystra)** lets the report cite the analysis by path: re-run the analysis and the report
   follows.
+
+<Cards>
+  <Card icon={<Bot />} title="Agent Skills" href="/agent-skills">
+    Plugins that teach Claude Code and Codex to scope, build and run your analysis.
+  </Card>
+  <Card icon={<Terminal />} title="Lightcone CLI" href="/lightcone-cli">
+    The `lc` command: runs the analysis and records the provenance of every output.
+  </Card>
+  <Card icon={<FlaskConical />} title="Lightcone Lab" href="/lightcone-lab">
+    A JupyterLab workbench for exploring your project.
+  </Card>
+  <Card icon={<PenLine />} title="MySTRA" href="/mystra">
+    A report that references the analysis instead of copying its results.
+  </Card>
+</Cards>
 
 ## You and your agent
 
