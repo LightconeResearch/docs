@@ -1,8 +1,31 @@
 ---
-title: What is the Lightcone Stack
-description: Infrastructure for research that others can verify, reproduce and build on.
+title: Overview
+description: Rigorous research, without the bookkeeping.
 icon: CircleQuestionMark
 ---
+
+import { Bot, FlaskConical, PenLine, Terminal } from 'lucide-react';
+
+The Lightcone Stack is a sidecar for your research: it attaches to the project you're working on and
+to the agent you already use, stays out of the way of how you work, and makes sure your work is
+rigorous and reproducible by default.
+
+- **Every decision, and why.** The methodological choices you make are written down with the options
+  you considered, the reasons for the choice, and the papers that informed it.
+- **Every result, and what made it.** Each result carries a record of the code, data and environment
+  that produced it, and anything made outside that record is flagged.
+- **What a change affects.** When a decision or the data changes, you can see which results are out
+  of date, and why.
+
+We're not prescriptive about how much you use AI in your research: use an agent for everything, for
+some things, or not at all. Our goal is to make sure that the science you do, however you do it, is
+rigorous and reproducible.
+
+<Callout type="warn" title="Public beta">
+  The Lightcone Stack is in a **public beta**: expect some breaking changes between minor versions.
+  Bug reports, design challenges and use cases we don't cover yet are exactly what we want to hear.
+  Please [open an issue](https://github.com/LightconeResearch/lightcone-cli/issues).
+</Callout>
 
 ## Why it exists
 
@@ -48,6 +71,21 @@ Each result then becomes a solid foundation for the next: science that compounds
 - **[MySTRA](/mystra)** lets the report cite the analysis by path: re-run the analysis and the report
   follows.
 
+<Cards>
+  <Card icon={<Bot />} title="Agent Skills" href="/agent-skills">
+    Plugins that teach Claude Code and Codex to scope, build and run your analysis.
+  </Card>
+  <Card icon={<Terminal />} title="Lightcone CLI" href="/lightcone-cli">
+    The `lc` command: runs the analysis and records the provenance of every output.
+  </Card>
+  <Card icon={<FlaskConical />} title="Lightcone Lab" href="/lightcone-lab">
+    A JupyterLab workbench for exploring your project.
+  </Card>
+  <Card icon={<PenLine />} title="MySTRA" href="/mystra">
+    A report that references the analysis instead of copying its results.
+  </Card>
+</Cards>
+
 ## You and your agent
 
 The agent does much of the work, but not the judgment:
@@ -61,6 +99,6 @@ The agent does much of the work, but not the judgment:
 
 ## Status
 
-The stack is in early development. Its pieces are released separately and still change between
+The stack is in public beta. Its pieces are released separately and still change between
 versions, so projects pin the versions they use. It is open source under the BSD 3-Clause license,
 at [github.com/LightconeResearch](https://github.com/LightconeResearch).

@@ -5,8 +5,8 @@
   "root": true,
   "pages": [
     "---Introduction---",
-    "getting-started",
     "index",
+    "getting-started",
     "---[Book]Guides---",
     "...authoring",
     "---Reference---",

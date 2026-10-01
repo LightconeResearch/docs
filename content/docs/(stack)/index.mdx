@@ -4,47 +4,35 @@ description: Start a reproducible research analysis with your coding agent.
 icon: Rocket
 ---
 
-import { Bot, FlaskConical, PenLine, Terminal } from 'lucide-react';
-
 The Lightcone Research Stack is a set of open-source tools for research you can inspect, reproduce
 and build on. You work through your coding agent: it interviews you about your question, writes the
 analysis down as an [ASTRA](/astra) specification, and runs it with the Lightcone CLI, which records
 how every result was produced. The scientific choices stay yours.
 
-<Cards>
-  <Card icon={<Bot />} title="Agent Skills" href="/agent-skills">
-    Plugins that teach Claude Code and Codex to scope, build and run your analysis.
-  </Card>
-  <Card icon={<Terminal />} title="Lightcone CLI" href="/lightcone-cli">
-    The `lc` command: runs the analysis and records the provenance of every output.
-  </Card>
-  <Card icon={<FlaskConical />} title="Lightcone Lab" href="/lightcone-lab">
-    A JupyterLab workbench for exploring your project.
-  </Card>
-  <Card icon={<PenLine />} title="MySTRA" href="/mystra">
-    A report that references the analysis instead of copying its results.
-  </Card>
-</Cards>
-
 <Callout title="Want to learn more?">
-  Read [What is the Lightcone Stack](/what-is-lightcone) for the ideas behind it.
+  Read the [Overview](/what-is-lightcone) for the ideas behind it.
 </Callout>
 
 ## Install
 
-You need Linux or macOS (on Windows, use WSL) and a coding agent: Claude Code or Codex.
-[Installation](/installation) covers each step in more detail.
+You need Linux or macOS (on Windows, use WSL) and a coding agent: Claude Code or Codex. There are
+two parts to set up: the plugin, which drives your analysis through your agent, and JupyterLab with
+Lightcone Lab, where you watch it take shape. [Installation](/installation) covers each step in more
+detail.
 
 <Steps>
 <Step>
 
 ### Install uv and git
 
-[uv](https://docs.astral.sh/uv/) installs everything else, Python included:
+[uv](https://docs.astral.sh/uv/) 0.12 or newer installs everything else, Python included. If you
+don't have it, install it:
 
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
+
+If you do, run `uv self update`.
 
 git comes with macOS; on Linux, install it with your package manager. Every result is committed,
 so git needs to know who you are:
@@ -57,22 +45,10 @@ git config --global user.email "ada@example.org"
 </Step>
 <Step>
 
-### Install the Lightcone CLI
-
-```bash
-uv tool install lightcone-cli==0.5.0rc5
-```
-
-Keep the exact version: while the current release is a pre-release, a plain
-`uv tool install lightcone-cli` installs an older one.
-
-</Step>
-<Step>
-
 ### Add the plugin to your agent
 
-Register the Lightcone marketplace, then install the `lightcone` plugin. It includes the `astra`
-plugin, so there is nothing else to add.
+The plugin is what drives Lightcone. Register the Lightcone marketplace, then install the
+`lightcone` plugin. It includes the `astra` plugin, so there is nothing else to add.
 
 <Tabs groupId="agent" persist items={['Claude Code', 'Codex', 'Claude app', 'Codex app']}>
 <Tab value="Claude Code">
@@ -89,6 +65,9 @@ claude plugin install lightcone@lightcone-research
 codex plugin marketplace add LightconeResearch/agent-skills
 codex plugin add lightcone@lightcone-research
 ```
+
+The first time Codex asks you to review the plugin's hooks, approve them: they are how the plugin
+checks the agent's work.
 
 </Tab>
 <Tab value="Claude app">
@@ -107,11 +86,40 @@ marketplace. Then search for **lightcone** and install it.
 </Tabs>
 
 </Step>
+<Step>
+
+### Install JupyterLab with Lightcone Lab
+
+[Lightcone Lab](/lightcone-lab) is a JupyterLab extension that shows a project's results and their
+status, its decisions, and the papers it cites. Install JupyterLab with Lightcone Lab, and `lc`, the
+Lightcone CLI the plugin drives:
+
+```bash
+uv tool install jupyterlab --with "jupyterlab-lightcone[full]" --with-executables-from jupyter-core,lightcone-cli
+```
+
+Then start it:
+
+```bash
+jupyter lab
+```
+
+Already installed `lc` on its own? Leave `lightcone-cli` out of `--with-executables-from`, or uv
+refuses to replace it.
+
+<Callout title="Working without JupyterLab?">
+  Install the CLI on its own instead, with its exact version:
+  `uv tool install lightcone-cli==0.5.0rc5`. While the current release is a pre-release, a plain
+  `uv tool install lightcone-cli` installs an older one that the plugin doesn't support.
+</Callout>
+
+</Step>
 </Steps>
 
 ## Start your first analysis
 
-Make a directory for the project and start your agent in it:
+Make a directory for the project and start your agent in it, in JupyterLab's terminal
+(**File › New › Terminal**) or any other:
 
 ```bash
 mkdir my-analysis && cd my-analysis
@@ -138,16 +146,40 @@ You can also call the skill by name: `/lightcone:lightcone` in Claude and the Co
 
 For a worked example, follow [Your first analysis](/guides/first-analysis).
 
-## Optional: Lightcone Lab
+## Watch it in Lightcone Lab
 
-If you work in JupyterLab, [Lightcone Lab](/lightcone-lab) adds a workbench for your project: its
-inventory, its pipeline, the provenance of each result, and the report. See
-[Installation](/installation#lightcone-lab) to add it.
+In JupyterLab's file browser, open your project's directory. The status bar shows
+**Lightcone · _your project_**; click it to open the project: its results, their status and
+provenance, and its decisions. Lab checks for changes every 15 seconds, so it keeps up as your agent
+works.
+
+![A project open in Lightcone Lab: the file browser on the left, and the project's inventory with its figure, decisions and inputs.](./lab-inventory.png)
+
+## Keep working as usual
+
+Use your agent however you normally would to work through the project, in JupyterLab's terminal or
+any other. Whenever you start it in the project's directory, it manages everything through
+Lightcone: decisions go into `astra.yaml`, results are made with `lc`, and it keeps track of what's
+out of date.
+
+## Commands to know
+
+```bash
+CLUSTER=$(lc compute launch --wait)   # start compute on this machine, keep its name
+lc materialize "$CLUSTER"             # make the results, each recorded with what made it
+lc status                             # see which results are out of date, and why
+```
+
+The local cluster stops on its own after 30 minutes without work. Run these yourself, or ask your
+agent to. The [`lc` reference](/lightcone-cli/commands) covers every command.
 
 ## Learn more
 
 <Cards>
-  <Card title="What is the Lightcone Stack" href="/what-is-lightcone">
+  <Card title="Your first analysis" href="/guides/first-analysis">
+    A complete analysis with an agent, from a question to a report.
+  </Card>
+  <Card title="Overview" href="/what-is-lightcone">
     Why the stack exists, and how its pieces fit together.
   </Card>
   <Card title="ASTRA" href="/astra">
@@ -156,7 +188,43 @@ inventory, its pipeline, the provenance of each result, and the report. See
   <Card title="Comparisons" href="/comparisons">
     How the stack relates to other tools for AI-assisted research.
   </Card>
-  <Card title="Your first analysis" href="/guides/first-analysis">
-    A complete analysis with an agent, from a question to a report.
+  <Card title="Lightcone Lab" href="/lightcone-lab">
+    Get more out of the workbench, including agent sessions inside JupyterLab.
+  </Card>
+  <Card title="Running on a cluster" href="/lightcone-cli/cluster">
+    Run the analysis on local or Slurm compute.
+  </Card>
+  <Card title="MySTRA" href="/mystra">
+    Write up the analysis in a report that cites its results.
+  </Card>
+  <Card title="Without an agent" href="/lightcone-cli/getting-started">
+    Drive `lc` yourself, from an empty directory to a published analysis.
   </Card>
 </Cards>
+
+## Uninstall
+
+<Tabs groupId="agent" persist items={['Claude Code', 'Codex']}>
+<Tab value="Claude Code">
+
+```bash
+claude plugin uninstall lightcone@lightcone-research
+claude plugin marketplace remove lightcone-research
+uv tool uninstall jupyterlab
+```
+
+</Tab>
+<Tab value="Codex">
+
+```bash
+codex plugin remove lightcone@lightcone-research
+codex plugin marketplace remove lightcone-research
+uv tool uninstall jupyterlab
+```
+
+</Tab>
+</Tabs>
+
+Uninstalling `jupyterlab` also removes Lightcone Lab and `lc`. If you installed `lc` on its own,
+remove it with `uv tool uninstall lightcone-cli`. Your projects are left as they are: everything
+Lightcone knows about an analysis lives in the project's own git repository.
