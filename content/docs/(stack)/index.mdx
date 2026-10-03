@@ -4,11 +4,9 @@ description: Rigorous research, without the bookkeeping.
 icon: CircleQuestionMark
 ---
 
-import { Bot, FlaskConical, PenLine, Terminal } from 'lucide-react';
-
 The Lightcone Stack is a sidecar for your research: it attaches to the project you're working on and
 to the agent you already use, stays out of the way of how you work, and makes sure your work is
-rigorous and reproducible by default.
+rigorous and reproducible by default. As you work, it keeps track of three things for you:
 
 - **Every decision, and why.** The methodological choices you make are written down with the options
   you considered, the reasons for the choice, and the papers that informed it.
@@ -27,78 +25,39 @@ rigorous and reproducible.
   Please [open an issue](https://github.com/LightconeResearch/lightcone-cli/issues).
 </Callout>
 
-## Why it exists
+## Start using Lightcone
 
-AI agents are making research faster: an analysis that took weeks can now take an afternoon. But a
-gap is opening between what gets produced and what can be verified. Trust is needed at every step:
+New to Lightcone? Follow the [Quick Start](/quickstart) to install it, add it to your agent, and
+open Lightcone Lab. If Lightcone is already installed, you can go on to:
 
-- when a scientist reviews what their agent has just produced;
-- when a reviewer judges an analysis they did not run themselves;
-- when someone later sets out to reproduce the work, or to build on it.
+- [Your first analysis](/guides/first-analysis), a walk-through of a complete analysis that you do
+  with your agent, from a research question to a report.
+- [Running on a cluster](/lightcone-cli/cluster), to set Lightcone up on a high-performance
+  computing system.
 
-Neither of the usual records answers that. **Code** is executable but opaque: it buries its
-assumptions and says nothing of intent. **A paper** is legible but lossy: the analysis cannot be
-regenerated from it. What is missing between them is the record of the decisions, assumptions,
-evidence and provenance behind each result.
+{/* TODO: more options */}
 
-## What it provides
+## Components
 
-The Lightcone Stack keeps that record as the work happens, so that every result is:
+Lightcone is deliberately built as a vertical stack of interoperable components. To see how it
+works in detail, read [How it works](/how-it-works). To learn more about a specific component, pick
+one below; they're listed from the bottom of the stack up.
 
-- **Traceable.** Every figure, number and claim ties back to the data, code and decisions that
-  produced it, and can be checked without re-running the analysis.
-- **Observable.** The whole analysis is recorded, including the choices that were made and the
-  alternatives they were weighed against, not just the path that was taken.
-- **Legible.** People and agents can both read the record: what was done, why, and on what
-  evidence.
+- **[ASTRA](/astra)** is the specification the analysis is written in: its inputs, outputs,
+  decisions and evidence, in `astra.yaml`.
+- **[Lightcone CLI](/lightcone-cli)**, `lc`, runs every recipe in a sandbox and records the
+  provenance of every output.
+- **[MySTRA](/mystra)** lets the report cite the analysis by path: re-run the analysis and the
+  report follows.
+- **[Lightcone Lab](/lightcone-lab)** is a JupyterLab workbench for the project: its inventory,
+  pipeline, provenance and report.
+- **[Agent Skills](/agent-skills)** teach Claude Code or Codex to scope, build, run and report on
+  the analysis with you.
 
-Each result then becomes a solid foundation for the next: science that compounds.
+## Developer corner
 
-## How it fits together
+The Lightcone Stack is open source under the BSD 3-Clause license, and we build it in the open:
+the code, issues and pull requests for every part of it are public on GitHub.
+[See how we're building it, and how to get involved](https://github.com/LightconeResearch).
 
-<StackLayers />
-
-- **[ASTRA](/astra)** is the open specification the analysis is written in. `astra.yaml` declares its
-  inputs, outputs and recipes, the decisions that shape it with their alternatives, and the evidence
-  behind its claims.
-- **The [Lightcone CLI](/lightcone-cli)**, `lc`, executes the specification. It runs each recipe in a
-  sandbox, runs every combination of choices you ask for, and commits each output with a record of
-  how it was made.
-- **[Agent Skills](/agent-skills)** teach your coding agent to work this way: to open with an
-  interview, write the specification with you, and drive `lc` to produce the results.
-- **[Lightcone Lab](/lightcone-lab)** brings the project into JupyterLab, where you can browse its
-  inventory, follow its pipeline and inspect the provenance of each result.
-- **[MySTRA](/mystra)** lets the report cite the analysis by path: re-run the analysis and the report
-  follows.
-
-<Cards>
-  <Card icon={<Bot />} title="Agent Skills" href="/agent-skills">
-    Plugins that teach Claude Code and Codex to scope, build and run your analysis.
-  </Card>
-  <Card icon={<Terminal />} title="Lightcone CLI" href="/lightcone-cli">
-    The `lc` command: runs the analysis and records the provenance of every output.
-  </Card>
-  <Card icon={<FlaskConical />} title="Lightcone Lab" href="/lightcone-lab">
-    A JupyterLab workbench for exploring your project.
-  </Card>
-  <Card icon={<PenLine />} title="MySTRA" href="/mystra">
-    A report that references the analysis instead of copying its results.
-  </Card>
-</Cards>
-
-## You and your agent
-
-The agent does much of the work, but not the judgment:
-
-- **It starts with questions, not code.** Before anything runs, the agent interviews you and writes
-  the analysis down in the specification, where you can read it.
-- **It never writes a result itself.** The agent describes the analysis and drives the CLI; every
-  output comes out of `lc`, with its provenance, never out of the conversation.
-- **You own the argument.** You make the scientific choices and remain responsible for what the
-  results mean. The record makes those choices visible, to you and to your readers.
-
-## Status
-
-The stack is in public beta. Its pieces are released separately and still change between
-versions, so projects pin the versions they use. It is open source under the BSD 3-Clause license,
-at [github.com/LightconeResearch](https://github.com/LightconeResearch).
+{/* TODO: link to a page on how we build in the open and how to contribute, once it exists. */}

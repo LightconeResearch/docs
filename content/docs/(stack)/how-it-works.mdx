@@ -1,0 +1,31 @@
+---
+title: How it works
+description: How the components of the Lightcone Stack fit together.
+icon: Workflow
+---
+
+<StackDiagram />
+
+- **[ASTRA](/astra)** is the open specification the analysis is written in. `astra.yaml` declares its
+  inputs, outputs and recipes, the decisions that shape it with their alternatives, and the evidence
+  behind its claims.
+- **The [Lightcone CLI](/lightcone-cli)**, `lc`, executes the specification. It runs each recipe in a
+  sandbox, runs every combination of choices you ask for, and commits each output with a record of
+  how it was made.
+- **[MySTRA](/mystra)** lets the report cite the analysis by path: re-run the analysis and the report
+  follows.
+- **[Lightcone Lab](/lightcone-lab)** brings the project into JupyterLab, where you can browse its
+  inventory, follow its pipeline and inspect the provenance of each result.
+- **[Agent Skills](/agent-skills)** teach your coding agent to work with the stack: to open with an
+  interview, write the specification with you, and drive `lc` to produce the results.
+
+## You and your agent
+
+The agent does much of the work, but not the judgment:
+
+- **It starts with questions, not code.** Before anything runs, the agent interviews you and writes
+  the analysis down in the specification, where you can read it.
+- **It never writes a result itself.** The agent describes the analysis and drives the CLI; every
+  output comes out of `lc`, with its provenance, never out of the conversation.
+- **You own the argument.** You make the scientific choices and remain responsible for what the
+  results mean. The record makes those choices visible, to you and to your readers.

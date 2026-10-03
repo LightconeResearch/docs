@@ -2,7 +2,7 @@ import defaultMdxComponents from 'fumadocs-ui/mdx';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 import { Tab } from 'fumadocs-ui/components/tabs';
 import type { MDXComponents } from 'mdx/types';
-import { StackLayers } from '@/components/stack-layers';
+import { StackDiagram } from '@/components/stack-diagram';
 import { Tabs } from '@/components/tabs';
 
 export function getMDXComponents(components?: MDXComponents) {
@@ -12,7 +12,7 @@ export function getMDXComponents(components?: MDXComponents) {
     Steps,
     Tab,
     Tabs,
-    StackLayers,
+    StackDiagram,
     ...components,
   } satisfies MDXComponents;
 }
