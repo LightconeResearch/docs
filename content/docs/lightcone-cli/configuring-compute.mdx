@@ -1,0 +1,438 @@
+---
+title: Configuring compute
+description: Tell lc what compute it can use, on your own machine or a Slurm cluster, with or without GPUs.
+---
+
+`lc run` and `lc materialize` only execute tasks through allocated compute resources, which may be on the local
+system or on a Slurm cluster. Available compute providers that your agents may request compute allocations from
+ are configured in the `~/.lightcone/compute.yaml` file which is described in this guide.
+
+<ComputeLayers />
+
+## How the compute.yaml file works [#how-it-works]
+
+By default, the compute providers are configured in `~/.lightcone/compute.yaml`, but that location may be
+overidden by setting the environment variable `LC_COMPUTE_CONFIG=/path/to/compute.yaml`.
+
+This file lists **offers**: the allocations you can request. Each offer names its `provider`,
+which says where the compute comes from: `local` (this machine) or `slurm` (the Slurm cluster your
+`sbatch` submits to). It also says how many CPUs, how much memory and how many GPUs each node has,
+how many nodes at most, and how long the allocation may run.
+
+For example, this file lets you allocate up to four 64-CPU nodes on a Slurm cluster:
+
+```yaml title="~/.lightcone/compute.yaml"
+offers:
+  - name: cpu                       # a name you choose
+    provider: slurm                 # allocate compute by submitting Slurm jobs
+    resources: {cpus: 64, memory: 240}   # each node: 64 CPUs and 240 GiB
+    max_nodes: 4                    # at most 4 nodes per allocation
+    time: {default: 1h, max: 12h}   # 1 hour unless you ask for more, 12 at most
+    config:
+      account: myproject            # the Slurm account to charge
+```
+
+With it, `lc compute launch --cpus 64 --memory 240 --num-nodes 2` submits a one-hour Slurm job for
+two such nodes, charged to `myproject`. lc keeps its built-in `local` offer after yours, so
+`lc compute launch` without options still allocates this machine. Every field is explained in
+[A first Slurm configuration](#configure-slurm).
+
+
+When you run `lc compute launch`, lc goes through the offers in the order they appear in the file
+and launches the first one that matches what you asked for. You may inspect the currently configured 
+resources by running: 
+```bash
+lc compute resources          # the offers lc sees, in the order it tries them
+```
+
+
+## On your own machine [#on-your-machine]
+
+### Without a configuration file
+
+With no file, lc has one built-in offer named `local`: all of this machine's CPUs and memory, as a
+single node. 
+
+Launch it without options:
+
+```bash
+lc compute launch --wait              # prints the cluster's name: local
+lc materialize local
+lc compute down local                 # optional: it also stops by itself
+```
+
+A local cluster stops on its own after 30 minutes without work. You can only run one local cluster 
+at a time on each machine.
+
+### Use part of the machine, or change when it stops
+
+To change how much of the machine a local cluster uses, or when it stops, write your own local
+offer. It replaces the built-in one:
+
+```yaml title="~/.lightcone/compute.yaml"
+offers:
+  - name: workstation
+    provider: local
+    resources: {cpus: 4, memory: 8}   # 4 CPUs and 8 GiB of memory
+    max_nodes: 1                      # a local offer is always one node
+    time: {idle: 2h, max: 8h}         # stop after 2 hours without work; --time up to 8 hours
+```
+
+`lc compute launch` without options now uses this offer, and still names the cluster `local`. A
+local cluster you started before writing the file stays visible, and can still be stopped.
+
+`resources` leaves the rest of the machine free for other work. lc schedules recipes within these
+limits, but doesn't reserve them: other programs on the machine can still use the rest.
+
+`time` sets when the cluster stops:
+
+- `idle` stops the cluster after that long without work.
+- `default` is a hard limit applied to every launch, which stops the cluster even mid-recipe.
+- `max` is the longest hard limit you can ask for with `lc compute launch --time`.
+
+A cluster stops at whichever limit it reaches first, and `time` needs an `idle` or a `default`. Durations combine days, hours, minutes and seconds, in that
+order: `45s`, `30m`, `1h30m`, `2d`.
+
+### Turn local compute off
+
+```yaml title="~/.lightcone/compute.yaml"
+allow_local: false
+```
+
+Use this where work shouldn't run on the machine itself, such as a cluster's login node (see
+[Keep work off the login node](#login-nodes)).
+
+### GPUs [#local-gpus]
+
+On Linux, local clusters can use this machine's GPUs. lc doesn't go looking for them on its own:
+it uses the GPUs listed in the `CUDA_VISIBLE_DEVICES` environment variable when you run
+`lc compute launch`. That keeps you in control of which GPUs your analyses use. Set the variable to
+the GPUs you'd like to share, in your shell or your shell profile; on some systems it's already set
+for you, for instance inside a Slurm GPU job. When it's unset or empty, local clusters run without
+GPUs.
+
+There's nothing to add to `compute.yaml`. With two GPUs listed, `lc compute resources` shows the
+built-in offer with `GPU:2`, and a local cluster uses both of them. Launch it with `--gpus 0` when
+you'd rather leave them out.
+
+List exactly the GPUs you want the cluster to use. lc counts the devices in the variable, written as
+indexes such as `0,1` or as `GPU-…` UUIDs, and passes the variable on as it is. `--gpus GPU:2` must
+match that count, so to use fewer GPUs, list fewer.
+
+To name the GPU model, or to fix the CPUs and memory, list a local offer yourself:
+
+```yaml title="~/.lightcone/compute.yaml"
+offers:
+  - name: workstation
+    provider: local
+    resources: {cpus: 16, memory: 64, accelerators: A100:2}
+    max_nodes: 1
+    time: {idle: 30m}
+```
+
+- **It replaces the built-in offer,** like any local offer, so it only has the GPUs it declares.
+- **`A100:2` is a label you choose:** lc doesn't detect your hardware. Launch the offer as it is
+  with no `--gpus`, or ask for `--gpus A100:2` or `--gpus GPU:2` (any model). `CUDA_VISIBLE_DEVICES`
+  must list at least two GPUs; `--gpus 0` launches the offer without them.
+- **The offer has to fit on the machine.** lc skips an offer with more CPUs or memory than the
+  machine has. Adjust the numbers to your machine.
+
+<Callout type="warn" title="lc trusts what you list">
+
+Local GPUs work on Linux with NVIDIA GPUs whose driver is loaded. lc doesn't check them: it uses the
+devices `CUDA_VISIBLE_DEVICES` lists. The GPUs aren't reserved either, so other programs can use
+them at the same time.
+
+</Callout>
+
+## On a Slurm cluster [#slurm]
+
+On a Slurm cluster, `lc compute launch` submits a job, and your recipes run on the compute nodes it
+gets. The rest of the workflow doesn't change. You run `lc` from a login node, or anywhere else you
+can submit jobs from.
+
+### A first Slurm configuration [#configure-slurm]
+
+```yaml title="~/.lightcone/compute.yaml"
+offers:
+  - name: cpu
+    provider: slurm
+    resources: {cpus: 64, memory: 240}
+    max_nodes: 4
+    time: {default: 1h, max: 12h}
+    config:
+      account: myproject
+      partition: standard
+```
+
+- **`provider: slurm`** allocates by submitting Slurm jobs, to the cluster your Slurm commands
+  reach by default: the one `sbatch` submits to from this shell.
+- **`resources`** is what each node gets: `cpus` logical CPUs and `memory` GiB of memory.
+- **`max_nodes`** is the most nodes one launch can ask for.
+- **`time.default`** is the job's time limit when you don't pass `--time`, and **`time.max`** the
+  longest you can ask for. A Slurm offer needs a `default` and can't use `idle`: the cluster runs
+  until its time limit or until `lc compute down`, so stop it when you're done.
+- **`config`** holds the Slurm options for the job:
+
+| Setting       | What it does                                                           |
+| ------------- | ---------------------------------------------------------------------- |
+| `account`     | The account the job is charged to (`--account`)                        |
+| `partition`   | The partition (`--partition`); leave it out to let the site choose     |
+| `qos`         | The quality of service (`--qos`)                                       |
+| `constraint`  | Node features (`--constraint`)                                         |
+| `reservation` | A reservation to run in (`--reservation`)                              |
+| `submit`      | `sbatch` (the default) or `salloc`, for QOS that require it            |
+| `gpu_type`    | The GPU type to request; see [GPUs](#slurm-gpus)                       |
+
+`config` also takes a few optional settings for the workers that run your recipes; see
+[Advanced settings](#advanced-settings).
+
+Put these settings in the offer, even if your shell already sets them: lc ignores Slurm settings
+from environment variables such as `SBATCH_ACCOUNT`, so a job doesn't depend on the shell it was
+launched from.
+
+To launch, give the CPUs and memory per node; they select the offer:
+
+```bash
+CLUSTER=$(lc compute launch --cpus 64 --memory 240 --time 2h --wait)
+lc materialize "$CLUSTER"
+lc compute down "$CLUSTER"
+```
+
+- **Matching offers.** `--cpus` and `--memory` must match an offer exactly. Add `+` to accept any
+  offer at least that large: `--cpus 32+ --memory 100+` takes the first such offer in the file.
+- **More nodes.** `--num-nodes 2` asks for two nodes, up to the offer's `max_nodes`.
+- **Waiting.** `--wait` waits for the job to start, but gives up after 5 minutes (the job stays
+  queued). Pass `--timeout` with a number of seconds to wait longer, or wait again later with
+  `lc compute status "$CLUSTER" --wait`.
+
+An `salloc` job lives in a process on the login node, so it may end when you log out. Use the
+default `sbatch` unless your site requires `salloc` for the QOS you want.
+
+While a Slurm allocation runs, keep at least one Slurm offer in the file. lc only looks for
+allocations through the providers your offers name: without one, `lc compute status` stops listing
+the allocation and its name stops working. Its full ID, the `id` in `lc compute launch --json`,
+still reaches it.
+
+### Several offers
+
+Offers are tried in order, so list them from the one you want most often to the least. An offer's
+`startup` says how quickly it usually starts: `fast` for an interactive or debug QOS, `batch` for a
+regular queue. `lc compute launch --startup fast` only considers `fast` offers. The example in
+[NERSC Perlmutter](#nersc) uses both.
+
+### Keep work off the login node [#login-nodes]
+
+If local compute is still enabled, `lc compute launch` without `--cpus` and `--memory` starts a
+local cluster on the login node. NERSC login nodes are recognized and refuse it automatically.
+Elsewhere, add `allow_local: false` to the file.
+
+Your home directory is shared, so the same file also applies on compute nodes: with local compute
+off, you can't start a local cluster inside an interactive job either. If you want to, leave it on,
+and always pass `--cpus` and `--memory` on the login node.
+
+### GPUs [#slurm-gpus]
+
+Add an offer with `accelerators`:
+
+```yaml title="~/.lightcone/compute.yaml (excerpt)"
+  - name: gpu
+    provider: slurm
+    resources: {cpus: 32, memory: 120, accelerators: GPU:4}
+    max_nodes: 2
+    time: {default: 1h, max: 6h}
+    config:
+      account: myproject
+      partition: gpu
+```
+
+and launch it with `--gpus`:
+
+```bash
+CLUSTER=$(lc compute launch --cpus 32 --memory 120 --gpus GPU:4 --wait)
+```
+
+lc asks Slurm for four GPUs on each node, and Slurm decides which ones the job sees. The GPU count
+must match the offer exactly; it doesn't take `+`.
+
+`GPU:4` accepts any GPU model. If your site has several models and you want a specific one, name it
+and add its Slurm type as `gpu_type`. `sinfo -o "%P %G"` lists each partition's GPUs; in
+`gpu:a100:4`, the type is `a100`:
+
+```yaml title="~/.lightcone/compute.yaml (excerpt)"
+    resources: {cpus: 32, memory: 120, accelerators: A100:4}
+    config:
+      account: myproject
+      gpu_type: a100
+```
+
+A named model always needs `gpu_type`, even when the two are spelled the same. Launch it with
+`--gpus A100:4`, or with `--gpus GPU:4` to take whichever GPU offer comes first.
+
+### NERSC Perlmutter [#nersc]
+
+This configuration shows the shape of a Perlmutter setup. Replace the account, and adjust the sizes
+to your allocation; it hasn't been tested by submitting jobs at NERSC.
+
+```yaml title="~/.lightcone/compute.yaml"
+offers:
+  - name: cpu
+    provider: slurm
+    resources: {cpus: 256, memory: 480}
+    max_nodes: 16
+    time: {default: 1h, max: 12h}
+    startup: batch
+    config: {account: myproject, constraint: cpu, qos: regular}
+  - name: cpu-interactive
+    provider: slurm
+    resources: {cpus: 256, memory: 480}
+    max_nodes: 2
+    time: {default: 1h, max: 4h}
+    startup: fast
+    config: {submit: salloc, account: myproject, constraint: cpu, qos: interactive}
+  - name: gpu
+    provider: slurm
+    resources: {cpus: 32, memory: 128, accelerators: GPU:4}
+    max_nodes: 2
+    time: {default: 1h, max: 4h}
+    startup: batch
+    config: {account: myproject, constraint: gpu, qos: regular}
+```
+
+The two CPU offers have the same shape, so `lc compute launch --cpus 256 --memory 480` takes the
+first one, in the regular queue. Add `--startup fast` to take the interactive one instead.
+
+A few things specific to NERSC:
+
+- **Move uv's cache to scratch before launching.** Recipes run through uv, which locks files in its
+  cache, and Perlmutter's compute nodes can't lock files in `$HOME`, where the cache lives by
+  default. Add this to your shell profile; a cluster launched without it has to be relaunched:
+
+  ```bash
+  export UV_CACHE_DIR=$PSCRATCH/uv-cache
+  ```
+
+- **Leave `partition` out.** NERSC picks the partition from the QOS and constraint.
+- **Login nodes refuse local compute.** An interactive job on a compute node can still use the
+  built-in local offer.
+- **Containerized projects use podman-hpc**, which NERSC provides. It's also the only container
+  runtime that gives recipes access to GPUs.
+
+## Advanced settings [#advanced-settings]
+
+An offer's `config` also takes optional settings for the workers that run your recipes. The defaults
+suit a home directory shared by all nodes:
+
+```yaml title="~/.lightcone/compute.yaml (excerpt)"
+  - name: cpu
+    provider: slurm
+    resources: {cpus: 64, memory: 240}
+    max_nodes: 4
+    time: {default: 1h, max: 12h}
+    config:
+      account: myproject
+      task_slots_per_node: 16
+      scratch_root: /local/scratch
+```
+
+| Setting               | Default                                            | Change it when                                                     |
+| --------------------- | -------------------------------------------------- | ------------------------------------------------------------------ |
+| `task_slots_per_node` | All CPUs locally; one fewer than the CPUs on Slurm | Fewer recipes should run at once on a node, e.g. memory-heavy ones |
+| `python`              | The Python running `lc`                            | Workers must use another installation of lc                        |
+| `scratch_root`        | The system's temporary directory                   | Workers need their temporary files elsewhere                       |
+| `cwd` (Slurm only)    | Your home directory                                | Jobs should start in another directory                             |
+| `interface` (Slurm only) | None: nodes use their hostname                  | Nodes can't reach each other by hostname; on Perlmutter, `hsn0`    |
+
+lc keeps each allocation's private files, such as the scheduler's address, its credentials and
+Slurm's logs, under `~/.lightcone/compute`. The driver and every node must reach them. If your home
+directory isn't shared by every node, move them with the top-level `connection_root`:
+
+```yaml title="~/.lightcone/compute.yaml (excerpt)"
+connection_root: /shared/scratch/me/lightcone-compute
+```
+
+Stop running allocations before changing it: lc no longer finds those it started under the old
+directory.
+
+## What a recipe needs [#recipe-resource-requirements]
+
+A recipe declares what it needs in `astra.yaml`, and lc makes sure each recipe gets it on the
+cluster:
+
+```yaml title="astra.yaml (excerpt)"
+recipe:
+  command: python src/fit.py {output}
+  resources:
+    cpus: 4
+    memory: 8Gi
+    gpus: 1
+```
+
+- **`cpus`** is a whole number, 1 by default.
+- **`memory`** needs units: `512Mi` and `8Gi` are binary (GiB), `8GB` is decimal. Without it, no
+  memory is set aside for the recipe.
+- **`gpus`** is a whole number, 0 by default. The recipe only gives a count: the GPU model is chosen
+  when you launch the cluster.
+
+Each recipe runs on one node, so what it asks for must fit on one node of the cluster. Recipes run
+side by side as long as their requests fit together. A recipe that asks for GPUs gets all of its
+node's GPUs, and runs alone among GPU recipes on that node; recipes without `gpus` see no GPU.
+
+<Callout title="Memory units differ">
+
+In `compute.yaml`, memory is always in GiB: `8`, `8GB` and `8GiB` all mean 8 GiB. In `astra.yaml`,
+`8Gi` means 8 GiB but `8GB` means 8 billion bytes, and a bare number is refused.
+
+</Callout>
+
+A few limits:
+
+- **There's no per-recipe time limit.** Limit the cluster instead, with `lc compute launch --time`.
+- **Declared resources are a budget, not a cage.** A recipe can use more than it asks for, and
+  slow down or crash its neighbors. Declare what it really uses.
+- **Numerical libraries use one thread by default.** `OMP_NUM_THREADS`, `MKL_NUM_THREADS` and
+  `OPENBLAS_NUM_THREADS` default to 1 for each recipe. For more, set them before
+  `lc compute launch`, and declare enough `cpus`.
+- **In containers, GPUs need podman-hpc.** With Docker or Podman, recipes that ask for GPUs are
+  refused before they start.
+
+## Reference [#reference]
+
+Every field of `compute.yaml`:
+
+| Field                         | Meaning                                                                          |
+| ----------------------------- | -------------------------------------------------------------------------------- |
+| `connection_root`             | Where lc keeps allocations' private files; `~/.lightcone/compute` by default     |
+| `allow_local`                 | `false` turns local compute off; `true` by default                               |
+| `offers[].name`               | A unique name, shown by `lc compute resources`                                   |
+| `offers[].provider`           | `local` (this machine) or `slurm` (your default Slurm cluster)                   |
+| `offers[].resources`          | Per node: `cpus`, `memory` in GiB, and optional `accelerators` (`MODEL:COUNT`)   |
+| `offers[].max_nodes`          | The most nodes one launch can ask for; a local offer provides one node           |
+| `offers[].time`               | `default`, `max`, `idle`; local offers need `default` or `idle`, Slurm needs `default` and no `idle` |
+| `offers[].startup`            | `fast`, `batch`, or `unknown` (the default)                                      |
+| `offers[].config`             | Slurm settings, see [A first Slurm configuration](#configure-slurm), and [advanced settings](#advanced-settings) |
+
+Memory can be written `240`, `240GB` or `240GiB`, all meaning 240 GiB; Slurm offers need a whole
+number of MiB. Durations use `d`, `h`, `m` and `s`, in that order: `1h30m`.
+
+## When a launch is refused
+
+When no offer fits your request, lc refuses to launch. If an offer matches but can't run here, the
+error also names it and says why:
+
+```text
+Error: no local offer matches this request; see lc compute resources for local shapes and time limits, or supply --cpus and --memory for a remote allocation; workstation: the local offer has 2 GPUs, but CUDA_VISIBLE_DEVICES exposes 1 on this host
+```
+
+The usual reasons:
+
+- **The CPUs or memory don't match exactly.** Compare with `lc compute resources`, or add `+`.
+- **The GPU count differs.** `--gpus GPU:2` doesn't match an offer with four GPUs, nor a local
+  cluster whose `CUDA_VISIBLE_DEVICES` lists four.
+- **`--time` is longer than the offer's `max`.**
+- **A local offer is larger than the machine**, or `CUDA_VISIBLE_DEVICES` lists fewer GPUs than
+  the offer has.
+
+A Slurm cluster that is running but never becomes ready has a startup log under `slurm/` in the
+connection root (`~/.lightcone/compute` by default); look for `Slurm Dask startup failed`. See
+[`lc compute`](/lightcone-cli/commands/compute) for every launch option.

@@ -50,15 +50,14 @@ environment) is reported and left alone; `--refresh` widens the run to remake th
   be running. The same holds when a commit fails while other recipes are still running: the error
   says so. Stop the allocation with `lc compute down` and its full ID (a name can already belong to
   a newer allocation), and confirm its recipes have stopped before cleaning results. Local
-  containers may need separate termination through their runtime; see
-  [execution limits](/lightcone-cli/cluster#execution-requirements-and-limits).
+  containers may need separate termination through their runtime.
 - **Honors recipe resources.** CPU, memory, and GPU requests must fit one worker and are reserved
   through standard Dask scheduling. GPU recipes run one at a time per worker and inherit the whole
   allocation's CUDA mask, which may expose more GPUs than requested. Recipes without `gpus` see
   none. Resource checks apply to outputs that may rebuild; already-current outputs need no
   reservation. Omitted memory reserves no RAM, so CPU requests and task slots control concurrency.
   Recipe `time_limit` is unsupported and refused; allocation walltime remains supported. See
-  [recipe resource requirements](/lightcone-cli/cluster#recipe-resource-requirements).
+  [recipe resource requirements](/lightcone-cli/configuring-compute#recipe-resource-requirements).
 - **Fetches what it needs.** Declared inputs whose annexed content is not in this clone are fetched
   before workers hash or execute.
 - **Commits as it goes.** Each output lands in its own commit, written by the driver in one thread
@@ -74,7 +73,7 @@ environment) is reported and left alone; `--refresh` widens the run to remake th
 On a containerized project, the run resolves the committed image first (building it as a preflight
 if the declaration is committed but the image never built). Tasks use the explicitly selected
 cluster and the client detaches on completion, leaving that cluster available; see
-[Running on a cluster](/lightcone-cli/cluster).
+[Configuring compute](/lightcone-cli/configuring-compute).
 
 ## Check mode
 

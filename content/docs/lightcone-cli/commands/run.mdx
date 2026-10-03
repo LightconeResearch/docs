@@ -42,14 +42,13 @@ The command reserves one worker's full CPU, memory, and GPU budgets for its dura
 podman-hpc probes inherit the allocation's whole CUDA mask. Ordinary Docker and Podman probes run
 without GPUs and report that limitation, even on a GPU allocation. CPU-only allocations expose no
 GPUs. A recipe declares its minimum GPU count explicitly; unsupported GPU recipes fail before image
-preparation. See [GPU allocations](/lightcone-cli/cluster#gpu-allocations) for container
+preparation. See [What a recipe needs](/lightcone-cli/configuring-compute#recipe-resource-requirements) for container
 prerequisites.
 
 Interrupting the CLI detaches its client; the remote command may still be running. Stop the
 allocation with `lc compute down` and its full ID (a name can already belong to a newer allocation)
 before working with files the interrupted command could still be writing. Confirm that the command
-has stopped; local containers may require separate termination through their runtime (see
-[execution limits](/lightcone-cli/cluster#execution-requirements-and-limits)).
+has stopped; local containers may require separate termination through their runtime.
 
 ## What it does
 

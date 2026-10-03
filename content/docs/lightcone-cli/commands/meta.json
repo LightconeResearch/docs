@@ -1,5 +1,5 @@
 {
   "title": "Commands",
   "defaultOpen": true,
-  "pages": ["index", "init", "materialize", "status", "run", "compute", "build"]
+  "pages": ["init", "materialize", "status", "run", "compute", "build"]
 }

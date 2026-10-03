@@ -9,16 +9,10 @@
     "getting-started",
     "concepts",
     "installation",
-    "---[Book]Guides---",
-    "cluster",
+    "---Guides---",
+    "configuring-compute",
     "troubleshooting",
     "---Reference---",
-    "commands",
-    "glossary",
-    "---Contributing---",
-    "developer-corner",
-    "architecture",
-    "internals",
-    "...contributing"
+    "...commands"
   ]
 }
