@@ -1,22 +1,15 @@
 ---
 title: Overview
-description: The lc command runs an ASTRA analysis and records the provenance of every output.
+description: The Lightcone CLI runs an ASTRA analysis and records the provenance of every output.
 icon: CircleQuestionMark
 ---
 
-The Lightcone CLI, `lc`, is the execution layer of the stack. It turns an `astra.yaml`
-specification into outputs produced in a sandbox and committed with git and git-annex, with
-provenance recorded for each one. It runs every variant of an analysis (its universes) and reuses
-outputs that are already up to date.
-
-`lc` is built to be driven by people and coding agents alike: its commands never prompt, and most
-of them report in JSON with `--json`. However the spec gets written, **you stay in charge of the
-scientific choices**: every methodological decision is declared in the open, and `lc` records
-exactly what produced every result, from the recipe, the decisions and the input data to the
-environment and the commit.
+The Lightcone CLI is an agent-native scientific workflow management system designed
+to orchestrate the materialization of research artifacts declared in an `astra.yaml`
+file while guaranteeing their provenance and reproducibility.
 
 <Callout type="warn" title="Alpha development">
-lightcone-cli is in **early alpha**. The CLI and the execution layer are still moving: expect
+lightcone-cli is in **early alpha**. The CLI is still evolving: expect
 breaking changes between minor versions. Bug reports, design challenges, and use cases the tooling
 doesn't yet cover are exactly what we want to hear at this stage; please open an issue on the
 [GitHub repo](https://github.com/LightconeResearch/lightcone-cli/issues).
@@ -24,14 +17,9 @@ doesn't yet cover are exactly what we want to hear at this stage; please open an
 
 ## What it does
 
-- **Multiverse analysis.** Declare methodological decisions with multiple defensible options; `lc`
-  materializes your analysis across every universe you define.
 - **Provenance by construction.** Every output is committed to git together with a
   content-addressed manifest and a re-runnable run record; git-annex carries the bytes, so results
   travel with the repository.
-- **Locked, isolated execution.** A project's environment is `pyproject.toml` + `uv.lock`; recipes
-  run in it under a sandbox (Landlock on Linux, Seatbelt on macOS) that keeps undeclared files out
-  and stray writes contained.
 - **Containers and HPC.** Declare `[tool.lightcone.image]` and recipes run in a content-addressed
   image archived in the repository itself; allocate local or Slurm Dask clusters explicitly with
   `lc compute`, then pass the cluster name or full ID to `run` or `materialize`.
@@ -39,50 +27,26 @@ doesn't yet cover are exactly what we want to hear at this stage; please open an
   [RO-Crate](https://www.researchobject.org/ro-crate/) of the project and its provenance, ready to
   archive or deposit.
 
-## How it fits the stack
-
-- **[ASTRA](/astra)** is the format `lc` executes. Its own SDK,
-  [astra-tools](https://github.com/LightconeResearch/astra-tools), provides the `astra` command,
-  which handles the ASTRA lifecycle and validation (schema, prior insights and findings, evidence
-  verification helpers). lightcone-cli depends on it for everything a spec *means*, and adds project
-  scaffolding, locked environments, sandboxed execution and the provenance layer.
-- **[Agent Skills](/agent-skills)** teach your coding agent to write the specification with you and
-  drive `lc` for you. That is the usual way to work: [Your first analysis](/guides/first-analysis)
-  walks through it. This section documents `lc` itself, for when you want to run it by hand, script
-  it, or understand what your agent is doing.
-- **[MySTRA](/mystra)** and **[Lightcone Lab](/lightcone-lab)** read what `lc` produces: `lc init`
-  scaffolds a MyST report next to the specification, and the Lab shows the project's outputs and
-  their provenance in JupyterLab.
-
 ## In a handful of lines
 
 With the CLI [installed](/installation), the shortest path from an empty directory to committed
 results is:
 
 ```bash
-lc init my-analysis && cd my-analysis
-# describe your analysis in astra.yaml, write your scripts,
-# declare what they import through normal uv interactions:
-uv add numpy
-# when you are done with your edits, commit:
+# Create a new analysis
+lc init my-analysis
+# Describe your analysis in astra.yaml, write your scripts,
+# and add their dependencies with uv
+# When you are done editing, commit your changes
 git add -A && git commit -m "First analysis"
-CLUSTER=$(lc compute launch --wait)
-# generate outputs with full provenance tracking
-lc materialize "$CLUSTER"
-lc compute down "$CLUSTER"
+# Allocate compute resources to materialize your scientific outputs
+lc compute launch --wait
+# Generate outputs with full provenance tracking
+lc materialize local
 ```
 
-The [Quick Start](/lightcone-cli/getting-started) walks through it step by step. The commit is not
-ceremony: every output is committed together with the code that produced it, which is why a build
-starts from a clean tree.
-
-## What lightcone-cli is not
-
-- **A statistics package.** It runs your code; it doesn't compute things itself.
-- **A workflow language.** Recipes in `astra.yaml` are short shell commands, not a DSL. There's no
-  learning curve beyond what's in the [Quick Start](/lightcone-cli/getting-started).
-- **An IDE.** `lc` is a command-line tool; write `astra.yaml` and your analysis code with whatever
-  editor or tooling you prefer.
+The [Quick Start](/lightcone-cli/getting-started) walks through it step by step. Every output is
+committed together with the code that produced it, which is why a build starts from a clean tree.
 
 ## Where to go next
 
