@@ -4,6 +4,7 @@ import { Tab } from 'fumadocs-ui/components/tabs';
 import type { MDXComponents } from 'mdx/types';
 import { StackDiagram } from '@/components/stack-diagram';
 import { Tabs } from '@/components/tabs';
+import { ComputeLayers } from '@/components/compute-layers';
 
 export function getMDXComponents(components?: MDXComponents) {
   return {
@@ -13,6 +14,7 @@ export function getMDXComponents(components?: MDXComponents) {
     Tab,
     Tabs,
     StackDiagram,
+    ComputeLayers,
     ...components,
   } satisfies MDXComponents;
 }

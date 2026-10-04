@@ -54,8 +54,7 @@ python -m pip uninstall lightcone-cli
 
 pip puts `lc` and `git-annex` in that Python environment's own `bin` directory, so keep it on your
 `PATH` whenever you work in a project. Avoid running `lc` through `uvx`, which puts nothing on your
-`PATH` at all; see
-[the clean filter failure](/lightcone-cli/troubleshooting#fatal-clean-filter-annex-failed).
+`PATH` at all, so git cannot find `git-annex` and a plain `git add` fails.
 
 ## On NERSC Perlmutter
 
@@ -69,9 +68,9 @@ uv lands under `~/.local/bin`: make sure it's on your `PATH`. git is already on 
 things differ from a workstation once you run analyses there:
 
 - **Local compute is refused on login nodes.** Use a compute node in an interactive allocation, or
-  a configured Slurm offer; see [Running on a cluster](/lightcone-cli/cluster#local-allocations).
+  a configured Slurm offer; see [Keep work off the login node](/lightcone-cli/configuring-compute#login-nodes).
 - **uv's cache must move off `$HOME`**, because Perlmutter's compute nodes cannot lock files there.
-  See [Configure Slurm](/lightcone-cli/cluster#configure-slurm).
+  See [NERSC Perlmutter](/lightcone-cli/configuring-compute#nersc).
 
 ## Container runtimes
 
@@ -81,7 +80,7 @@ machine in the project's own locked environment.
 
 - Local machine: install [Podman](https://podman.io/) (rootless, no daemon) or
   [Docker](https://docs.docker.com/get-docker/).
-- HPC login node: see [Running on a cluster](/lightcone-cli/cluster).
+- HPC login node: see [NERSC Perlmutter](/lightcone-cli/configuring-compute#nersc).
 
 There is nothing to configure: `lc` detects whichever runtime is available (`podman-hpc`, then
 `podman`, then `docker`, skipping docker if its daemon isn't running).
