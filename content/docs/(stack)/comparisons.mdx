@@ -4,25 +4,42 @@ description: How the Lightcone Stack relates to other tools for AI-assisted rese
 icon: Scale
 ---
 
-Here we compare the purpose of the Lightcone Stack with other tools for AI-assisted science.
+Here we put the purpose of the Lightcone Stack in perspective alongside other tools for AI-assisted science.
 
-The central idea behind the Lightcone Stack is that agent-driven research should produce a record of the analysis, covering
-its inputs, outputs, choices, and evidence. Today, research is shared mainly as a paper and sometimes a code
-repository, and neither captures every important aspect of the research. A full record enables research to be
-reproduced and extended.
+Today, research is shared mainly as a paper and sometimes a code repository, and neither captures every important
+aspect of the research. The central idea behind the Lightcone Research initiative is that agent-driven research
+should produce a record of the analysis, covering its inputs, outputs, decisions, and evidence. A full record
+enables research to be reproduced and extended.
 
 The Lightcone Stack records these in an `astra.yaml` file, an [open specification](https://astra-spec.org) that
 allows an analysis to be reviewed, reproduced, and cited as a piece of work in its own right.
 
-[Claude Science](https://www.anthropic.com/news/claude-science-ai-workbench) and
-[OpenScience](https://github.com/synthetic-sciences/openscience) are AI workbenches that save versioned figures and
+## At a glance
+
+| Tool                | Main focus                                                           |
+| ------------------- | -------------------------------------------------------------------- |
+| Lightcone Stack     | Explicit scientific decisions, evidence, and an open analysis record |
+| Claude Science      | Research workbench with artifact provenance                          |
+| OpenScience         | Research workbench with artifact provenance                          |
+| Kosmos              | Autonomous research from question to report                          |
+| The AI Scientist    | Autonomous research from question to report                          |
+| Snakemake, Nextflow  | Defining and running reproducible pipelines                          |
+
+## Beyond provenance
+
+Trending AI scientific workbenches such as [Claude Science](https://www.anthropic.com/news/claude-science-ai-workbench)
+and [OpenScience](https://github.com/synthetic-sciences/openscience) save versioned figures and
 other files, along with the conversation, code, and logs that produced them. ASTRA goes beyond surface-level
 provenance tracking. Its specification focuses not just on inputs and outputs, but also on the scientific decisions behind an analysis,
 why they were made, and the literature that supports them.
 
-Workflow managers such as [Snakemake](https://snakemake.readthedocs.io/) help researchers define and run reproducible
-pipelines but were not designed with agent-driven science in mind, whereas the Lightcone Stack is built for agents and also
-records the scientific decisions and evidence behind each step.
+## Workflow managers
+
+Workflow managers such as [Snakemake](https://snakemake.readthedocs.io/) and [Nextflow](https://www.nextflow.io/)
+are the established way to define and run reproducible pipelines. They capture how each output is computed, but not
+the scientific reasoning behind the pipeline, and they were not designed with agent-driven science in mind. The
+Lightcone Stack is built for agents and records the decisions and evidence behind each step. The two are
+complementary rather than competing, as the next section explains.
 
 ## Bring your own workspace
 
@@ -45,13 +62,3 @@ Scientist](https://sakana.ai/ai-scientist/), which are designed to pursue their 
 Finally, the Lightcone Stack is open source. We believe that the tools the academic community relies on should be
 owned, maintained, and extended by that community. Claude Science and Kosmos, by contrast, are proprietary and
 require subscriptions.
-
-## At a glance
-
-| Tool                     | What it does                                                                                                   |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------- |
-| Lightcone Stack          | Records analyses in ASTRA spec, with tools to write, run, and share them with your own agent. Open source. |
-| Claude Science           | Browser-based research workbench in which Claude runs analyses and records provenance for each file. Proprietary.            |
-| OpenScience              | Browser-based research workbench with its own research agents. Open source.                       |
-| Kosmos                   | AI scientist that carries out research end to end and returns a report. Proprietary.                          |
-| The AI Scientist                   | AI scientist that carries out research end to end and returns a report. Open source.                       |
