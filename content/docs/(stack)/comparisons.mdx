@@ -4,71 +4,54 @@ description: How the Lightcone Stack relates to other tools for AI-assisted rese
 icon: Scale
 ---
 
-Many tools now help researchers work with AI agents. What sets the Lightcone Stack apart is the
-record it keeps: the analysis is declared in an open specification before anything runs, its choices
-and their alternatives are explicit, and every result is traced back to them in files you own. This
-page compares it with the tools you are most likely to weigh it against. It was last reviewed in
-September 2026; the other tools move quickly, so check their own documentation too.
+Here we compare the purpose of the Lightcone Stack with other tools for AI-assisted science.
 
-## Claude Science
+The central idea behind the Lightcone Stack is that agent-driven research should produce a record of the analysis, covering
+its inputs, outputs, choices, and evidence. Today, research is shared mainly as a paper and sometimes a code
+repository, and neither captures every important aspect of the research. A full record enables research to be
+reproduced and extended.
 
-[Claude Science](https://www.anthropic.com/news/claude-science-ai-workbench) is Anthropic's desktop
-"AI workbench for scientists", in beta since June 2026. Claude writes and runs Python, R or shell code
-in a sandbox on your machine, can send jobs to remote servers, draws on data sources through
-connectors, and saves versioned artifacts. Each saved artifact keeps the
-[code, execution log and environment](https://claude.com/docs/claude-science/artifacts) that produced
-it, and a reviewer agent checks claims against what actually ran.
+The Lightcone Stack records these in an `astra.yaml` file, an [open specification](https://astra-spec.org) that
+allows an analysis to be reviewed, reproduced, and cited as a piece of work in its own right.
 
-It is a polished, well-supported application, and it already records a great deal. The difference
-lies in what the record is and who owns it:
+[Claude Science](https://www.anthropic.com/news/claude-science-ai-workbench) and
+[OpenScience](https://github.com/synthetic-sciences/openscience) are AI workbenches that save versioned figures and
+other files, along with the conversation, code, and logs that produced them. ASTRA goes beyond surface-level
+provenance tracking. Its specification focuses not just on inputs and outputs, but also on the scientific decisions behind an analysis,
+why they were made, and the literature that supports them.
 
-|                            | Claude Science                                                         | Lightcone Stack                                                                   |
-| -------------------------- | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| **The analysis**           | Reconstructed from what the agent did: code, logs and environment      | Declared up front in `astra.yaml`: inputs, outputs, decisions, evidence           |
-| **Analysis choices**       | Fork a session to compare approaches                                   | Named decisions with their alternatives, run side by side as universes            |
-| **Evidence**               | A reviewer agent checks claims and citations against what ran          | Quotes recorded in the specification and checked against the source paper        |
-| **Where the record lives** | The app's data folder, on one computer                                 | A git repository, with data and results in git-annex                              |
-| **Sharing**                | Manuscripts, figures and code exports                                  | An RO-Crate, and a MySTRA report tied to the analysis                             |
-| **Agents and models**      | Claude, in the Claude Science app, on a paid Claude plan               | Claude Code or Codex                                                              |
-| **Compute**                | Local, remote Linux servers, Slurm, and cloud GPUs through Modal       | Local, or Slurm clusters                                                          |
-| **Openness**               | Proprietary                                                            | Open source (BSD 3-Clause), open specification                                    |
+Workflow managers such as [Snakemake](https://snakemake.readthedocs.io/) help researchers define and run reproducible
+pipelines but were not designed with agent-driven science in mind, whereas the Lightcone Stack is built for agents and also
+records the scientific decisions and evidence behind each step.
 
-Where Claude Science is ahead: a graphical interface with built-in viewers (for example for protein
-structures and genome tracks), more than sixty connectors and skills with a strong life-sciences
-focus, cloud GPUs, and Anthropic's support.
+## Bring your own workspace
 
-Where the Lightcone Stack is ahead:
+Tools like Claude Science and OpenScience bring their own agents and browser-based workspaces, whereas
+Lightcone lets users keep the existing tools and agents that fit their workflow.
 
-- **The analysis is declared, not reconstructed.** The specification is written, with you, before
-  anything runs; it states the intent, not only the steps that happened to run.
-- **Choices are first-class.** A decision records the alternatives and the reasons, and the multiverse
-  shows whether a result survives changing them.
-- **Claims carry checkable evidence.** Findings and prior insights cite the exact text they rest on,
-  and the tools verify it against the source.
-- **The record is open and portable.** It lives in a repository you own, in open formats that other
-  tools and other agents can read, without any particular application.
+The Lightcone Stack covers an analysis from start to finish, but its components are independent, and none of them
+requires the others. For example, a researcher can record an analysis in `astra.yaml` and still run it with their
+own scripts or workflow manager instead of the Lightcone CLI. They could even ask Claude Science to use `astra.yaml`!
 
-The two can also work together: the Lightcone Stack runs inside Claude Code, so you can keep using
-Claude while keeping your analysis in an open, portable record.
+## Researchers stay in the loop
 
-## Workflow managers
+The Lightcone Stack is built for researchers who want to understand and remain responsible for every step of their
+analysis. Compare this with a growing number of independent AI scientists, such as
+[Kosmos](https://advances.edisonscientific.com/research/announcing-kosmos/) and Sakana's [AI
+Scientist](https://sakana.ai/ai-scientist/), which are designed to pursue their own research questions end to end. With these tools, researchers are left with conclusions they did not shape and may not fully understand.
 
-[Snakemake](https://snakemake.readthedocs.io/), [Nextflow](https://www.nextflow.io/) and
-[DVC](https://dvc.org/) are mature tools for running pipelines and versioning data. The Lightcone CLI
-covers similar ground (running recipes, tracking what is up to date, recording provenance), but its
-input is the scientific structure of the analysis: the decisions and their alternatives, the evidence
-and the findings. And it is built to be driven by an agent: it never prompts, and it reports in JSON.
+## Owned by the research community
 
-## Notebooks
+Finally, the Lightcone Stack is open source. We believe that the tools the academic community relies on should be
+owned, maintained, and extended by that community. Claude Science and Kosmos, by contrast, are proprietary and
+require subscriptions.
 
-Jupyter notebooks are the most common way to explore data interactively, but their hidden state and
-their mix of code, output and prose make an analysis hard to re-run or review.
-[Lightcone Lab](/lightcone-lab) keeps what is good about JupyterLab and adds the project around it:
-the inventory, the pipeline and the provenance of each result.
+## At a glance
 
-## Autonomous research agents
-
-Systems such as [Kosmos](https://labs.edisonscientific.com/research/announcing-kosmos/) carry out
-research end to end and hand back a report. The Lightcone Stack takes the opposite approach: the
-agent does the work, but you make the scientific choices, and the specification records them where
-you and your readers can see them.
+| Tool                     | What it does                                                                                                   |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| Lightcone Stack          | Records analyses in ASTRA spec, with tools to write, run, and share them with your own agent. Open source. |
+| Claude Science           | Browser-based research workbench in which Claude runs analyses and records provenance for each file. Proprietary.            |
+| OpenScience              | Browser-based research workbench with its own research agents. Open source.                       |
+| Kosmos                   | AI scientist that carries out research end to end and returns a report. Proprietary.                          |
+| The AI Scientist                   | AI scientist that carries out research end to end and returns a report. Open source.                       |
