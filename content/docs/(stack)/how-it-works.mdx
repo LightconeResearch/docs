@@ -4,20 +4,24 @@ description: How the components of the Lightcone Stack fit together.
 icon: Workflow
 ---
 
+The stack is a set of separate tools that work on one repository: the project's own git
+repository, whose `astra.yaml` describes the analysis in [ASTRA](/astra). The Lightcone CLI reads
+that file to run the analysis and commits each result next to it, with a record of how it was made.
+Lightcone Lab, MySTRA and the Agent Skills read the same file and the same record. They share
+nothing else, so you can use, replace or leave out any of them on its own.
+
+We split the stack up this way so that it can attach to a project that already exists. A research
+group has its own code, its own compute and its own way of writing papers, and it rarely wants to
+move all of that into a new system at once. With separate tools, you can start by writing the
+specification with your agent and running it with the CLI, and add Lab or MySTRA later, or not at
+all. The specification is plain YAML with an open schema, so a tool we didn't write, including one
+you write yourself, can read it too.
+
 <StackDiagram />
 
-- **[ASTRA](/astra)** is the open specification the analysis is written in. `astra.yaml` declares its
-  inputs, outputs and recipes, the decisions that shape it with their alternatives, and the evidence
-  behind its claims.
-- **The [Lightcone CLI](/lightcone-cli)**, `lc`, executes the specification. It runs each recipe in a
-  sandbox, runs every combination of choices you ask for, and commits each output with a record of
-  how it was made.
-- **[MySTRA](/mystra)** lets the report cite the analysis by path: re-run the analysis and the report
-  follows.
-- **[Lightcone Lab](/lightcone-lab)** brings the project into JupyterLab, where you can browse its
-  inventory, follow its pipeline and inspect the provenance of each result.
-- **[Agent Skills](/agent-skills)** teach your coding agent to work with the stack: to open with an
-  interview, write the specification with you, and drive `lc` to produce the results.
+The code is yours and lives wherever you put it. A recipe in `astra.yaml` names the command that
+runs it, and `lc` commits what comes out next to it, in the same repository as the specification
+and the data. Each layer in the figure has its own section; select one to read more.
 
 ## You and your agent
 

@@ -1,0 +1,325 @@
+/* The stack figure: layers top to bottom, a dashed box around the layers that
+   live in the repository, and a label down the left for who works where.
+   Square corners and a coloured top rule per layer, as in the deck; brand
+   tokens, so it follows the light and dark schemes. */
+.sd {
+  margin: 2rem 0 1.5rem;
+  container-type: inline-size;
+  font-variant-caps: normal;
+  --sd-ink: var(--color-fd-foreground);
+  --sd-muted: var(--color-fd-muted-foreground);
+  --sd-card: var(--color-fd-card);
+}
+.sd-band {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 14px;
+}
+.sd-band + .sd-band {
+  margin-top: 14px;
+}
+.sd-who {
+  margin: 0;
+  padding-right: 12px;
+  align-self: center;
+  text-align: right;
+  font: 600 0.6875rem/1.35 var(--lc-font-ui);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--lc-color-vert-de-gris);
+  border-right: 2px solid color-mix(in srgb, var(--lc-color-vert-de-gris) 45%, transparent);
+  min-height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.sd-who:empty {
+  border-right-color: transparent;
+}
+.sd-layers {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.sd-layer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 12px 16px 14px;
+  background: var(--sd-card);
+  border: 1px solid var(--color-fd-border);
+  border-top: 3px solid var(--lc-color-slate-blue);
+  box-shadow: 0 10px 24px -18px rgb(78 90 112 / 0.45);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+.sd-layer:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px -16px rgb(78 90 112 / 0.55);
+}
+.sd-layer--strong {
+  border-top-color: var(--lc-color-blue-ink);
+}
+.sd-layer--tool {
+  border-top-color: var(--lc-color-vert-de-gris);
+}
+.sd-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  min-width: 0;
+}
+.sd-layer--tool .sd-name {
+  font-size: 1.125rem;
+}
+.sd-layer--tool .sd-logo {
+  height: 24px;
+}
+.sd-layer--tool .sd-logo--wordmark {
+  height: 20px;
+}
+
+.sd-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sd-logo {
+  height: 28px;
+  width: auto;
+  flex: none;
+}
+.sd-logo--wordmark {
+  height: 22px;
+}
+.sd-logo--icon {
+  width: 26px;
+  height: 26px;
+  color: var(--lc-color-slate-blue);
+}
+.dark .sd-logo--ink {
+  filter: brightness(0) invert(0.82);
+}
+.dark .sd-logo--wordmark {
+  filter: brightness(1.5);
+}
+.sd-name {
+  margin: 0;
+  font: 1.25rem/1.15 var(--lc-font-heading);
+  color: var(--sd-ink);
+}
+.sd-aside {
+  margin-left: 10px;
+  font: 0.8125rem/1 var(--lc-font-ui);
+  letter-spacing: 0.04em;
+  color: var(--sd-muted);
+}
+.sd-link {
+  color: inherit;
+  text-decoration: none;
+}
+/* A layer with one name is a link in its entirety. */
+.sd-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+.sd-layer:hover .sd-link,
+.sd-link:focus-visible {
+  text-decoration: underline;
+  text-decoration-color: var(--lc-color-antique-gold);
+  text-underline-offset: 3px;
+}
+
+.sd-text {
+  margin: 0;
+  font: 0.875rem/1.4 var(--lc-font-body);
+  color: var(--sd-muted);
+}
+.sd-text code,
+.sd-file > code {
+  padding: 0 5px;
+  font: 0.8125rem var(--lc-font-mono);
+  background: color-mix(in srgb, var(--lc-color-slate-blue) 12%, transparent);
+  color: var(--lc-color-slate-blue);
+}
+
+/* The repository: a dashed box around the spec, the CLI and the files. */
+.sd-repo {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px 14px 14px;
+  border: 2px dashed color-mix(in srgb, var(--lc-color-blue-ink) 35%, transparent);
+}
+.sd-repo__label {
+  position: absolute;
+  top: -0.5rem;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0 10px;
+  background: var(--color-fd-background);
+  font: 600 0.75rem/1 var(--lc-font-ui);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lc-color-blue-ink);
+}
+.sd-repo__icon {
+  width: 14px;
+  height: 14px;
+}
+.sd-files {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.sd-file {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px 12px;
+  background: var(--sd-card);
+  border: 1px solid var(--color-fd-border);
+  border-top: 3px solid var(--lc-color-antique-gold);
+}
+.sd-file > code {
+  align-self: flex-start;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+/* Phones and narrow tablets: the label above its band, files in a column. */
+@container (max-width: 639px) {
+  .sd-band {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .sd-who {
+    justify-content: flex-start;
+    text-align: left;
+    min-height: 0;
+    padding: 0 0 0 10px;
+    border-right: 0;
+    border-left: 2px solid color-mix(in srgb, var(--lc-color-vert-de-gris) 45%, transparent);
+  }
+  .sd-who:empty {
+    display: none;
+  }
+  .sd-files,
+  .sd-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Card bodies carried over from the deck's cards: the astra.yaml preview, and
+   the tools a layer builds on, each with its logos. */
+.sd-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+.sd-text b {
+  color: var(--sd-ink);
+  font-weight: 600;
+}
+.sd-code {
+  margin: 0;
+  padding: 10px 12px;
+  background: var(--lc-color-surface-muted);
+  font: 0.6875rem/1.45 var(--lc-font-mono);
+  color: var(--sd-ink);
+}
+/* One line of code: its indentation, then a hanging indent where it wraps. */
+.sd-line {
+  display: block;
+  padding-left: calc((var(--indent) + 2) * 1ch);
+  text-indent: -2ch;
+  white-space: pre-wrap;
+}
+.sd-code .k {
+  color: var(--lc-color-slate-blue);
+  font-weight: 600;
+}
+.sd-code .s {
+  color: var(--sd-ink);
+}
+.sd-code .p {
+  color: var(--sd-muted);
+}
+.sd-code .b {
+  color: var(--lc-color-wax-red);
+  font-weight: 600;
+}
+.sd-code .ref {
+  color: var(--lc-color-vert-de-gris);
+  font-weight: 600;
+}
+.sd-code .id {
+  font-weight: 600;
+}
+.sd-code .ph {
+  color: var(--lc-color-antique-gold-strong);
+  font-weight: 600;
+}
+
+.sd-tools {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 18px;
+  margin-top: 4px;
+}
+.sd-tool {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-fd-border);
+}
+.sd-tool .sd-text b {
+  display: block;
+  font: 600 0.9375rem/1.3 var(--lc-font-ui);
+}
+.sd-logos {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.sd-logos img {
+  height: 26px;
+  width: auto;
+}
+.sd-logos .sd-logo--uv {
+  height: 20px;
+}
+.sd-logos--grid {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+}
+.sd-logos--grid img {
+  height: 22px;
+}
+.sd-logos--grid .sd-logo--slurm {
+  height: 15px;
+}
+.sd-layer--compute .sd-tool {
+  grid-template-columns: 96px minmax(0, 1fr);
+}
+
+@container (max-width: 639px) {
+  .sd-split,
+  .sd-tools {
+    grid-template-columns: 1fr;
+  }
+}
