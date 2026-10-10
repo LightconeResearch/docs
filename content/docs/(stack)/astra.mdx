@@ -5,15 +5,35 @@ icon: Sparkles
 ---
 
 ASTRA, the Agentic Schema for Transparent Research Analysis, is an open specification for describing
-a research analysis in a YAML file, `astra.yaml`. Code captures how an analysis runs, but not its
-structure: `astra.yaml` records its inputs, outputs, methodological choices and evidence, so that the
-work is easier to review, reproduce and extend.
+a research analysis in one YAML file, `astra.yaml`. Your code says how the analysis runs; `astra.yaml`
+says what it is: its inputs and outputs, the methodological choices behind them, and the evidence for
+those choices. Anyone who picks up the work, an agent or a person, can read it without reading the
+code.
 
-ASTRA doesn't depend on any tool: agents, workflow runners and people can all read the same file.
-It has its own documentation, schema and releases at [astra-spec.org](https://astra-spec.org/latest/);
-this page covers what you need to know to use it with the Lightcone Stack.
+ASTRA doesn't depend on any tool. It has its own documentation, schema and releases at
+[astra-spec.org](https://astra-spec.org/latest/); this page covers what you need to use it with the
+Lightcone Stack.
+
+<LoopVideo
+  src="/videos/astra/astra-spec-demo.mp4"
+  label="An animated walkthrough of astra.yaml: its inputs, outputs and decisions, then the recipe command that runs with an option chosen for each decision."
+  width={1920}
+  height={1080}
+/>
 
 ## What an analysis records
+
+An ASTRA record is a graph: each element is a node, and the fields that name other elements are its
+edges. Here is a slice of one, an example from [Price-Whelan & Bonaca (2018)](https://arxiv.org/abs/1805.00425),
+*Off the beaten path: Gaia reveals GD-1 stars outside of the main stream*:
+
+<AstraGraph />
+
+Inputs feed the outputs that list them, and one output can feed another. Each decision parameterizes
+the outputs whose recipes use it, and an option can cite the prior insight that backs it; the filled
+options are each decision's default. A finding cites the outputs that support it.
+
+Each element type in full:
 
 | Element        | What you record                                                          |
 | -------------- | ------------------------------------------------------------------------ |
@@ -21,16 +41,15 @@ this page covers what you need to know to use it with the Lightcone Stack.
 | Outputs        | The metrics, figures, tables and other artifacts you intend to produce   |
 | Recipes        | The command that produces each output from its declared inputs and choices |
 | Decisions      | Methodological choices, their alternatives, and the reasons for them     |
-| Universes      | A selection of one option per decision, to run together                  |
 | Prior insights | Existing knowledge, with its evidence, that informs the approach         |
 | Findings       | Claims supported by the analysis's outputs                               |
 
-## Decisions and universes
+### Decisions
 
-Results depend on choices: which data to include, how to treat outliers, which prior to assume. In
-ordinary research code those choices are scattered across scripts, notebooks and memory. ASTRA gives
-each one an explicit place: a **decision** names the options that were considered and why one might
-choose each.
+Results depend on choices, such as which data to include or which prior to assume. In most research
+code those choices sit in scattered scripts and in people's heads. In ASTRA each one is a
+**decision**: it lists the options you considered, records why the choice matters, and names the
+default. An output lists the decisions it depends on, and its recipe receives the chosen option:
 
 ```yaml title="astra.yaml (excerpt)"
 outputs:
@@ -59,34 +78,49 @@ decisions:
         label: Robust linear fit
 ```
 
-Picking one option per decision gives a **universe**, a single runnable configuration. A universe is
-just a small YAML file:
+An option can also list the [prior insights](#prior-insights) that back it.
 
-```yaml title="universes/baseline.yaml"
-id: baseline
-description: Default configuration for the period-luminosity fit.
+### Prior insights
 
-decisions:
-  fit_method: ordinary_least_squares
+A **prior insight** records something the analysis takes from the literature: a claim, and the
+evidence for it. Each piece of evidence cites a paper by its DOI and quotes the exact sentence the
+claim rests on, with its page. In the example from Price-Whelan & Bonaca (2018), one of the Milky Way
+potential options rests on this insight from Bovy (2015):
+
+```yaml title="astra.yaml (Price-Whelan & Bonaca 2018 example, shortened)"
+prior_insights:
+  mwpotential2014_composition:
+    id: mwpotential2014_composition
+    claim: >-
+      galpy's MWPotential2014 is a three-component Milky Way model: a power-law bulge,
+      a Miyamoto–Nagai disk and an NFW dark-matter halo, fit to dynamical data.
+    created_at: '2026-09-10T13:30:00Z'
+    evidence:
+      - id: ev2
+        doi: "10.1088/0067-0049/216/2/29"
+        quote:
+          exact: >-
+            The galpy.potential module also contains a model MWPotential2014 for the
+            Milky Way’s gravitational potential that is designed to provide a simple,
+            easy-to-use model in cases where a realistic model for the Milky Way is
+            required.
+        location:
+          page: 7
 ```
 
-The set of all universes is the analysis's **multiverse**. Running several of them shows whether a
-result holds when you change a method, a model or a prior.
+The `astra` command can [check each quote against its paper](#the-astra-command): a quote that
+isn't in the paper fails validation.
 
-## Evidence
-
-Knowledge comes into an analysis as **prior insights** and goes out as **findings**. Both carry
-their evidence: for a published result, the paper's identifier and the exact quote it rests on.
-ASTRA's tools fetch the paper and check that the quote is really there, so a citation can't be
-invented.
+What the analysis concludes goes into **findings**, which have the same shape as prior insights but
+cite the analysis's own outputs as their evidence, such as a figure or a table of results.
 
 ## How the stack uses it
 
 - **[Agent Skills](/agent-skills)**: the `astra` skill teaches your agent the format, so it writes and
   revises `astra.yaml` with you. A hook validates the file each time the agent saves it.
 - **[Lightcone CLI](/lightcone-cli)**: `lc` executes the recipes. Each output that `lc` runs needs a
-  `format`, a `recipe`, and its `inputs` and `decisions` declared; its file lands at
-  `results/<universe>/<output>.<format>`, next to a manifest that records how it was made.
+  `format`, a `recipe`, and its `inputs` and `decisions` declared; its file lands in `results/`,
+  next to a manifest that records how it was made.
 - **[MySTRA](/mystra)**: the report refers to outputs, decisions and values by their path in
   `astra.yaml`, rather than copying them.
 - **[Lightcone Lab](/lightcone-lab)**: the workbench shows the analysis as an inventory and a
@@ -98,22 +132,36 @@ the version of any tool.
 ## The `astra` command
 
 [astra-tools](https://github.com/LightconeResearch/astra-tools) provides the `astra` command, which
-validates and inspects a specification. You don't need to install it: `uvx` fetches it on first use.
-Run it from your project directory, with the version the current Lightcone CLI expects:
+validates and inspects a specification. Install it with uv, at the version the current Lightcone CLI
+expects:
 
 ```bash
-uvx astra-tools@0.2.18 validate
-uvx astra-tools@0.2.18 info
+uv tool install astra-tools@0.2.18
 ```
 
-With no file name, `validate` checks the project's specification and universe files. Add
-`--verify-evidence` to check quotes against their sources:
+Then run it from your project directory:
 
 ```bash
-uvx astra-tools@0.2.18 validate astra.yaml --verify-evidence
+astra validate
+astra info
 ```
 
-The agent plugin runs the same command with its own pinned version, so you only need it to check
+With no file name, `validate` checks every specification file in the project.
+
+To check the quotes in your evidence, add each cited paper to `astra`'s local cache, then validate
+with `--verify-evidence`:
+
+```bash
+astra paper add 10.1088/0067-0049/216/2/29 --pdf bovy2015.pdf
+astra validate astra.yaml --verify-evidence
+```
+
+Without `--pdf`, `paper add` downloads the paper itself: arXiv DOIs straight from arXiv, and other
+DOIs from an open-access copy when one exists. Publisher DOIs often have none, as for Bovy (2015)
+above, so download the PDF yourself and register it with `--pdf`. Evidence that cites the analysis's
+own outputs is skipped until those outputs exist.
+
+The agent plugin runs `astra` with its own pinned version, so you only need to install it to check
 things yourself.
 
 ## Learn more
@@ -121,4 +169,4 @@ things yourself.
 - [Getting started with ASTRA](https://astra-spec.org/latest/getting-started/): the format on its
   own, without Lightcone.
 - [Specification reference](https://astra-spec.org/latest/specification/): every element and field.
-- [CLI reference](https://astra-spec.org/latest/cli/): validation, universes, and paper tools.
+- [CLI reference](https://astra-spec.org/latest/cli/): validation, inspection and paper tools.
