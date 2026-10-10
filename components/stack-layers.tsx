@@ -1,13 +1,16 @@
 import type { CSSProperties } from 'react';
 import Link from 'fumadocs-core/link';
 import { CalloutContainer, CalloutDescription, CalloutTitle } from 'fumadocs-ui/components/callout';
+import { Bot, FlaskConical, PenLine, ScrollText, Terminal } from 'lucide-react';
 
 // The layers of the stack, drawn with the brand's colours so the diagram
 // follows the light and dark schemes. ASTRA is the foundation the others
-// read from and write to.
+// read from and write to. Each layer has the icon of its docs, for the
+// landing page's navbar and cards.
 export const layers = [
   {
     name: 'Agent Skills',
+    icon: Bot,
     role: 'Work with your agent',
     text: 'Teach Claude Code or Codex to scope, build, run and report on the analysis with you.',
     href: '/docs/agent-skills',
@@ -15,6 +18,7 @@ export const layers = [
   },
   {
     name: 'Lightcone Lab',
+    icon: FlaskConical,
     role: 'Explore',
     text: 'A JupyterLab workbench for the project: its inventory, pipeline, provenance and report.',
     href: '/docs/lightcone-lab',
@@ -22,6 +26,7 @@ export const layers = [
   },
   {
     name: 'MySTRA',
+    icon: PenLine,
     role: 'Communicate',
     text: 'A report that references the analysis by path, so it stays in step with it.',
     href: '/docs/mystra',
@@ -29,6 +34,7 @@ export const layers = [
   },
   {
     name: 'Lightcone CLI',
+    icon: Terminal,
     role: 'Execute',
     text: 'Runs every recipe in a sandbox and records the provenance of every output.',
     href: '/docs/lightcone-cli',
@@ -36,6 +42,7 @@ export const layers = [
   },
   {
     name: 'ASTRA',
+    icon: ScrollText,
     role: 'Describe',
     text: 'The specification: the inputs, outputs, decisions and evidence of the analysis, in astra.yaml.',
     href: '/docs/astra',

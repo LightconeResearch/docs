@@ -59,6 +59,14 @@ html {
   scrollbar-gutter: stable;
 }
 
+/* The landing page's navbar links (the Quick Start and each element of the
+   stack) stay on one line where they fit, from the md breakpoint. */
+@media (width >= 48rem) {
+  #nd-nav a {
+    white-space: nowrap;
+  }
+}
+
 html > body[data-scroll-locked] {
   margin-right: 0px !important;
   --removed-body-scroll-bar-size: 0px !important;
