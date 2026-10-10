@@ -1,7 +1,12 @@
 import type { CSSProperties } from 'react';
 import Link from 'fumadocs-core/link';
 import { CalloutContainer, CalloutDescription, CalloutTitle } from 'fumadocs-ui/components/callout';
-import { Bot, FlaskConical, PenLine, ScrollText, Terminal } from 'lucide-react';
+import { Bot, FlaskConical, PenLine, Terminal } from 'lucide-react';
+
+// ASTRA's icon across the site is the ✨ emoji, as in its docs' frontmatter.
+export function AstraIcon() {
+  return <span aria-hidden>✨</span>;
+}
 
 // The layers of the stack, drawn with the brand's colours so the diagram
 // follows the light and dark schemes. ASTRA is the foundation the others
@@ -42,7 +47,7 @@ export const layers = [
   },
   {
     name: 'ASTRA',
-    icon: ScrollText,
+    icon: AstraIcon,
     role: 'Describe',
     text: 'The specification: the inputs, outputs, decisions and evidence of the analysis, in astra.yaml.',
     href: '/docs/astra',
