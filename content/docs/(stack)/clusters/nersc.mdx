@@ -48,11 +48,40 @@ plugin offers to install the Lightcone CLI the first time you start a project.
 
 ## Describe Perlmutter's queues
 
-The CLI launches compute from the offers in `~/.lightcone/compute.yaml`. Copy the
-[Perlmutter configuration](/lightcone-cli/configuring-compute#nersc) from the CLI documentation, with a
-regular and an interactive CPU queue and a GPU queue. Replace `myproject` with your NERSC project, such
-as `m1234`, and use its GPU account, `m1234_g`, for the GPU offer: NERSC charges GPU jobs to the
-account ending in `_g`. Then check what the CLI sees:
+The CLI launches compute from the offers in `~/.lightcone/compute.yaml`. This one has a regular and
+an interactive CPU queue, and a GPU queue:
+
+```yaml title="~/.lightcone/compute.yaml"
+offers:
+  - name: cpu
+    provider: slurm
+    resources: {cpus: 256, memory: 480}
+    max_nodes: 16
+    time: {default: 1h, max: 12h}
+    startup: batch
+    config: {account: myproject, constraint: cpu, qos: regular}
+  - name: cpu-interactive
+    provider: slurm
+    resources: {cpus: 256, memory: 480}
+    max_nodes: 2
+    time: {default: 1h, max: 4h}
+    startup: fast
+    config: {submit: salloc, account: myproject, constraint: cpu, qos: interactive}
+  - name: gpu
+    provider: slurm
+    resources: {cpus: 32, memory: 128, accelerators: GPU:4}
+    max_nodes: 2
+    time: {default: 1h, max: 4h}
+    startup: batch
+    config: {account: myproject_g, constraint: gpu, qos: regular}
+```
+
+Replace `myproject` with your NERSC project, such as `m1234`. The GPU offer uses the project's GPU
+account, ending in `_g`, which NERSC charges GPU jobs to. The two CPU offers have the same shape, so
+`lc compute launch --cpus 256 --memory 480` takes the regular queue, and `--startup fast` the
+interactive one. [Configuring compute](/lightcone-cli/configuring-compute) explains every field.
+
+Then check what the CLI sees:
 
 ```bash
 lc compute resources
