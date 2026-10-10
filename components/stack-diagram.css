@@ -1,7 +1,5 @@
-/* The stack figure: layers top to bottom, a dashed box around the layers that
-   live in the repository, and a label down the left for who works where.
-   Square corners and a coloured top rule per layer, as in the deck; brand
-   tokens, so it follows the light and dark schemes. */
+/* The CLI is the hub; the dashed boundary contains only project files.
+   Keep the diagram's card styling and light/dark brand tokens. */
 .sd {
   margin: 2rem 0 1.5rem;
   container-type: inline-size;
@@ -9,38 +7,90 @@
   --sd-ink: var(--color-fd-foreground);
   --sd-muted: var(--color-fd-muted-foreground);
   --sd-card: var(--color-fd-card);
+  --sd-edge: var(--lc-color-slate-blue);
 }
-.sd-band {
+.sd-flow {
   display: grid;
-  grid-template-columns: 112px minmax(0, 1fr);
-  gap: 14px;
+  grid-template-columns: minmax(0, 2fr) 96px minmax(0, 1fr);
+  grid-template-areas:
+    'agent . .'
+    'agent-link . .'
+    'cli compute-link compute'
+    'project-link . .'
+    'project project project';
+  grid-template-rows: auto 48px auto 64px auto;
 }
-.sd-band + .sd-band {
-  margin-top: 14px;
+.sd-agent {
+  grid-area: agent;
 }
-.sd-who {
-  margin: 0;
-  padding-right: 12px;
+.sd-cli {
+  grid-area: cli;
+}
+.sd-compute {
+  grid-area: compute;
   align-self: center;
-  text-align: right;
-  font: 600 0.6875rem/1.35 var(--lc-font-ui);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--lc-color-vert-de-gris);
-  border-right: 2px solid color-mix(in srgb, var(--lc-color-vert-de-gris) 45%, transparent);
-  min-height: 2.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
 }
-.sd-who:empty {
-  border-right-color: transparent;
+.sd-edge {
+  position: relative;
+  color: var(--sd-edge);
+  font: 500 0.75rem/1.4 var(--lc-font-ui);
 }
-.sd-layers {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  min-width: 0;
+.sd-edge--agent {
+  grid-area: agent-link;
+}
+.sd-edge--compute {
+  grid-area: compute-link;
+}
+.sd-edge--project {
+  grid-area: project-link;
+}
+.sd-edge__line {
+  position: absolute;
+  inset: 0 50% 0 auto;
+  border-right: 1px solid;
+}
+.sd-edge__line::after,
+.sd-edge--project .sd-edge__line::before {
+  content: '';
+  position: absolute;
+  right: -4px;
+  bottom: 1px;
+  width: 7px;
+  height: 7px;
+  border-right: 1px solid;
+  border-bottom: 1px solid;
+  transform: rotate(45deg);
+}
+.sd-edge--project .sd-edge__line::before {
+  top: 1px;
+  bottom: auto;
+  transform: rotate(225deg);
+}
+.sd-edge__label {
+  position: absolute;
+  top: 50%;
+  left: calc(50% + 12px);
+  right: 0;
+  transform: translateY(-50%);
+}
+.sd-edge__label > span {
+  display: block;
+}
+.sd-edge--compute .sd-edge__line {
+  inset: 50% 0 auto;
+  border-right: 0;
+  border-top: 1px solid;
+}
+.sd-edge--compute .sd-edge__line::after {
+  right: 1px;
+  top: -4px;
+  bottom: auto;
+  transform: rotate(-45deg);
+}
+.sd-edge--compute .sd-edge__label {
+  inset: auto 4px calc(50% + 8px);
+  transform: none;
+  text-align: center;
 }
 
 .sd-layer {
@@ -54,10 +104,9 @@
   border: 1px solid var(--color-fd-border);
   border-top: 3px solid var(--lc-color-slate-blue);
   box-shadow: 0 10px 24px -18px rgb(78 90 112 / 0.45);
-  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  transition: box-shadow 0.15s ease;
 }
 .sd-layer:hover {
-  transform: translateY(-1px);
   box-shadow: 0 14px 28px -16px rgb(78 90 112 / 0.55);
 }
 .sd-layer--strong {
@@ -66,20 +115,11 @@
 .sd-layer--tool {
   border-top-color: var(--lc-color-vert-de-gris);
 }
-.sd-row {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-  min-width: 0;
-}
 .sd-layer--tool .sd-name {
   font-size: 1.125rem;
 }
 .sd-layer--tool .sd-logo {
   height: 24px;
-}
-.sd-layer--tool .sd-logo--wordmark {
-  height: 20px;
 }
 
 .sd-head {
@@ -127,6 +167,10 @@
   position: absolute;
   inset: 0;
 }
+.sd-link:focus-visible::after {
+  outline: 2px solid var(--lc-color-slate-blue);
+  outline-offset: 3px;
+}
 .sd-layer:hover .sd-link,
 .sd-link:focus-visible {
   text-decoration: underline;
@@ -147,25 +191,22 @@
   color: var(--lc-color-slate-blue);
 }
 
-/* The repository: a dashed box around the spec, the CLI and the files. */
+/* The repository: a dashed box around the specification and files. */
 .sd-repo {
+  grid-area: project;
   position: relative;
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 22px 14px 14px;
+  padding: 14px;
+  min-width: 0;
   border: 2px dashed color-mix(in srgb, var(--lc-color-blue-ink) 35%, transparent);
 }
 .sd-repo__label {
-  position: absolute;
-  top: -0.5rem;
-  left: 16px;
   display: flex;
   align-items: center;
   gap: 6px;
   margin: 0;
-  padding: 0 10px;
-  background: var(--color-fd-background);
   font: 600 0.75rem/1 var(--lc-font-ui);
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -174,6 +215,11 @@
 .sd-repo__icon {
   width: 14px;
   height: 14px;
+}
+.sd-repo__label > span {
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
 }
 .sd-files {
   display: grid;
@@ -195,31 +241,7 @@
   font-weight: 600;
 }
 
-/* Phones and narrow tablets: the label above its band, files in a column. */
-@container (max-width: 639px) {
-  .sd-band {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-  .sd-who {
-    justify-content: flex-start;
-    text-align: left;
-    min-height: 0;
-    padding: 0 0 0 10px;
-    border-right: 0;
-    border-left: 2px solid color-mix(in srgb, var(--lc-color-vert-de-gris) 45%, transparent);
-  }
-  .sd-who:empty {
-    display: none;
-  }
-  .sd-files,
-  .sd-row {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Card bodies carried over from the deck's cards: the astra.yaml preview, and
-   the tools a layer builds on, each with its logos. */
+/* The specification and write-up use matching code previews and explanations. */
 .sd-split {
   display: grid;
   grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
@@ -243,6 +265,7 @@
   padding-left: calc((var(--indent) + 2) * 1ch);
   text-indent: -2ch;
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 .sd-code .k {
   color: var(--lc-color-slate-blue);
@@ -272,7 +295,7 @@
 
 .sd-tools {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 10px 18px;
   margin-top: 4px;
 }
@@ -314,12 +337,75 @@
   height: 15px;
 }
 .sd-layer--compute .sd-tool {
-  grid-template-columns: 96px minmax(0, 1fr);
+  grid-template-columns: 1fr;
+}
+.sd-layer--compute .sd-logos {
+  justify-content: flex-start;
 }
 
-@container (max-width: 639px) {
+/* Narrow screens keep two separate branches from the CLI. The rail beside
+   compute connects the CLI directly to the project, avoiding a false chain. */
+@container (max-width: 719px) {
+  .sd-flow {
+    grid-template-columns: 32px minmax(0, 1fr);
+    grid-template-areas:
+      'agent agent'
+      'agent-link agent-link'
+      'cli cli'
+      'compute-link compute-link'
+      '. compute'
+      'project-link project-link'
+      '. project';
+    grid-template-rows: auto 48px auto 64px auto 64px auto;
+  }
+  .sd-flow::before {
+    content: '';
+    grid-column: 1;
+    grid-row: 4 / 7;
+    margin: 0 0 32px 12px;
+    border-left: 1px solid var(--sd-edge);
+  }
+  .sd-edge--compute .sd-edge__line,
+  .sd-edge--project .sd-edge__line {
+    inset: 50% 50% 0 12px;
+    border-top: 1px solid;
+    border-right: 1px solid;
+  }
+  .sd-edge--compute .sd-edge__line::after {
+    top: auto;
+    right: -4px;
+    bottom: 1px;
+    transform: rotate(45deg);
+  }
+  .sd-edge--project .sd-edge__line::before {
+    top: -4px;
+    left: 1px;
+    right: auto;
+    transform: rotate(135deg);
+  }
+  .sd-edge--compute .sd-edge__label,
+  .sd-edge--project .sd-edge__label {
+    inset: 0 0 auto 44px;
+    transform: none;
+    text-align: left;
+  }
+  .sd-edge--project .sd-edge__label > span {
+    display: inline;
+  }
+  .sd-edge--project .sd-edge__label > span + span::before {
+    content: ' · ';
+  }
+  .sd-aside {
+    display: block;
+    margin: 4px 0 0;
+  }
+  .sd-repo__label {
+    flex-wrap: wrap;
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+  }
   .sd-split,
-  .sd-tools {
+  .sd-files {
     grid-template-columns: 1fr;
   }
 }
