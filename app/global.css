@@ -59,6 +59,15 @@ html {
   scrollbar-gutter: stable;
 }
 
+/* The sidebar's section headers, the separators in meta.json, are the only
+   paragraphs Fumadocs puts in the sidebar, on desktop and in the phone menu.
+   They sit a step above the page links under them, rather than below. */
+#nd-sidebar p,
+#nd-sidebar-mobile p {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
 html > body[data-scroll-locked] {
   margin-right: 0px !important;
   --removed-body-scroll-bar-size: 0px !important;
