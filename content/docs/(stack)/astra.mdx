@@ -16,7 +16,7 @@ Lightcone Stack.
 
 <LoopVideo
   src="/videos/astra/astra-spec-demo.mp4"
-  label="An animated walkthrough of astra.yaml: its inputs, outputs and decisions, then a universe that picks one option per decision and the recipe command it runs."
+  label="An animated walkthrough of astra.yaml: its inputs, outputs and decisions, then the recipe command that runs with an option chosen for each decision."
   width={1920}
   height={1080}
 />
@@ -30,7 +30,7 @@ edges. Here is a slice of the record of a reproduction of the GD-1 stellar-strea
 
 Inputs feed the outputs that list them, and one output can feed another. Each decision parameterizes
 the outputs whose recipes use it, and an option can cite the prior insight that backs it; the filled
-options are the ones the baseline universe picks. A finding cites the outputs that support it.
+options are each decision's default. A finding cites the outputs that support it.
 
 Each element type in full:
 
@@ -40,15 +40,15 @@ Each element type in full:
 | Outputs        | The metrics, figures, tables and other artifacts you intend to produce   |
 | Recipes        | The command that produces each output from its declared inputs and choices |
 | Decisions      | Methodological choices, their alternatives, and the reasons for them     |
-| Universes      | A selection of one option per decision, to run together                  |
 | Prior insights | Existing knowledge, with its evidence, that informs the approach         |
 | Findings       | Claims supported by the analysis's outputs                               |
 
-## Decisions and universes
+### Decisions
 
 Results depend on choices, such as which data to include or which prior to assume. In most research
 code those choices sit in scattered scripts and in people's heads. In ASTRA each one is a
-**decision**: it lists the options you considered and records why the choice matters.
+**decision**: it lists the options you considered, records why the choice matters, and names the
+default. An output lists the decisions it depends on, and its recipe receives the chosen option:
 
 ```yaml title="astra.yaml (excerpt)"
 outputs:
@@ -77,25 +77,10 @@ decisions:
         label: Robust linear fit
 ```
 
-Picking one option per decision gives a **universe**, a single runnable configuration, stored as a
-small YAML file:
-
-```yaml title="universes/baseline.yaml"
-id: baseline
-description: Default configuration for the period-luminosity fit.
-
-decisions:
-  fit_method: ordinary_least_squares
-```
-
-The set of all universes is the analysis's **multiverse**. Running several of them shows whether a
-result holds when you change a method, a model or a prior.
-
-## Evidence
-
-Knowledge enters an analysis as **prior insights** and leaves it as **findings**, and both carry
-evidence. A prior insight cites a paper by its DOI, with the exact sentence it rests on. A finding
-cites the outputs that support it, such as a figure or a table of results. The `astra` command can
+The evidence for a choice comes from **prior insights**: results from the literature, each citing a
+paper by its DOI and the exact sentence it rests on. An option lists the insights that back it, as
+one of the Milky Way potential options does in the graph above. What the analysis concludes goes
+into **findings**, which cite the outputs that support them. The `astra` command can
 [check each quote against its paper](#the-astra-command): a quote that isn't in the paper fails
 validation.
 
@@ -104,8 +89,8 @@ validation.
 - **[Agent Skills](/agent-skills)**: the `astra` skill teaches your agent the format, so it writes and
   revises `astra.yaml` with you. A hook validates the file each time the agent saves it.
 - **[Lightcone CLI](/lightcone-cli)**: `lc` executes the recipes. Each output that `lc` runs needs a
-  `format`, a `recipe`, and its `inputs` and `decisions` declared; its file lands at
-  `results/<universe>/<output>.<format>`, next to a manifest that records how it was made.
+  `format`, a `recipe`, and its `inputs` and `decisions` declared; its file lands in `results/`,
+  next to a manifest that records how it was made.
 - **[MySTRA](/mystra)**: the report refers to outputs, decisions and values by their path in
   `astra.yaml`, rather than copying them.
 - **[Lightcone Lab](/lightcone-lab)**: the workbench shows the analysis as an inventory and a
@@ -125,7 +110,7 @@ uvx astra-tools@0.2.18 validate
 uvx astra-tools@0.2.18 info
 ```
 
-With no file name, `validate` checks the project's specification and universe files.
+With no file name, `validate` checks every specification file in the project.
 
 To check the quotes in your evidence, add each cited paper to `astra`'s local cache, then validate
 with `--verify-evidence`:
@@ -147,4 +132,4 @@ things yourself.
 - [Getting started with ASTRA](https://astra-spec.org/latest/getting-started/): the format on its
   own, without Lightcone.
 - [Specification reference](https://astra-spec.org/latest/specification/): every element and field.
-- [CLI reference](https://astra-spec.org/latest/cli/): validation, universes, and paper tools.
+- [CLI reference](https://astra-spec.org/latest/cli/): validation, inspection and paper tools.
