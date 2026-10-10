@@ -35,10 +35,6 @@ export function AgentDemo() {
           </video>
         )}
       </div>
-      <figcaption className="mt-3 text-sm text-fd-muted-foreground">
-        A replay of a Claude Code session. The agent asks which uncertainties the supernova fit should
-        use, records the choice in <code>astra.yaml</code> and runs the fit both ways with <code>lc</code>.
-      </figcaption>
     </figure>
   );
 }
