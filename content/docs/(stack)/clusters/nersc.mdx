@@ -36,12 +36,27 @@ Do this before you launch any compute: an allocation started without it has to b
 </Step>
 <Step>
 
+## Install the Lightcone CLI
+
+With uv's cache on scratch, install the CLI, which provides the `lc` command:
+
+```bash
+uv tool install lightcone-cli==0.5.0rc5
+```
+
+Keep the exact version: without it, uv installs an older stable release. The install also puts
+`git-annex` on your `PATH`; if `lc` runs but `git-annex` doesn't, run `uv tool update-shell` and open a
+new shell. See [Installation](/lightcone-cli/installation) for more.
+
+</Step>
+<Step>
+
 ## Install your agent and the plugin
 
 Install [Claude Code](https://docs.nersc.gov/development/coding-agents/claude-code/) or
 [Codex](https://docs.nersc.gov/development/coding-agents/codex/) as NERSC's own guides describe, then
 add the Lightcone plugin as in the [Quick Start](/quickstart#install-the-lightcone-plugin). The
-plugin offers to install the Lightcone CLI the first time you start a project.
+plugin checks that the CLI is the version it needs when you start a project.
 
 </Step>
 <Step>
