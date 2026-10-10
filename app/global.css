@@ -1,7 +1,7 @@
 @import 'tailwindcss';
+@import 'fumadocs-ui/css/generated/spacious.css';
 @import './lightcone.css';
 @import 'fumadocs-ui/css/preset.css';
-@import 'fumadocs-ui/css/generated/glass.css';
 
 @theme {
   --font-sans: var(--lc-font-ui);
