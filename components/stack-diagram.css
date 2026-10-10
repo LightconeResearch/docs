@@ -1,5 +1,6 @@
 /* Only the diagram's topology is custom. Cards, code, colors and typography
-   come from Fumadocs. Keep compute and the project connected to the CLI. */
+   come from Fumadocs. Keep compute and the project connected to the CLI,
+   and Lab below the project it reads. */
 .sd-flow {
   display: grid;
   grid-template-columns: minmax(0, 2fr) 96px minmax(0, 1fr);
@@ -8,8 +9,10 @@
     'agent-link . .'
     'cli compute-link compute'
     'project-link . .'
-    'project project project';
-  grid-template-rows: auto 48px auto 64px auto;
+    'project project project'
+    'lab-link . .'
+    'lab . .';
+  grid-template-rows: auto 48px auto 64px auto 48px auto;
 }
 .sd-split {
   display: grid;
@@ -31,6 +34,9 @@
 }
 .sd-edge--project {
   grid-area: project-link;
+}
+.sd-edge--lab {
+  grid-area: lab-link;
 }
 .sd-edge__line {
   position: absolute;
@@ -92,8 +98,10 @@
       'compute-link compute-link'
       '. compute'
       'project-link project-link'
-      '. project';
-    grid-template-rows: auto 48px auto 64px auto 64px auto;
+      '. project'
+      '. lab-link'
+      '. lab';
+    grid-template-rows: auto 48px auto 64px auto 64px auto 48px auto;
   }
   .sd-flow::before {
     content: '';

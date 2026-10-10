@@ -22,12 +22,11 @@ const mystDocument = 'Using {astra}`decisions.noise_model`,\n'
   + 'we obtain the following fit.\n\n'
   + ':::{astra} outputs.fit_results\n:::';
 
-function Title({ logo, name, href, aside }: { logo?: ReactNode; name: string; href: string; aside?: string }) {
+function Title({ logo, name, href }: { logo?: ReactNode; name: string; href: string }) {
   return (
     <Link href={href} className="inline-flex flex-wrap items-center gap-2 hover:underline">
       {logo}
       {name}
-      {aside && <span className="text-xs font-normal text-fd-muted-foreground">{aside}</span>}
     </Link>
   );
 }
@@ -48,31 +47,30 @@ export function StackDiagram() {
   return (
     <figure
       className="not-prose my-8 @container"
-      aria-label="The agent drives the Lightcone CLI, which reads the project, runs recipes on compute, and records results back in the project."
+      aria-label="The agent drives the Lightcone CLI, which reads the project, runs recipes on compute, and records results back in the project. Lightcone Lab reads the project to show it."
     >
       <div className="sd-flow">
         <div className="min-w-0 [grid-area:agent]">
           <Card
-            title={<Title logo={<Bot aria-hidden className="size-5" />} name="You and your agent" href="/agent-skills" aside="Agent Skills" />}
+            title={<Title logo={<Bot aria-hidden className="size-5" />} name="You and your agent" href="/agent-skills" />}
           >
-            Agent Skills teach Claude Code or Codex to write the specification with you, drive <code>lc</code>,
-            and write the report up.
+            Agent Skills teach Claude Code or Codex to write the specification with you and run it.
           </Card>
         </div>
 
         <div className="sd-edge sd-edge--agent" aria-hidden="true">
           <span className="sd-edge__line" />
-          <span className="sd-edge__label">Drives <code>lc</code></span>
+          <span className="sd-edge__label">Drives the CLI</span>
         </div>
 
         <div className="min-w-0 [grid-area:cli]">
           <Card
-            title={<Title logo={<img src="/logos/lightcone-mark.svg" alt="" className="size-6 dark:invert" />} name="Lightcone CLI" href="/lightcone-cli" aside="lc" />}
+            title={<Title logo={<img src="/logos/lightcone-mark.svg" alt="" className="size-6 dark:invert" />} name="Lightcone CLI" href="/lightcone-cli" />}
           >
             <div className="flex flex-col gap-3">
               <p>
-                Reads the specification, runs each recipe sandboxed, and commits every result with{' '}
-                <strong>certified provenance</strong>: what ran, on which inputs, in which environment, under which sandbox.
+                Runs each recipe from the specification in a sandbox, and commits the result with{' '}
+                <strong>certified provenance</strong>: the code, inputs and environment that produced it.
               </p>
               <Tool
                 title="Code and artifact versioning"
@@ -83,8 +81,8 @@ export function StackDiagram() {
                   </>
                 }
               >
-                Code and spec in git, data and results in git-annex: every output committed with a
-                content-addressed run record.
+                git holds the code and the specification. git-annex holds the data and results, each
+                output with a content-addressed run record.
               </Tool>
               <Tool
                 title="Reusable environment"
@@ -95,7 +93,8 @@ export function StackDiagram() {
                   </>
                 }
               >
-                A uv lockfile, optionally in a container image, hashed on every output; recipes run sandboxed.
+                A uv lockfile, which you can wrap in a container image. The CLI hashes it into each
+                output&apos;s record.
               </Tool>
             </div>
           </Card>
@@ -116,7 +115,7 @@ export function StackDiagram() {
               </span>
               <p>
                 <strong className="block text-fd-foreground">From a laptop to a cluster</strong>
-                Recipes run on your machine, or on Dask, Kubernetes or Slurm clusters, under the same run record.
+                Run recipes on your laptop or on a Dask, Kubernetes or Slurm cluster, with the same run record.
               </p>
             </div>
           </Card>
@@ -133,7 +132,7 @@ export function StackDiagram() {
             Your project <span>· one git repository</span>
           </p>
           <Card
-            title={<Title logo={<img src="/logos/astra.svg" alt="" className="size-6 dark:invert" />} name="astra.yaml" href="/astra" aside="ASTRA" />}
+            title={<Title logo={<img src="/logos/astra.svg" alt="" className="size-6 dark:invert" />} name="astra.yaml" href="/astra" />}
           >
             <div className="sd-split">
               <ServerCodeBlock code={astraYaml} lang="yaml" codeblock={{ keepBackground: true }} />
@@ -145,13 +144,13 @@ export function StackDiagram() {
             </div>
           </Card>
           <Card
-            title={<Title logo={<img src="/logos/myst-logo.svg" alt="" className="h-5 w-auto dark:brightness-150" />} name="index.md" href="/mystra" aside="MySTRA" />}
+            title={<Title logo={<img src="/logos/myst-logo.svg" alt="" className="h-5 w-auto dark:brightness-150" />} name="index.md" href="/mystra" />}
           >
             <div className="sd-split">
               <ServerCodeBlock code={mystDocument} lang="md" codeblock={{ keepBackground: true }} />
               <p>
-                Your write-up in MyST: <strong>decisions</strong> link to their record, and <strong>results</strong> are embedded
-                from the project. MySTRA resolves the references when you build the document.
+                Your write-up in MyST. You link <strong>decisions</strong> to their record and embed{' '}
+                <strong>results</strong> from the project, and MySTRA resolves both when you build the document.
               </p>
             </div>
           </Card>
@@ -159,9 +158,23 @@ export function StackDiagram() {
             <Card title={<code>src/</code>}>Your code, in git. A recipe names the command that runs it.</Card>
             <Card title={<code>data/</code>}>Input data, carried by git-annex.</Card>
             <Card title={<code>results/</code>}>
-              What <code>lc</code> produced, each with a manifest and run record.
+              Your results, each with a manifest and run record.
             </Card>
           </Cards>
+        </div>
+
+        <div className="sd-edge sd-edge--lab" aria-hidden="true">
+          <span className="sd-edge__line" />
+          <span className="sd-edge__label">Reads the spec and results</span>
+        </div>
+
+        <div className="min-w-0 [grid-area:lab]">
+          <Card
+            title={<Title logo={<img src="/logos/jupyter.svg" alt="" className="h-6 w-auto dark:brightness-150" />} name="Lightcone Lab" href="/lightcone-lab" />}
+          >
+            A JupyterLab workbench that shows the project: its results, decisions and cited papers, and
+            the run behind each result. Start Claude Code or Codex from the project&apos;s Home.
+          </Card>
         </div>
       </div>
     </figure>

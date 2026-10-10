@@ -1,24 +1,51 @@
 ---
 title: Overview
-description: Rigorous research, without the bookkeeping.
+description: Rigorous and reproducible research with AI agents.
 icon: CircleQuestionMark
 ---
 
-The Lightcone Stack makes it easier to do research with an AI agent, from planning an analysis to
-running it and writing up the results. It works with agents such as Claude Code and Codex, using
-your own code, data and compute.
+Your AI agent can write and run an analysis faster than you can check it. Before you publish the
+result, you need to know which choices went into it, and to be able to run it again when a referee
+asks.
 
-Your agent writes down the methods, choices and supporting evidence as you work. When the analysis
-runs, Lightcone automatically records the code, data and environment behind each result. You and
-your collaborators can trace a result back to the work that produced it, review the reasoning and
-rerun the analysis. That record stays in your project, where you can check it long after the agent's
-session has ended.
+The Lightcone Stack keeps that record for you. The agent asks before it writes code: you make the
+scientific choices, and it writes each one down with the evidence behind it. Each result comes from
+a recorded run, so you or a collaborator can trace a figure back to the decisions that shaped it,
+and reproduce it months later.
 
-<Callout type="warn" title="Public beta">
-  The Lightcone Stack is in a **public beta**: expect some breaking changes between minor versions.
-  Bug reports, design challenges and use cases we don't cover yet are exactly what we want to hear.
-  Please [open an issue](https://github.com/LightconeResearch/lightcone-cli/issues).
-</Callout>
+The stack works with Claude Code and Codex, on your own code and data.
+
+<AgentDemo />
+
+Add the Lightcone plugin to your agent:
+
+<Tabs groupId="agent" persist defaultValue="claude-code">
+<TabsList>
+  <TabsTrigger value="claude-code">Claude Code</TabsTrigger>
+  <TabsTrigger value="codex">Codex</TabsTrigger>
+</TabsList>
+<TabsContent value="claude-code">
+
+```bash
+claude plugin marketplace add LightconeResearch/agent-skills
+claude plugin install lightcone@lightcone-research
+```
+
+</TabsContent>
+<TabsContent value="codex">
+
+```bash
+codex plugin marketplace add LightconeResearch/agent-skills
+codex plugin add lightcone@lightcone-research
+```
+
+The first time Codex asks you to review the plugin's hooks, approve them: they are how the plugin
+checks the agent's work.
+
+</TabsContent>
+</Tabs>
+
+Then follow the [Quick Start](/quickstart) to set up your first analysis.
 
 ## Elements of the stack
 
@@ -29,29 +56,14 @@ session has ended.
 The stack is a set of separate tools that work on one repository: the project's own git
 repository, whose `astra.yaml` describes the analysis in [ASTRA](/astra). The Lightcone CLI reads
 that file to run the analysis and commits each result next to it, with a record of how it was made.
-Lightcone Lab, MySTRA and the Agent Skills read the same file and the same record. They share
+[Lightcone Lab](/lightcone-lab), [MySTRA](/mystra) and the [Agent Skills](/agent-skills) read the same file and the same record. They share
 nothing else, so you can use, replace or leave out any of them on its own.
 
 We split the stack up this way so that it can attach to a project that already exists. A research
 group has its own code, its own compute and its own way of writing papers, and it rarely wants to
 move all of that into a new system at once. With separate tools, you can start by writing the
-specification with your agent and running it with the CLI, and add Lab or MySTRA later, or not at
+specification with your agent and running it with the CLI, and add [Lab](/lightcone-lab) or [MySTRA](/mystra) later, or not at
 all. The specification is plain YAML with an open schema, so a tool we didn't write, including one
 you write yourself, can read it too.
 
 <StackDiagram />
-
-The code is yours and lives wherever you put it. A recipe in `astra.yaml` names the command that
-runs it, and `lc` commits what comes out next to it, in the same repository as the specification
-and the data. Each layer in the figure has its own section; select one to read more.
-
-## You and your agent
-
-The agent does much of the work, but not the judgment:
-
-- **It starts with questions, not code.** Before anything runs, the agent interviews you and writes
-  the analysis down in the specification, where you can read it.
-- **It never writes a result itself.** The agent describes the analysis and drives the CLI; every
-  output comes out of `lc`, with its provenance, never out of the conversation.
-- **You own the argument.** You make the scientific choices and remain responsible for what the
-  results mean. The record makes those choices visible, to you and to your readers.

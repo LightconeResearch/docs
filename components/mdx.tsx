@@ -6,6 +6,7 @@ import type { MDXComponents } from 'mdx/types';
 import { StackDiagram } from '@/components/stack-diagram';
 import { StackLayers } from '@/components/stack-layers';
 import { ComputeLayers } from '@/components/compute-layers';
+import { AgentDemo } from '@/components/agent-demo';
 
 export function getMDXComponents(components?: MDXComponents) {
   return {
@@ -21,6 +22,7 @@ export function getMDXComponents(components?: MDXComponents) {
     StackDiagram,
     StackLayers,
     ComputeLayers,
+    AgentDemo,
     ...components,
   } satisfies MDXComponents;
 }
