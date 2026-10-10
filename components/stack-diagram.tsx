@@ -1,7 +1,7 @@
 import Link from 'fumadocs-core/link';
 import { Card, Cards } from 'fumadocs-ui/components/card';
 import { ServerCodeBlock } from 'fumadocs-ui/components/codeblock.rsc';
-import { Bot, FolderTree } from 'lucide-react';
+import { Bot, FlaskConical, FolderTree } from 'lucide-react';
 import type { ReactNode } from 'react';
 import './stack-diagram.css';
 
@@ -47,7 +47,7 @@ export function StackDiagram() {
   return (
     <figure
       className="not-prose my-8 @container"
-      aria-label="The agent drives the Lightcone CLI, which reads the project, runs recipes on compute, and records results back in the project."
+      aria-label="The agent drives the Lightcone CLI, which reads the project, runs recipes on compute, and records results back in the project. Lightcone Lab reads the project to show it."
     >
       <div className="sd-flow">
         <div className="min-w-0 [grid-area:agent]">
@@ -161,6 +161,20 @@ export function StackDiagram() {
               Your results, each with a manifest and run record.
             </Card>
           </Cards>
+        </div>
+
+        <div className="sd-edge sd-edge--lab" aria-hidden="true">
+          <span className="sd-edge__line" />
+          <span className="sd-edge__label">Reads the spec and results</span>
+        </div>
+
+        <div className="min-w-0 [grid-area:lab]">
+          <Card
+            title={<Title logo={<FlaskConical aria-hidden className="size-5" />} name="Lightcone Lab" href="/lightcone-lab" />}
+          >
+            A JupyterLab workbench that shows the project: its results, decisions and cited papers, and
+            the run behind each result. Start Claude Code or Codex from the project&apos;s Home.
+          </Card>
         </div>
       </div>
     </figure>
