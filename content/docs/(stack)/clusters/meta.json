@@ -1,5 +1,4 @@
 {
   "title": "HPC clusters",
-  "icon": "Server",
   "pages": ["nersc", "cc-in2p3"]
 }
