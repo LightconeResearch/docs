@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Banner } from 'fumadocs-ui/components/banner';
 import { Provider } from '@/components/provider';
 import './global.css';
 
@@ -16,7 +17,17 @@ export default function Layout({ children }: LayoutProps<'/'>) {
       suppressHydrationWarning
     >
       <body className="flex flex-col min-h-screen">
-        <Provider>{children}</Provider>
+        <Provider>
+          {/* Readers can close the banner; its id remembers that they did. */}
+          <Banner id="public-beta">
+            Public beta:&nbsp;
+            <a href="https://discord.gg/EbG6JKuyAx" className="underline">
+              join our Discord
+            </a>
+            <span className="max-sm:hidden">&nbsp;to share feedback and suggestions</span>
+          </Banner>
+          {children}
+        </Provider>
       </body>
     </html>
   );
