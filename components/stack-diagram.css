@@ -1,0 +1,138 @@
+/* Only the diagram's topology is custom. Cards, code, colors and typography
+   come from Fumadocs. Keep compute and the project connected to the CLI. */
+.sd-flow {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) 96px minmax(0, 1fr);
+  grid-template-areas:
+    'agent . .'
+    'agent-link . .'
+    'cli compute-link compute'
+    'project-link . .'
+    'project project project';
+  grid-template-rows: auto 48px auto 64px auto;
+}
+.sd-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+.sd-edge {
+  position: relative;
+  color: var(--color-fd-muted-foreground);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+.sd-edge--agent {
+  grid-area: agent-link;
+}
+.sd-edge--compute {
+  grid-area: compute-link;
+}
+.sd-edge--project {
+  grid-area: project-link;
+}
+.sd-edge__line {
+  position: absolute;
+  inset: 0 50% 0 auto;
+  border-right: 1px solid;
+}
+.sd-edge__line::after,
+.sd-edge--project .sd-edge__line::before {
+  content: '';
+  position: absolute;
+  right: -4px;
+  bottom: 1px;
+  width: 7px;
+  height: 7px;
+  border-right: 1px solid;
+  border-bottom: 1px solid;
+  transform: rotate(45deg);
+}
+.sd-edge--project .sd-edge__line::before {
+  top: 1px;
+  bottom: auto;
+  transform: rotate(225deg);
+}
+.sd-edge__label {
+  position: absolute;
+  top: 50%;
+  left: calc(50% + 12px);
+  right: 0;
+  transform: translateY(-50%);
+}
+.sd-edge__label > span {
+  display: block;
+}
+.sd-edge--compute .sd-edge__line {
+  inset: 50% 0 auto;
+  border-right: 0;
+  border-top: 1px solid;
+}
+.sd-edge--compute .sd-edge__line::after {
+  right: 1px;
+  top: -4px;
+  bottom: auto;
+  transform: rotate(-45deg);
+}
+.sd-edge--compute .sd-edge__label {
+  inset: auto 4px calc(50% + 8px);
+  transform: none;
+  text-align: center;
+}
+
+/* A shared rail keeps the two CLI branches distinct on narrow screens. */
+@container (max-width: 719px) {
+  .sd-flow {
+    grid-template-columns: 32px minmax(0, 1fr);
+    grid-template-areas:
+      'agent agent'
+      'agent-link agent-link'
+      'cli cli'
+      'compute-link compute-link'
+      '. compute'
+      'project-link project-link'
+      '. project';
+    grid-template-rows: auto 48px auto 64px auto 64px auto;
+  }
+  .sd-flow::before {
+    content: '';
+    grid-column: 1;
+    grid-row: 4 / 7;
+    margin: 0 0 32px 12px;
+    border-left: 1px solid var(--color-fd-muted-foreground);
+  }
+  .sd-edge--compute .sd-edge__line,
+  .sd-edge--project .sd-edge__line {
+    inset: 50% 50% 0 12px;
+    border-top: 1px solid;
+    border-right: 1px solid;
+  }
+  .sd-edge--compute .sd-edge__line::after {
+    top: auto;
+    right: -4px;
+    bottom: 1px;
+    transform: rotate(45deg);
+  }
+  .sd-edge--project .sd-edge__line::before {
+    top: -4px;
+    left: 1px;
+    right: auto;
+    transform: rotate(135deg);
+  }
+  .sd-edge--compute .sd-edge__label,
+  .sd-edge--project .sd-edge__label {
+    inset: 0 0 auto 44px;
+    transform: none;
+    text-align: left;
+  }
+  .sd-edge--project .sd-edge__label > span {
+    display: inline;
+  }
+  .sd-edge--project .sd-edge__label > span + span::before {
+    content: ' · ';
+  }
+  .sd-split {
+    grid-template-columns: 1fr;
+  }
+}

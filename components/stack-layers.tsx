@@ -1,4 +1,6 @@
+import type { CSSProperties } from 'react';
 import Link from 'fumadocs-core/link';
+import { CalloutContainer, CalloutDescription, CalloutTitle } from 'fumadocs-ui/components/callout';
 
 // The layers of the stack, drawn with the brand's colours so the diagram
 // follows the light and dark schemes. ASTRA is the foundation the others
@@ -38,7 +40,6 @@ const layers = [
     text: 'The specification: the inputs, outputs, decisions and evidence of the analysis, in astra.yaml.',
     href: '/astra',
     color: 'var(--lc-color-antique-gold)',
-    base: true,
   },
 ];
 
@@ -47,22 +48,20 @@ export function StackLayers() {
     <figure className="not-prose my-6">
       <div className="flex flex-col gap-2">
         {layers.map((layer) => (
-          <Link
-            key={layer.name}
-            href={layer.href}
-            className="grid gap-x-4 gap-y-0.5 rounded-lg border border-l-[3px] bg-fd-card px-4 py-3 transition-colors hover:bg-fd-accent sm:grid-cols-[9rem_1fr]"
-            style={{
-              borderLeftColor: layer.color,
-              background: layer.base
-                ? `color-mix(in srgb, ${layer.color} 10%, var(--color-fd-card))`
-                : undefined,
-            }}
-          >
-            <span className="font-medium text-fd-foreground">
-              {layer.name}
-              <span className="block text-xs text-fd-muted-foreground">{layer.role}</span>
-            </span>
-            <span className="text-sm text-fd-muted-foreground">{layer.text}</span>
+          <Link key={layer.name} href={layer.href} className="block rounded-xl">
+            <CalloutContainer
+              icon={false}
+              className="my-0 transition-colors hover:bg-fd-accent/80"
+              style={{ '--callout-color': layer.color } as CSSProperties}
+            >
+              <div className="grid gap-x-4 gap-y-0.5 sm:grid-cols-[9rem_1fr]">
+                <CalloutTitle>
+                  {layer.name}
+                  <span className="block text-xs font-normal text-fd-muted-foreground">{layer.role}</span>
+                </CalloutTitle>
+                <CalloutDescription>{layer.text}</CalloutDescription>
+              </div>
+            </CalloutContainer>
           </Link>
         ))}
       </div>

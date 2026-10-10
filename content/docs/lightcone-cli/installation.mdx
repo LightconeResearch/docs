@@ -1,12 +1,18 @@
 ---
 title: Installation
-description: Details specific to installing lc, beyond the stack's installation guide.
+description: Install the Lightcone CLI and check that it works.
 icon: Wrench
 ---
 
-[Installation](/installation) covers the standard setup: uv and git, a git identity, the pinned
-`uv tool install lightcone-cli==0.5.0rc5`, container runtimes, updating and uninstalling. This page
-adds what is specific to `lc`.
+For setup with a coding agent, follow the [Quick Start](/quickstart). To install the CLI directly,
+make sure [uv](https://docs.astral.sh/uv/getting-started/installation/) and git are installed, then run:
+
+```bash
+uv tool install lightcone-cli==0.5.0rc5
+```
+
+Keep the exact version: without it, uv installs an older stable release. Before your first run,
+make sure [git knows who you are](/lightcone-cli/troubleshooting#git-identity).
 
 ## What the install brings
 

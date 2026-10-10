@@ -4,22 +4,15 @@ description: Rigorous research, without the bookkeeping.
 icon: CircleQuestionMark
 ---
 
-import { Bot, FlaskConical, PenLine, Terminal } from 'lucide-react';
+The Lightcone Stack makes it easier to do research with an AI agent, from planning an analysis to
+running it and writing up the results. It works with agents such as Claude Code and Codex, using
+your own code, data and compute.
 
-The Lightcone Stack is a sidecar for your research: it attaches to the project you're working on and
-to the agent you already use, stays out of the way of how you work, and makes sure your work is
-rigorous and reproducible by default.
-
-- **Every decision, and why.** The methodological choices you make are written down with the options
-  you considered, the reasons for the choice, and the papers that informed it.
-- **Every result, and what made it.** Each result carries a record of the code, data and environment
-  that produced it, and anything made outside that record is flagged.
-- **What a change affects.** When a decision or the data changes, you can see which results are out
-  of date, and why.
-
-We're not prescriptive about how much you use AI in your research: use an agent for everything, for
-some things, or not at all. Our goal is to make sure that the science you do, however you do it, is
-rigorous and reproducible.
+Your agent writes down the methods, choices and supporting evidence as you work. When the analysis
+runs, Lightcone automatically records the code, data and environment behind each result. You and
+your collaborators can trace a result back to the work that produced it, review the reasoning and
+rerun the analysis. That record stays in your project, where you can check it long after the agent's
+session has ended.
 
 <Callout type="warn" title="Public beta">
   The Lightcone Stack is in a **public beta**: expect some breaking changes between minor versions.
@@ -27,64 +20,30 @@ rigorous and reproducible.
   Please [open an issue](https://github.com/LightconeResearch/lightcone-cli/issues).
 </Callout>
 
-## Why it exists
-
-AI agents are making research faster: an analysis that took weeks can now take an afternoon. But a
-gap is opening between what gets produced and what can be verified. Trust is needed at every step:
-
-- when a scientist reviews what their agent has just produced;
-- when a reviewer judges an analysis they did not run themselves;
-- when someone later sets out to reproduce the work, or to build on it.
-
-Neither of the usual records answers that. **Code** is executable but opaque: it buries its
-assumptions and says nothing of intent. **A paper** is legible but lossy: the analysis cannot be
-regenerated from it. What is missing between them is the record of the decisions, assumptions,
-evidence and provenance behind each result.
-
-## What it provides
-
-The Lightcone Stack keeps that record as the work happens, so that every result is:
-
-- **Traceable.** Every figure, number and claim ties back to the data, code and decisions that
-  produced it, and can be checked without re-running the analysis.
-- **Observable.** The whole analysis is recorded, including the choices that were made and the
-  alternatives they were weighed against, not just the path that was taken.
-- **Legible.** People and agents can both read the record: what was done, why, and on what
-  evidence.
-
-Each result then becomes a solid foundation for the next: science that compounds.
-
-## How it fits together
+## Elements of the stack
 
 <StackLayers />
 
-- **[ASTRA](/astra)** is the open specification the analysis is written in. `astra.yaml` declares its
-  inputs, outputs and recipes, the decisions that shape it with their alternatives, and the evidence
-  behind its claims.
-- **The [Lightcone CLI](/lightcone-cli)**, `lc`, executes the specification. It runs each recipe in a
-  sandbox, runs every combination of choices you ask for, and commits each output with a record of
-  how it was made.
-- **[Agent Skills](/agent-skills)** teach your coding agent to work this way: to open with an
-  interview, write the specification with you, and drive `lc` to produce the results.
-- **[Lightcone Lab](/lightcone-lab)** brings the project into JupyterLab, where you can browse its
-  inventory, follow its pipeline and inspect the provenance of each result.
-- **[MySTRA](/mystra)** lets the report cite the analysis by path: re-run the analysis and the report
-  follows.
+## How it works
 
-<Cards>
-  <Card icon={<Bot />} title="Agent Skills" href="/agent-skills">
-    Plugins that teach Claude Code and Codex to scope, build and run your analysis.
-  </Card>
-  <Card icon={<Terminal />} title="Lightcone CLI" href="/lightcone-cli">
-    The `lc` command: runs the analysis and records the provenance of every output.
-  </Card>
-  <Card icon={<FlaskConical />} title="Lightcone Lab" href="/lightcone-lab">
-    A JupyterLab workbench for exploring your project.
-  </Card>
-  <Card icon={<PenLine />} title="MySTRA" href="/mystra">
-    A report that references the analysis instead of copying its results.
-  </Card>
-</Cards>
+The stack is a set of separate tools that work on one repository: the project's own git
+repository, whose `astra.yaml` describes the analysis in [ASTRA](/astra). The Lightcone CLI reads
+that file to run the analysis and commits each result next to it, with a record of how it was made.
+Lightcone Lab, MySTRA and the Agent Skills read the same file and the same record. They share
+nothing else, so you can use, replace or leave out any of them on its own.
+
+We split the stack up this way so that it can attach to a project that already exists. A research
+group has its own code, its own compute and its own way of writing papers, and it rarely wants to
+move all of that into a new system at once. With separate tools, you can start by writing the
+specification with your agent and running it with the CLI, and add Lab or MySTRA later, or not at
+all. The specification is plain YAML with an open schema, so a tool we didn't write, including one
+you write yourself, can read it too.
+
+<StackDiagram />
+
+The code is yours and lives wherever you put it. A recipe in `astra.yaml` names the command that
+runs it, and `lc` commits what comes out next to it, in the same repository as the specification
+and the data. Each layer in the figure has its own section; select one to read more.
 
 ## You and your agent
 
@@ -96,9 +55,3 @@ The agent does much of the work, but not the judgment:
   output comes out of `lc`, with its provenance, never out of the conversation.
 - **You own the argument.** You make the scientific choices and remain responsible for what the
   results mean. The record makes those choices visible, to you and to your readers.
-
-## Status
-
-The stack is in public beta. Its pieces are released separately and still change between
-versions, so projects pin the versions they use. It is open source under the BSD 3-Clause license,
-at [github.com/LightconeResearch](https://github.com/LightconeResearch).
