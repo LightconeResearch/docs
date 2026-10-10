@@ -1,7 +1,7 @@
 import Link from 'fumadocs-core/link';
 import { Card, Cards } from 'fumadocs-ui/components/card';
 import { ServerCodeBlock } from 'fumadocs-ui/components/codeblock.rsc';
-import { Bot, FlaskConical, FolderTree } from 'lucide-react';
+import { Bot, FolderTree } from 'lucide-react';
 import type { ReactNode } from 'react';
 import './stack-diagram.css';
 
@@ -170,7 +170,7 @@ export function StackDiagram() {
 
         <div className="min-w-0 [grid-area:lab]">
           <Card
-            title={<Title logo={<FlaskConical aria-hidden className="size-5" />} name="Lightcone Lab" href="/lightcone-lab" />}
+            title={<Title logo={<img src="/logos/jupyter.svg" alt="" className="h-6 w-auto dark:brightness-150" />} name="Lightcone Lab" href="/lightcone-lab" />}
           >
             A JupyterLab workbench that shows the project: its results, decisions and cited papers, and
             the run behind each result. Start Claude Code or Codex from the project&apos;s Home.
