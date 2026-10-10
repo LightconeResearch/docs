@@ -24,7 +24,8 @@ Lightcone Stack.
 ## What an analysis records
 
 An ASTRA record is a graph: each element is a node, and the fields that name other elements are its
-edges. Here is a slice of the record of a reproduction of the GD-1 stellar-stream analysis:
+edges. Here is a slice of one, an example from [Price-Whelan & Bonaca (2018)](https://arxiv.org/abs/1805.00425),
+*Off the beaten path: Gaia reveals GD-1 stars outside of the main stream*:
 
 <AstraGraph />
 
@@ -83,10 +84,10 @@ An option can also list the [prior insights](#prior-insights) that back it.
 
 A **prior insight** records something the analysis takes from the literature: a claim, and the
 evidence for it. Each piece of evidence cites a paper by its DOI and quotes the exact sentence the
-claim rests on, with its page. In the GD-1 reproduction, one of the Milky Way potential options rests
-on this insight from Bovy (2015):
+claim rests on, with its page. In the example from Price-Whelan & Bonaca (2018), one of the Milky Way
+potential options rests on this insight from Bovy (2015):
 
-```yaml title="astra.yaml (excerpt from the GD-1 reproduction, shortened)"
+```yaml title="astra.yaml (Price-Whelan & Bonaca 2018 example, shortened)"
 prior_insights:
   mwpotential2014_composition:
     id: mwpotential2014_composition
