@@ -64,21 +64,3 @@ lc compute resources
 
 </Step>
 </Steps>
-
-## Run an analysis
-
-Start your agent in your project's directory on the login node. Login nodes refuse local compute, so
-the agent launches Slurm allocations from your offers. To launch one yourself in the interactive
-queue, run the recipes on it, then release it:
-
-```bash
-lc compute launch --name analysis --cpus 256 --memory 480 --startup fast --wait
-lc materialize analysis
-lc compute down analysis
-```
-
-The interactive queue usually starts within minutes, but its job may end when you log out. Leave out
-`--startup fast` to use the regular queue instead.
-
-Projects that run in containers use `podman-hpc`, which NERSC provides. For every compute option,
-see [Configuring compute](/lightcone-cli/configuring-compute).
