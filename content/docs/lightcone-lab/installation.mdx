@@ -10,8 +10,8 @@ own terminal (**File › New › Terminal**), then restart JupyterLab. There is 
 `jupyter labextension install` step and nothing to build.
 
 <Callout title="Setting up the whole stack?">
-  [Installation](/installation) covers uv, git and the Lightcone CLI, which Lab relies on. This page
-  covers Lab itself.
+  Follow the [Quick Start](/quickstart) to install the agent plugin and start an analysis.
+  This page covers Lab itself.
 </Callout>
 
 ## Choose an install
@@ -41,7 +41,7 @@ The full install also needs, on the server:
 - **Linux or macOS.**
 - **git** and **[uv](https://docs.astral.sh/uv/getting-started/installation/)** on the server's
   `PATH`, for the Lightcone engine that runs inside the server. See
-  [Installation](/installation#1-uv-and-git).
+  [CLI installation](/lightcone-cli/installation).
 - **Node.js 20 or newer**, only to preview the project's report.
 - **Node.js 22 or newer**, only for the adapters that connect Claude Code and Codex to Jupyter AI.
   See [Agents](/lightcone-lab/agents#jupyter-ai).
@@ -70,7 +70,7 @@ The workbench runs in the browser, on JupyterLab's own file and terminal service
 starts run in JupyterLab's terminals, so install them where those terminals can find them:
 
 - **The Lightcone CLI**, `lc`, to set up new projects (**New Lightcone project** runs `lc init` in a
-  terminal) and to run the analysis. See [Installation](/installation#3-the-lightcone-cli).
+  terminal) and to run the analysis. See [CLI installation](/lightcone-cli/installation).
 - **Claude Code or Codex**, installed and signed in, for the **claude** and **codex** buttons on
   Home. See [Agents](/lightcone-lab/agents#terminal).
 

@@ -37,27 +37,34 @@ open Lightcone Lab. If Lightcone is already installed, you can go on to:
 
 {/* TODO: more options */}
 
-## Components
+## How it works
 
-Lightcone is deliberately built as a vertical stack of interoperable components. To see how it
-works in detail, read [How it works](/how-it-works). To learn more about a specific component, pick
-one below; they're listed from the bottom of the stack up.
+The stack is a set of separate tools that work on one repository: the project's own git
+repository, whose `astra.yaml` describes the analysis in [ASTRA](/astra). The Lightcone CLI reads
+that file to run the analysis and commits each result next to it, with a record of how it was made.
+Lightcone Lab, MySTRA and the Agent Skills read the same file and the same record. They share
+nothing else, so you can use, replace or leave out any of them on its own.
 
-- **[ASTRA](/astra)** is the specification the analysis is written in: its inputs, outputs,
-  decisions and evidence, in `astra.yaml`.
-- **[Lightcone CLI](/lightcone-cli)**, `lc`, runs every recipe in a sandbox and records the
-  provenance of every output.
-- **[MySTRA](/mystra)** lets the report cite the analysis by path: re-run the analysis and the
-  report follows.
-- **[Lightcone Lab](/lightcone-lab)** is a JupyterLab workbench for the project: its inventory,
-  pipeline, provenance and report.
-- **[Agent Skills](/agent-skills)** teach Claude Code or Codex to scope, build, run and report on
-  the analysis with you.
+We split the stack up this way so that it can attach to a project that already exists. A research
+group has its own code, its own compute and its own way of writing papers, and it rarely wants to
+move all of that into a new system at once. With separate tools, you can start by writing the
+specification with your agent and running it with the CLI, and add Lab or MySTRA later, or not at
+all. The specification is plain YAML with an open schema, so a tool we didn't write, including one
+you write yourself, can read it too.
 
-## Developer corner
+<StackDiagram />
 
-The Lightcone Stack is open source under the BSD 3-Clause license, and we build it in the open:
-the code, issues and pull requests for every part of it are public on GitHub.
-[See how we're building it, and how to get involved](https://github.com/LightconeResearch).
+The code is yours and lives wherever you put it. A recipe in `astra.yaml` names the command that
+runs it, and `lc` commits what comes out next to it, in the same repository as the specification
+and the data. Each layer in the figure has its own section; select one to read more.
 
-{/* TODO: link to a page on how we build in the open and how to contribute, once it exists. */}
+## You and your agent
+
+The agent does much of the work, but not the judgment:
+
+- **It starts with questions, not code.** Before anything runs, the agent interviews you and writes
+  the analysis down in the specification, where you can read it.
+- **It never writes a result itself.** The agent describes the analysis and drives the CLI; every
+  output comes out of `lc`, with its provenance, never out of the conversation.
+- **You own the argument.** You make the scientific choices and remain responsible for what the
+  results mean. The record makes those choices visible, to you and to your readers.

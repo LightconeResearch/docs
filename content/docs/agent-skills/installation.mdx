@@ -10,7 +10,7 @@ which your agent registers as a plugin marketplace. The marketplace is named `li
 that is the `@lightcone-research` suffix in the install commands below.
 
 <Callout title="Setting up the whole stack?">
-  [Installation](/installation) walks through uv, git and the Lightcone CLI as well as the plugin.
+  Follow the [Quick Start](/quickstart) to install the agent plugin and start an analysis.
   This page covers the plugins in more detail.
 </Callout>
 
@@ -18,7 +18,7 @@ that is the `@lightcone-research` suffix in the install commands below.
 
 - **A coding agent**: Claude Code or Codex, in the terminal or as a desktop app.
 - **uv**, for either plugin: the plugins run the `astra` command through `uvx`, which installs
-  everything else it needs on first use. See [Installation](/installation#1-uv-and-git).
+  everything else it needs on first use. See the [uv installation guide](https://docs.astral.sh/uv/getting-started/installation/).
 - **The Lightcone CLI**, for the `lightcone` plugin only, at version `0.5.0rc5` or newer. See
   [below](#the-lightcone-cli).
 
@@ -180,7 +180,7 @@ so the agent runs the command and says in its final message that it did.
 
 `lc materialize` commits every output it makes, so git needs to know who you are. Setting it is up
 to you; the agent never does it for you. See
-[Installation](/installation#2-tell-git-who-you-are).
+[git identity setup](/lightcone-cli/troubleshooting#git-identity).
 
 ### Optional tools
 
