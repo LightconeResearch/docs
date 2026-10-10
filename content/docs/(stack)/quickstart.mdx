@@ -1,15 +1,15 @@
 ---
 title: Quick Start
-description: Start a reproducible research analysis with your coding agent.
+description: Install the Lightcone plugin and start an analysis with your agent.
 icon: Rocket
 ---
 
-Add the Lightcone plugin to your coding agent, then start an analysis together.
+Install the Lightcone plugin in your coding agent, then give the agent a research question.
 
 <Callout title="Before you start">
-  You'll need Linux or macOS (WSL on Windows), Claude Code or Codex, and
-  [uv](https://docs.astral.sh/uv/) 0.12 or newer. Your agent can guide you through setting up uv
-  if you don't have it yet.
+  You need Linux or macOS (or WSL on Windows), Claude Code or Codex, and
+  [uv](https://docs.astral.sh/uv/) 0.12 or newer. If you don't have uv yet, your agent can help you
+  install it.
 </Callout>
 
 <Steps>
@@ -18,7 +18,7 @@ Add the Lightcone plugin to your coding agent, then start an analysis together.
 ## Install the Lightcone plugin
 
 The plugin teaches your agent to use Lightcone. When you start a project, it checks for the
-Lightcone CLI and offers to install the right version.
+Lightcone CLI and offers to install the version it needs.
 
 <Tabs groupId="agent" persist defaultValue="claude-code">
 <TabsList>
@@ -52,11 +52,10 @@ checks the agent's work.
 
 ## Install a UI (optional)
 
-Much of what Lightcone records is meant to be read in a UI: the decisions in the analysis and the
-alternatives they were weighed against, the results it produces, which decisions each result depends
-on, and the findings and the papers behind them. All of it lives in the project's `astra.yaml`,
-which is easy for an agent to read but hard for a person. You can work without a UI if you prefer,
-but we recommend one.
+Lightcone records the analysis in the project's `astra.yaml`: its decisions and the alternatives you
+weighed, its results, and the papers behind them. Your agent reads that file directly, but as YAML it
+is hard for a person to follow. A UI shows the same record as pages you can browse, and we recommend
+installing one.
 
 <div className="grid gap-x-4 sm:grid-cols-2">
 <figure>
@@ -81,16 +80,18 @@ but we recommend one.
 </TabsList>
 <TabsContent value="jupyterlab">
 
-[Lightcone Lab](/lightcone-lab) is a JupyterLab extension, for JupyterLab 4.5.10 or newer. Start
-JupyterLab however you usually do, open the **Extension Manager** (the puzzle piece in the left
-sidebar), search for `jupyterlab-lightcone` and install it. Then restart JupyterLab.
-
-Or install JupyterLab and Lightcone Lab together with uv, then start it:
+[Lightcone Lab](/lightcone-lab) is a JupyterLab extension for JupyterLab 4.5.10 or newer. Install
+JupyterLab and Lab together with uv, then start JupyterLab:
 
 ```bash
 uv tool install jupyterlab --with "jupyterlab-lightcone[full]" --with-executables-from jupyter-core
 jupyter lab
 ```
+
+To add Lab to a JupyterLab you already run, open the **Extension Manager** (the puzzle piece in the
+left sidebar), search for `jupyterlab-lightcone`, install it and restart JupyterLab. That gives you
+the [workbench only](/lightcone-lab/installation#choose-an-install), without agent sessions or
+provenance; the [Lab installation guide](/lightcone-lab/installation) covers the full install.
 
 </TabsContent>
 </Tabs>
@@ -101,9 +102,9 @@ jupyter lab
 ## Start your first analysis
 
 1. **Create a project.** In Lightcone Lab, choose **New Lightcone project** in JupyterLab's launcher;
-   Lab sets it up and opens its **Home**. Without Lab, make a new directory for your analysis.
-2. **Launch your agent** in the project's directory.
-3. **Give it your research question**, using the Lightcone skill:
+   Lab sets it up and opens its **Home**. Without Lab, create an empty directory.
+2. **Start your agent** in the project's directory.
+3. **Give it your research question** with the Lightcone skill:
 
 <Tabs groupId="agent" persist defaultValue="claude-code">
 <TabsList>
@@ -127,45 +128,45 @@ $lightcone:lightcone I want to start a new analysis: <your research question>
 </TabsContent>
 </Tabs>
 
-From there, the agent:
+The agent then:
 
-1. **Interviews you** about the research question and the structure of the analysis, before it
+1. **Interviews you** about the research question and how to structure the analysis, before it
    writes any code.
-2. **Sets up the project** with `lc init`, if Lab hasn't already: the specification
-   (`astra.yaml`), a uv environment, a git repository whose data and results are stored with
-   git-annex, and a MyST report.
-3. **Writes the analysis down** in `astra.yaml` (its inputs, outputs, decisions and evidence), which
-   is validated each time it is saved, and shows you a summary.
-4. **Implements and runs it** once you agree, with the Lightcone CLI: each step runs in a sandbox, and
-   each output is committed with a record of how it was made.
-
-For a worked example, follow [Your first analysis](/guides/first-analysis).
+2. **Sets up the project** with `lc init`, unless Lab already did: an `astra.yaml` specification, a
+   uv environment, a git repository that keeps data and results in git-annex, and a MyST report.
+3. **Writes the plan into `astra.yaml`**: the inputs, outputs, decisions and evidence. A hook
+   validates the file each time the agent saves it, and the agent shows you a summary.
+4. **Implements and runs the analysis** once you approve the plan. The Lightcone CLI runs each step in
+   a sandbox and commits each output with a record of how it was made.
 
 </Step>
 <Step>
 
-## Work through your analysis
+## Keep working with your agent
 
-Work through the analysis however you usually would with your agent. It already knows how to use
-Lightcone and ASTRA, and it keeps the project's record up to date as you go; ask it at any point
-what has changed, or what is out of date. We recommend keeping Lightcone Lab open alongside, so you
-can follow the changes as they're made and explore how the pieces of the analysis fit together.
+Work with your agent as you would on any project. It knows Lightcone and ASTRA, and it updates the
+project's record as the analysis changes. Ask it what changed since you last looked, or which results
+are out of date. Keep Lightcone Lab open beside it to see each change as the agent makes it.
 
 </Step>
 </Steps>
 
 ## Next steps
 
-- Follow [a tutorial for a full analysis](/guides/first-analysis), from a research question to a
-  report.
-- [Set up Lightcone to work on your HPC cluster](/lightcone-cli/configuring-compute).
+- Follow [Your first analysis](/guides/first-analysis), a worked example from a research question to
+  a report.
+- [Run your recipes on an HPC cluster](/lightcone-cli/configuring-compute).
 
 ## Uninstall
 
-If you've chosen to uninstall Lightcone, we're sad to see you go.
+Remove the plugin, its marketplace and the Lightcone CLI:
 
-<Tabs groupId="agent" persist items={['Claude Code', 'Codex']}>
-<Tab value="Claude Code">
+<Tabs groupId="agent" persist defaultValue="claude-code">
+<TabsList>
+  <TabsTrigger value="claude-code">Claude Code</TabsTrigger>
+  <TabsTrigger value="codex">Codex</TabsTrigger>
+</TabsList>
+<TabsContent value="claude-code">
 
 ```bash
 claude plugin uninstall lightcone@lightcone-research
@@ -173,8 +174,8 @@ claude plugin marketplace remove lightcone-research
 uv tool uninstall lightcone-cli
 ```
 
-</Tab>
-<Tab value="Codex">
+</TabsContent>
+<TabsContent value="codex">
 
 ```bash
 codex plugin remove lightcone@lightcone-research
@@ -182,9 +183,9 @@ codex plugin marketplace remove lightcone-research
 uv tool uninstall lightcone-cli
 ```
 
-</Tab>
+</TabsContent>
 </Tabs>
 
-To remove Lightcone Lab, uninstall `jupyterlab-lightcone` from JupyterLab's Extension Manager, or
-run `uv tool uninstall jupyterlab` if you installed it with uv. Your projects are left as they are:
-everything Lightcone knows about an analysis lives in the project's own git repository.
+To remove Lightcone Lab, uninstall `jupyterlab-lightcone` in JupyterLab's Extension Manager, or run
+`uv tool uninstall jupyterlab` if you installed it with uv. Your projects stay as they are, with their
+full record in each project's git repository.
