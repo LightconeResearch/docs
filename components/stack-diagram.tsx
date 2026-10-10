@@ -22,12 +22,11 @@ const mystDocument = 'Using {astra}`decisions.noise_model`,\n'
   + 'we obtain the following fit.\n\n'
   + ':::{astra} outputs.fit_results\n:::';
 
-function Title({ logo, name, href, aside }: { logo?: ReactNode; name: string; href: string; aside?: string }) {
+function Title({ logo, name, href }: { logo?: ReactNode; name: string; href: string }) {
   return (
     <Link href={href} className="inline-flex flex-wrap items-center gap-2 hover:underline">
       {logo}
       {name}
-      {aside && <span className="text-xs font-normal text-fd-muted-foreground">{aside}</span>}
     </Link>
   );
 }
@@ -53,21 +52,20 @@ export function StackDiagram() {
       <div className="sd-flow">
         <div className="min-w-0 [grid-area:agent]">
           <Card
-            title={<Title logo={<Bot aria-hidden className="size-5" />} name="You and your agent" href="/agent-skills" aside="Agent Skills" />}
+            title={<Title logo={<Bot aria-hidden className="size-5" />} name="You and your agent" href="/agent-skills" />}
           >
-            Agent Skills teach Claude Code or Codex to write the specification with you and run it
-            with <code>lc</code>.
+            Agent Skills teach Claude Code or Codex to write the specification with you and run it.
           </Card>
         </div>
 
         <div className="sd-edge sd-edge--agent" aria-hidden="true">
           <span className="sd-edge__line" />
-          <span className="sd-edge__label">Drives <code>lc</code></span>
+          <span className="sd-edge__label">Drives the CLI</span>
         </div>
 
         <div className="min-w-0 [grid-area:cli]">
           <Card
-            title={<Title logo={<img src="/logos/lightcone-mark.svg" alt="" className="size-6 dark:invert" />} name="Lightcone CLI" href="/lightcone-cli" aside="lc" />}
+            title={<Title logo={<img src="/logos/lightcone-mark.svg" alt="" className="size-6 dark:invert" />} name="Lightcone CLI" href="/lightcone-cli" />}
           >
             <div className="flex flex-col gap-3">
               <p>
@@ -95,8 +93,8 @@ export function StackDiagram() {
                   </>
                 }
               >
-                A uv lockfile, which you can wrap in a container image. <code>lc</code> hashes it into
-                each output&apos;s record.
+                A uv lockfile, which you can wrap in a container image. The CLI hashes it into each
+                output&apos;s record.
               </Tool>
             </div>
           </Card>
@@ -134,7 +132,7 @@ export function StackDiagram() {
             Your project <span>· one git repository</span>
           </p>
           <Card
-            title={<Title logo={<img src="/logos/astra.svg" alt="" className="size-6 dark:invert" />} name="astra.yaml" href="/astra" aside="ASTRA" />}
+            title={<Title logo={<img src="/logos/astra.svg" alt="" className="size-6 dark:invert" />} name="astra.yaml" href="/astra" />}
           >
             <div className="sd-split">
               <ServerCodeBlock code={astraYaml} lang="yaml" codeblock={{ keepBackground: true }} />
@@ -146,7 +144,7 @@ export function StackDiagram() {
             </div>
           </Card>
           <Card
-            title={<Title logo={<img src="/logos/myst-logo.svg" alt="" className="h-5 w-auto dark:brightness-150" />} name="index.md" href="/mystra" aside="MySTRA" />}
+            title={<Title logo={<img src="/logos/myst-logo.svg" alt="" className="h-5 w-auto dark:brightness-150" />} name="index.md" href="/mystra" />}
           >
             <div className="sd-split">
               <ServerCodeBlock code={mystDocument} lang="md" codeblock={{ keepBackground: true }} />
@@ -160,7 +158,7 @@ export function StackDiagram() {
             <Card title={<code>src/</code>}>Your code, in git. A recipe names the command that runs it.</Card>
             <Card title={<code>data/</code>}>Input data, carried by git-annex.</Card>
             <Card title={<code>results/</code>}>
-              Outputs from <code>lc</code>, each with a manifest and run record.
+              Your results, each with a manifest and run record.
             </Card>
           </Cards>
         </div>

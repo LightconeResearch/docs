@@ -23,7 +23,7 @@ export function AgentDemo() {
           <video
             key={name}
             className="size-full"
-            aria-label="Claude Code scopes a supernova analysis with the user, writes it into astra.yaml, then runs it with lc."
+            aria-label="Claude Code plans a supernova analysis with the user, records the plan, then runs it and reports the result."
             autoPlay={!reducedMotion}
             controls
             loop
