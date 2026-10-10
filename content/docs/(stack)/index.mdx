@@ -4,23 +4,22 @@ description: Rigorous research, without the bookkeeping.
 icon: CircleQuestionMark
 ---
 
-The Lightcone Stack makes it easier to do research with an AI agent, from planning an analysis to
-running it and writing up the results. It works with agents such as Claude Code and Codex, using
-your own code, data and compute.
+The Lightcone Stack lets you do research with an AI agent, such as Claude Code or Codex, on your own
+code and data. You plan the analysis together, and the agent runs it and helps you write it up.
 
-Before any code runs, your agent asks you about the analysis and writes down its methods, choices
-and supporting evidence, where you can read them. The scientific choices are yours, and so is what
-the results mean. The agent never writes a result itself: each one comes out of a run, which
-automatically records the code, data and environment behind it. You and your collaborators can trace
-a result back to the work that produced it, review the reasoning and rerun the analysis. That record
-stays in your project, where you can check it long after the agent's session has ended.
+Before anything runs, the agent asks you about the analysis and writes the plan into `astra.yaml`:
+the decisions, the options you turned down, and the evidence behind each choice. You make those
+choices, and you decide what the results mean. Only `lc` produces results, and it commits each one
+with the code, data and environment that made it. The record lives in your git repository, so you or
+a collaborator can trace a result back to its decisions and rerun it long after the agent's session
+has ended.
 
 <AgentDemo />
 
 <Callout type="warn" title="Public beta">
-  The Lightcone Stack is in a **public beta**: expect some breaking changes between minor versions.
-  Bug reports, design challenges and use cases we don't cover yet are exactly what we want to hear.
-  Please [open an issue](https://github.com/LightconeResearch/lightcone-cli/issues).
+  The Lightcone Stack is in **public beta**, and a minor version can break things. Tell us about bugs
+  and the use cases we miss: [open an issue](https://github.com/LightconeResearch/lightcone-cli/issues)
+  or join our [Discord](https://discord.gg/EbG6JKuyAx).
 </Callout>
 
 ## Elements of the stack
@@ -29,21 +28,20 @@ stays in your project, where you can check it long after the agent's session has
 
 ## How it works
 
-The stack is a set of separate tools that work on one repository: the project's own git
-repository, whose `astra.yaml` describes the analysis in [ASTRA](/astra). The Lightcone CLI reads
-that file to run the analysis and commits each result next to it, with a record of how it was made.
-Lightcone Lab, MySTRA and the Agent Skills read the same file and the same record. They share
-nothing else, so you can use, replace or leave out any of them on its own.
+Each tool in the stack works on your project's git repository, where `astra.yaml` describes the
+analysis in [ASTRA](/astra). The Lightcone CLI reads that file, runs the analysis and commits each
+result next to it with a record of how it was made. Lightcone Lab, MySTRA and the Agent Skills read
+the same file and the same records, and share nothing else. You can use any one of them without the
+others, or replace it with your own.
 
-We split the stack up this way so that it can attach to a project that already exists. A research
-group has its own code, its own compute and its own way of writing papers, and it rarely wants to
-move all of that into a new system at once. With separate tools, you can start by writing the
-specification with your agent and running it with the CLI, and add Lab or MySTRA later, or not at
-all. The specification is plain YAML with an open schema, so a tool we didn't write, including one
-you write yourself, can read it too.
+We kept the tools separate so you can add them to a project you already have. Your group has its own
+code and its own way of writing papers, and you shouldn't have to move either into a new system to
+start. Begin by writing the specification with your agent and running it with the CLI; add Lab or
+MySTRA later if you want them. The specification is plain YAML with an open schema, so any tool can
+read it, including one you write.
 
 <StackDiagram />
 
-The code is yours and lives wherever you put it. A recipe in `astra.yaml` names the command that
-runs it, and `lc` commits what comes out next to it, in the same repository as the specification
-and the data. Each layer in the figure has its own section; select one to read more.
+You keep your code where it is. A recipe in `astra.yaml` names the command to run, and `lc` commits
+the output to the same repository as the specification and the data. Select a layer in the figure to
+read its section.

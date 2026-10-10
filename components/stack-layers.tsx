@@ -9,35 +9,35 @@ const layers = [
   {
     name: 'Agent Skills',
     role: 'Work with your agent',
-    text: 'Teach Claude Code or Codex to scope, build, run and report on the analysis with you.',
+    text: 'Teach Claude Code or Codex to plan the analysis with you and run it.',
     href: '/agent-skills',
     color: 'var(--lc-color-slate-blue)',
   },
   {
     name: 'Lightcone Lab',
     role: 'Explore',
-    text: 'A JupyterLab workbench for the project: its inventory, pipeline, provenance and report.',
+    text: "A JupyterLab workbench that shows the project's outputs and how each one was made.",
     href: '/lightcone-lab',
     color: 'var(--lc-color-vert-de-gris)',
   },
   {
     name: 'MySTRA',
     role: 'Communicate',
-    text: 'A report that references the analysis by path, so it stays in step with it.',
+    text: 'Write the report in MyST and cite results by their path, so a rebuild picks up the latest ones.',
     href: '/mystra',
     color: 'var(--lc-color-wax-red)',
   },
   {
     name: 'Lightcone CLI',
     role: 'Execute',
-    text: 'Runs every recipe in a sandbox and records the provenance of every output.',
+    text: 'Runs each recipe in a sandbox and commits its outputs with their provenance.',
     href: '/lightcone-cli',
     color: 'var(--lc-color-blue-ink)',
   },
   {
     name: 'ASTRA',
     role: 'Describe',
-    text: 'The specification: the inputs, outputs, decisions and evidence of the analysis, in astra.yaml.',
+    text: 'Describes the analysis in astra.yaml: its inputs and outputs, and each decision with its evidence.',
     href: '/astra',
     color: 'var(--lc-color-antique-gold)',
   },
@@ -66,8 +66,7 @@ export function StackLayers() {
         ))}
       </div>
       <figcaption className="mt-3 text-sm text-fd-muted-foreground">
-        Everything builds on ASTRA: the layers above read from and write to the analysis&apos;s
-        single source of truth.
+        The tools above all work from the same ASTRA specification, <code>astra.yaml</code>.
       </figcaption>
     </figure>
   );

@@ -36,8 +36,8 @@ export function AgentDemo() {
         )}
       </div>
       <figcaption className="mt-3 text-sm text-fd-muted-foreground">
-        A replay of a session with Claude Code: the agent asks about the one choice that matters,
-        records it in <code>astra.yaml</code>, then runs the fit both ways with <code>lc</code>.
+        A replay of a Claude Code session. The agent asks which uncertainties the supernova fit should
+        use, records the choice in <code>astra.yaml</code> and runs the fit both ways with <code>lc</code>.
       </figcaption>
     </figure>
   );

@@ -55,8 +55,8 @@ export function StackDiagram() {
           <Card
             title={<Title logo={<Bot aria-hidden className="size-5" />} name="You and your agent" href="/agent-skills" aside="Agent Skills" />}
           >
-            Agent Skills teach Claude Code or Codex to write the specification with you, drive <code>lc</code>,
-            and write the report up.
+            Agent Skills teach Claude Code or Codex to write the specification with you and run it
+            with <code>lc</code>.
           </Card>
         </div>
 
@@ -71,8 +71,8 @@ export function StackDiagram() {
           >
             <div className="flex flex-col gap-3">
               <p>
-                Reads the specification, runs each recipe sandboxed, and commits every result with{' '}
-                <strong>certified provenance</strong>: what ran, on which inputs, in which environment, under which sandbox.
+                Runs each recipe from the specification in a sandbox, and commits the result with{' '}
+                <strong>certified provenance</strong>: the code, inputs and environment that produced it.
               </p>
               <Tool
                 title="Code and artifact versioning"
@@ -83,8 +83,8 @@ export function StackDiagram() {
                   </>
                 }
               >
-                Code and spec in git, data and results in git-annex: every output committed with a
-                content-addressed run record.
+                git holds the code and the specification. git-annex holds the data and results, each
+                output with a content-addressed run record.
               </Tool>
               <Tool
                 title="Reusable environment"
@@ -95,7 +95,8 @@ export function StackDiagram() {
                   </>
                 }
               >
-                A uv lockfile, optionally in a container image, hashed on every output; recipes run sandboxed.
+                A uv lockfile, which you can wrap in a container image. <code>lc</code> hashes it into
+                each output&apos;s record.
               </Tool>
             </div>
           </Card>
@@ -116,7 +117,7 @@ export function StackDiagram() {
               </span>
               <p>
                 <strong className="block text-fd-foreground">From a laptop to a cluster</strong>
-                Recipes run on your machine, or on Dask, Kubernetes or Slurm clusters, under the same run record.
+                Run recipes on your laptop or on a Dask, Kubernetes or Slurm cluster, with the same run record.
               </p>
             </div>
           </Card>
@@ -150,8 +151,8 @@ export function StackDiagram() {
             <div className="sd-split">
               <ServerCodeBlock code={mystDocument} lang="md" codeblock={{ keepBackground: true }} />
               <p>
-                Your write-up in MyST: <strong>decisions</strong> link to their record, and <strong>results</strong> are embedded
-                from the project. MySTRA resolves the references when you build the document.
+                Your write-up in MyST. You link <strong>decisions</strong> to their record and embed{' '}
+                <strong>results</strong> from the project, and MySTRA resolves both when you build the document.
               </p>
             </div>
           </Card>
@@ -159,7 +160,7 @@ export function StackDiagram() {
             <Card title={<code>src/</code>}>Your code, in git. A recipe names the command that runs it.</Card>
             <Card title={<code>data/</code>}>Input data, carried by git-annex.</Card>
             <Card title={<code>results/</code>}>
-              What <code>lc</code> produced, each with a manifest and run record.
+              Outputs from <code>lc</code>, each with a manifest and run record.
             </Card>
           </Cards>
         </div>
