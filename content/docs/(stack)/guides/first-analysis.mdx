@@ -9,13 +9,15 @@ model of cosmology to 580 Type Ia supernovae from
 [Suzuki et al. 2012](https://arxiv.org/abs/1105.3470). Mechanically, it is a least-squares fit with a
 single free parameter, Ω<sub>Λ</sub>, which runs in seconds on a laptop.
 
-You need the stack installed, as in the [Quick Start](/quickstart): uv, git, the Lightcone CLI and the
-`lightcone` plugin.
+<Callout type="warn" title="Install the plugin first">
+  This tutorial assumes you've installed the Lightcone plugin in your agent, as in the
+  [Quick Start](/quickstart). The plugin offers to install the Lightcone CLI when you start the
+  project.
+</Callout>
 
-<Callout title="Prompts and commands">
-  Everything in a `text` block is a prompt: paste it into your agent, not into your shell. Shell
-  commands appear only where you are meant to look at something yourself. Your agent's answers will
-  vary in the details; what matters is what ends up in the project.
+<Callout title="Your results may vary">
+  Your agent's answers will differ from the ones shown here in the details. What matters is what ends
+  up in the project.
 </Callout>
 
 ## 1. Start the project
@@ -30,7 +32,7 @@ claude   # or: codex
 Then describe the analysis:
 
 ```text
-I want to start a new analysis. I'd like to fit a flat LCDM model to the Union2.1
+I want to start a new Lightcone analysis. I'd like to fit a flat LCDM model to the Union2.1
 supernova compilation to recover Omega_Lambda, varying only Omega_Lambda and using
 the calibration given in the data file's header. The data is here:
 
@@ -41,8 +43,8 @@ and a residuals panel.
 ```
 
 The agent opens with a short interview about the question and the structure of the analysis; answer
-its questions. It sets up the project with `lc init`, then writes the analysis down in `astra.yaml`
-and shows you a summary. A hook validates the file each time it is saved. You should see something
+its questions. It sets up the project with `lc init`, from the [Lightcone CLI](/lightcone-cli), then
+writes the analysis down in `astra.yaml` and shows you a summary. A hook validates the file each time it is saved. You should see something
 like this:
 
 ```yaml title="astra.yaml (excerpt)"
@@ -192,6 +194,13 @@ the paper's value from astra.yaml instead of copying numbers, and show me a prev
 The report is `index.md`, written in MyST Markdown. With [MySTRA](/mystra), it cites outputs,
 decisions and values by their path in `astra.yaml`, so when the analysis is re-run, the report
 follows. Previewing it needs Node.js and MyST; your agent asks before installing them.
+
+To see the report yourself, [install MyST](https://mystmd.org/guide/installing) if your agent hasn't,
+then start it from the project's directory and open the address it prints:
+
+```bash
+myst start
+```
 
 ## Going further
 
