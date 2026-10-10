@@ -1,6 +1,6 @@
 import { createElement } from 'react';
 import { llms, loader, type LoaderPlugin } from 'fumadocs-core/source';
-import { icons } from 'lucide-react';
+import { lucideIconsPlugin } from 'fumadocs-core/source/lucide-icons';
 import { docsContentRoute, docsImageRoute, docsRoute } from './shared';
 import { defineDocs } from 'fumadocs-mdx/macro';
 import { metaSchema, pageSchema } from 'fumadocs-core/source/schema';
@@ -34,18 +34,8 @@ const commandNamesAsCode: LoaderPlugin = {
 export const source = loader({
   baseUrl: docsRoute,
   source: docs.toFumadocsSource(),
-  // Resolves `icon` in frontmatter and meta.json: the name of a Lucide icon, such as each
-  // project's icon in the selector, or an emoji, such as ASTRA's ✨.
-  icon(icon) {
-    if (!icon) return;
-    if (icon in icons) return createElement(icons[icon as keyof typeof icons]);
-    if (/^\w+$/.test(icon)) {
-      console.warn(`Unknown Lucide icon: ${icon}`);
-      return;
-    }
-    return createElement('span', { 'aria-hidden': true }, icon);
-  },
-  plugins: [commandNamesAsCode],
+  // Resolves `icon` names in frontmatter and meta.json, such as each project's icon in the selector.
+  plugins: [lucideIconsPlugin(), commandNamesAsCode],
 });
 
 export const docsLlms = llms(source, {

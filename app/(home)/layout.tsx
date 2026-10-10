@@ -3,9 +3,9 @@ import { HomeLayout } from 'fumadocs-ui/layouts/home';
 import type { LinkItemType } from 'fumadocs-ui/layouts/shared';
 import { Banner } from 'fumadocs-ui/components/banner';
 import Link from 'fumadocs-core/link';
-import { ArrowUpRight, Rocket } from 'lucide-react';
+import { ArrowUpRight, Rocket, Sparkles } from 'lucide-react';
 import { baseOptions } from '@/lib/layout.shared';
-import { AstraIcon, layers } from '@/components/stack-layers';
+import { layers } from '@/components/stack-layers';
 
 const discordUrl = 'https://discord.gg/EbG6JKuyAx';
 
@@ -25,7 +25,7 @@ const navLinks = [
     };
   }),
   {
-    icon: <AstraIcon />,
+    icon: <Sparkles />,
     text: (
       <>
         ASTRA
