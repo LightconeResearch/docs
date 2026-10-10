@@ -50,60 +50,10 @@ checks the agent's work.
 </Step>
 <Step>
 
-## Install a UI (optional)
-
-Lightcone records the analysis in the project's `astra.yaml`: its decisions and the alternatives you
-weighed, its results, and the papers behind them. Your agent reads that file directly, but as YAML it
-is hard for a person to follow. A UI shows the same record as pages you can browse, and we recommend
-installing one.
-
-<div className="grid gap-x-4 sm:grid-cols-2">
-<figure>
-
-![The ASTRA inventory of the Union2.1 Hubble example in Lightcone Lab: its title, the Hubble diagram, the best-fit value, and counts of its outputs, decisions, inputs and papers.](./lab-inventory-view.png)
-
-<figcaption>A project's ASTRA inventory in Lightcone Lab.</figcaption>
-</figure>
-<figure>
-
-![The same project's astra.yaml open as text: a long YAML file of descriptions, inputs and paths.](./lab-yaml-view.png)
-
-<figcaption>The same project's `astra.yaml`.</figcaption>
-</figure>
-</div>
-
-<Tabs defaultValue="jupyterlab">
-<TabsList>
-  <TabsTrigger value="jupyterlab">JupyterLab</TabsTrigger>
-  <TabsTrigger value="vs-code" disabled>VS Code (soon)</TabsTrigger>
-  <TabsTrigger value="browser" disabled>Browser (soon)</TabsTrigger>
-</TabsList>
-<TabsContent value="jupyterlab">
-
-[Lightcone Lab](/lightcone-lab) is a JupyterLab extension for JupyterLab 4.5.10 or newer. Install
-JupyterLab and Lab together with uv, then start JupyterLab:
-
-```bash
-uv tool install jupyterlab --with "jupyterlab-lightcone[full]" --with-executables-from jupyter-core
-jupyter lab
-```
-
-To add Lab to a JupyterLab you already run, open the **Extension Manager** (the puzzle piece in the
-left sidebar), search for `jupyterlab-lightcone`, install it and restart JupyterLab. That gives you
-the [workbench only](/lightcone-lab/installation#choose-an-install), without agent sessions or
-provenance; the [Lab installation guide](/lightcone-lab/installation) covers the full install.
-
-</TabsContent>
-</Tabs>
-
-</Step>
-<Step>
-
 ## Start your first analysis
 
-1. **Create a project.** In Lightcone Lab, choose **New Lightcone project** in JupyterLab's launcher;
-   Lab sets it up and opens its **Home**. Without Lab, create an empty directory.
-2. **Start your agent** in the project's directory.
+1. **Create an empty directory** for the analysis.
+2. **Start your agent** in that directory.
 3. **Give it your research question** with the Lightcone skill:
 
 <Tabs groupId="agent" persist defaultValue="claude-code">
@@ -132,12 +82,28 @@ The agent then:
 
 1. **Interviews you** about the research question and how to structure the analysis, before it
    writes any code.
-2. **Sets up the project** with `lc init`, unless Lab already did: an `astra.yaml` specification, a
-   uv environment, a git repository that keeps data and results in git-annex, and a MyST report.
+2. **Sets up the project** with `lc init`: an `astra.yaml` specification, a uv environment, a git repository that keeps data and results in git-annex, and a MyST report.
 3. **Writes the plan into `astra.yaml`**: the inputs, outputs, decisions and evidence. A hook
    validates the file each time the agent saves it, and the agent shows you a summary.
 4. **Implements and runs the analysis** once you approve the plan. The Lightcone CLI runs each step in
    a sandbox and commits each output with a record of how it was made.
+
+</Step>
+<Step>
+
+## Explore the project in JupyterLab (optional)
+
+[Lightcone Lab](/lightcone-lab) shows the project in JupyterLab: its results, the decisions behind
+them and the papers they cite, so you don't have to read `astra.yaml` yourself. It needs JupyterLab
+4.5.10 or newer.
+
+To install it, open JupyterLab's **Extension Manager** (the puzzle piece in the left sidebar), search
+for `jupyterlab-lightcone`, install it and restart JupyterLab. Then browse into the project's
+directory: the launcher becomes the project's Home.
+
+![Lightcone Lab's Home for a reproduction of the GD-1 stream analysis: the project's title and description, counts of its results, decisions, inputs, findings and papers, a grid of its figures, and a panel of agent sessions.](./lab-home.png)
+
+To learn more, see [Lightcone Lab](/lightcone-lab).
 
 </Step>
 <Step>
@@ -186,6 +152,5 @@ uv tool uninstall lightcone-cli
 </TabsContent>
 </Tabs>
 
-To remove Lightcone Lab, uninstall `jupyterlab-lightcone` in JupyterLab's Extension Manager, or run
-`uv tool uninstall jupyterlab` if you installed it with uv. Your projects stay as they are, with their
-full record in each project's git repository.
+To remove Lightcone Lab, uninstall `jupyterlab-lightcone` in JupyterLab's Extension Manager. Your
+projects stay as they are, with their full record in each project's git repository.
