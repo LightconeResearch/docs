@@ -38,10 +38,10 @@ Do this before you launch any compute: an allocation started without it has to b
 
 ## Install your agent and the plugin
 
-Install [Claude Code](https://code.claude.com/docs/en/setup) or
-[Codex](https://developers.openai.com/codex/cli) on the login node, then add the Lightcone plugin as in
-the [Quick Start](/quickstart#install-the-lightcone-plugin). The plugin offers to install the
-Lightcone CLI the first time you start a project.
+Install [Claude Code](https://docs.nersc.gov/development/coding-agents/claude-code/) or
+[Codex](https://docs.nersc.gov/development/coding-agents/codex/) as NERSC's own guides describe, then
+add the Lightcone plugin as in the [Quick Start](/quickstart#install-the-lightcone-plugin). The
+plugin offers to install the Lightcone CLI the first time you start a project.
 
 </Step>
 <Step>
@@ -50,8 +50,9 @@ Lightcone CLI the first time you start a project.
 
 The CLI launches compute from the offers in `~/.lightcone/compute.yaml`. Copy the
 [Perlmutter configuration](/lightcone-cli/configuring-compute#nersc) from the CLI documentation, with a
-regular and an interactive CPU queue and a GPU queue, and replace `myproject` with your NERSC project,
-such as `m1234`. Then check what the CLI sees:
+regular and an interactive CPU queue and a GPU queue. Replace `myproject` with your NERSC project, such
+as `m1234`, and use its GPU account, `m1234_g`, for the GPU offer: NERSC charges GPU jobs to the
+account ending in `_g`. Then check what the CLI sees:
 
 ```bash
 lc compute resources
@@ -64,3 +65,25 @@ lc compute resources
 
 </Step>
 </Steps>
+
+## Where to work
+
+**From a login node.** Start your agent in your project on a login node, where
+[NERSC recommends](https://docs.nersc.gov/development/coding-agents/) running coding agents. Login
+nodes limit each user to 30 GB of memory and 12.5% of the CPUs, and refuse local compute, so your
+recipes run in Slurm allocations the CLI launches from your offers. Each allocation queues like any
+job: the interactive offer usually starts within minutes, the regular one may wait.
+
+**Inside an allocation.** To choose the node yourself and skip the queue between steps, open an
+[interactive allocation](https://docs.nersc.gov/jobs/interactive/) and start your agent on the compute
+node:
+
+```bash
+salloc --nodes 1 --qos interactive --time 01:00:00 --constraint cpu --account m1234
+```
+
+The CLI then runs recipes on that node through its built-in local offer, which uses one node, so ask
+for one. For GPUs, use `--constraint gpu --gpus 4` and your `_g` account; the CLI uses the GPUs listed
+in [`CUDA_VISIBLE_DEVICES`](/lightcone-cli/configuring-compute#local-gpus). An interactive allocation
+lasts at most 4 hours, and NERSC cancels the request if no node is free within 6 minutes. Your agent
+must also be able to reach its service from the compute node.
