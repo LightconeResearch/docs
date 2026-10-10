@@ -1,7 +1,0 @@
-{
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "redirects": [
-    { "source": "/what-is-lightcone", "destination": "/", "permanent": true },
-    { "source": "/lightcone-cli/cluster", "destination": "/lightcone-cli/configuring-compute", "permanent": true }
-  ]
-}
