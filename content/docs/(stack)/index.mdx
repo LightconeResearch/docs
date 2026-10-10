@@ -7,12 +7,9 @@ icon: CircleQuestionMark
 The Lightcone Stack lets you do research with an AI agent, such as Claude Code or Codex, on your own
 code and data. You plan the analysis together, and the agent runs it and helps you write it up.
 
-Before anything runs, the agent asks you about the analysis and writes the plan into `astra.yaml`:
-the decisions, the options you turned down, and the evidence behind each choice. You make those
-choices, and you decide what the results mean. Only `lc` produces results, and it commits each one
-with the code, data and environment that made it. The record lives in your git repository, so you or
-a collaborator can trace a result back to its decisions and rerun it long after the agent's session
-has ended.
+The agent asks before it acts, and writes the plan down where you can read it. The scientific
+choices stay yours. Each result comes from a recorded run, so you and your collaborators can see how
+it was made and reproduce it long after your session with the agent has ended.
 
 <AgentDemo />
 
