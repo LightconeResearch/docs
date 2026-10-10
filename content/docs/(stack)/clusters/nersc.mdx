@@ -1,0 +1,84 @@
+---
+title: NERSC
+description: Set up the Lightcone Stack on Perlmutter and run analyses on its compute nodes.
+---
+
+Run these steps once, on a Perlmutter login node.
+
+<Steps>
+<Step>
+
+## Install uv
+
+NERSC doesn't provide uv, but it installs into your home directory:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+uv lands in `~/.local/bin`; make sure that directory is on your `PATH`. git is already installed.
+
+</Step>
+<Step>
+
+## Move uv's cache to scratch
+
+Recipes run through uv, which locks files in its cache, and Perlmutter's compute nodes can't lock
+files in `$HOME`, where the cache lives by default. Add this line to your `~/.bashrc`, then open a new
+shell:
+
+```bash
+export UV_CACHE_DIR=$PSCRATCH/uv-cache
+```
+
+Do this before you launch any compute: an allocation started without it has to be relaunched.
+
+</Step>
+<Step>
+
+## Install your agent and the plugin
+
+Install [Claude Code](https://code.claude.com/docs/en/setup) or
+[Codex](https://developers.openai.com/codex/cli) on the login node, then add the Lightcone plugin as in
+the [Quick Start](/quickstart#install-the-lightcone-plugin). The plugin offers to install the
+Lightcone CLI the first time you start a project.
+
+</Step>
+<Step>
+
+## Describe Perlmutter's queues
+
+The CLI launches compute from the offers in `~/.lightcone/compute.yaml`. Copy the
+[Perlmutter configuration](/lightcone-cli/configuring-compute#nersc) from the CLI documentation, with a
+regular and an interactive CPU queue and a GPU queue, and replace `myproject` with your NERSC project,
+such as `m1234`. Then check what the CLI sees:
+
+```bash
+lc compute resources
+```
+
+<Callout type="warn" title="Not yet tested at NERSC">
+  This configuration hasn't been tested by submitting jobs at NERSC yet. If a launch fails, tell us on
+  [Discord](https://discord.gg/EbG6JKuyAx).
+</Callout>
+
+</Step>
+</Steps>
+
+## Run an analysis
+
+Start your agent in your project's directory on the login node. Login nodes refuse local compute, so
+the agent launches Slurm allocations from your offers. To launch one yourself in the interactive
+queue, run the recipes on it, then release it:
+
+```bash
+lc compute launch --name analysis --cpus 256 --memory 480 --startup fast --wait
+lc materialize analysis
+lc compute down analysis
+```
+
+The interactive queue usually starts within minutes, but its job may end when you log out. Leave out
+`--startup fast` to use the regular queue instead.
+
+Projects that run in containers use `podman-hpc`, which NERSC provides. For every compute option,
+see [Configuring compute](/lightcone-cli/configuring-compute).
