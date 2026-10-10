@@ -10,7 +10,7 @@ own terminal (**File › New › Terminal**), then restart JupyterLab. There is 
 `jupyter labextension install` step and nothing to build.
 
 <Callout title="Setting up the whole stack?">
-  Follow the [Quick Start](/quickstart) to install the agent plugin and start an analysis.
+  Follow the [Quick Start](/docs/quickstart) to install the agent plugin and start an analysis.
   This page covers Lab itself.
 </Callout>
 
@@ -26,7 +26,7 @@ own terminal (**File › New › Terminal**), then restart JupyterLab. There is 
 | Freshness, provenance, versions, comments, report | no                         | yes                                            |
 | Project setup                   | `lc init` in a terminal                      | by the server                                  |
 
-[Features](/lightcone-lab/features) marks each feature that needs the full install. You can start
+[Features](/docs/lightcone-lab/features) marks each feature that needs the full install. You can start
 with the workbench only and add the full install later: install the extra and restart.
 
 ## Requirements
@@ -41,10 +41,10 @@ The full install also needs, on the server:
 - **Linux or macOS.**
 - **git** and **[uv](https://docs.astral.sh/uv/getting-started/installation/)** on the server's
   `PATH`, for the Lightcone engine that runs inside the server. See
-  [CLI installation](/lightcone-cli/installation).
+  [CLI installation](/docs/lightcone-cli/installation).
 - **Node.js 20 or newer**, only to preview the project's report.
 - **Node.js 22 or newer**, only for the adapters that connect Claude Code and Codex to Jupyter AI.
-  See [Agents](/lightcone-lab/agents#jupyter-ai).
+  See [Agents](/docs/lightcone-lab/agents#jupyter-ai).
 
 ## Workbench only [#workbench-only]
 
@@ -70,9 +70,9 @@ The workbench runs in the browser, on JupyterLab's own file and terminal service
 starts run in JupyterLab's terminals, so install them where those terminals can find them:
 
 - **The Lightcone CLI**, `lc`, to set up new projects (**New Lightcone project** runs `lc init` in a
-  terminal) and to run the analysis. See [CLI installation](/lightcone-cli/installation).
+  terminal) and to run the analysis. See [CLI installation](/docs/lightcone-cli/installation).
 - **Claude Code or Codex**, installed and signed in, for the **claude** and **codex** buttons on
-  Home. See [Agents](/lightcone-lab/agents#terminal).
+  Home. See [Agents](/docs/lightcone-lab/agents#terminal).
 
 ## Full [#full]
 
@@ -94,7 +94,7 @@ The `full` extra adds what the server features need:
 | `mystmd`                                                       | The MyST CLI behind the report preview                      |
 
 None of these includes a coding agent: install Claude Code or Codex and its adapter as
-[Agents](/lightcone-lab/agents#jupyter-ai) describes, then restart JupyterLab.
+[Agents](/docs/lightcone-lab/agents#jupyter-ai) describes, then restart JupyterLab.
 
 <Callout type="warn" title="Keep the quotes">
   Quote `"jupyterlab-lightcone[full]"`: some shells, such as zsh, read the square brackets as a

@@ -29,7 +29,7 @@ stdout/stderr are forwarded as bytes, preserving binary output and line endings 
 The client detaches on completion; the allocation stays available until `lc compute down` or its
 time limit. A missing cluster, or one that is not yet active with every expected worker connected,
 is an error: nothing waits and nothing runs locally instead. Use `lc compute status CLUSTER --wait`
-first. See [lc compute](/lightcone-cli/commands/compute).
+first. See [lc compute](/docs/lightcone-cli/commands/compute).
 
 The command receives EOF on stdin; terminal input and pipes into `lc run` are not forwarded. Pass
 input files through the project's declared inputs instead. For direct execution, ambient

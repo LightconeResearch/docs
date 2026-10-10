@@ -42,11 +42,11 @@ export function ComputeLayers() {
     <figure aria-label="How lc reaches compute" className="not-prose my-6 flex flex-col gap-2">
       <Layer note="Execute your analysis">
         <div className="grid grid-cols-2 gap-2">
-          <Link href="/lightcone-cli/commands/run" className={box} style={tint('var(--lc-color-vert-de-gris)')}>
+          <Link href="/docs/lightcone-cli/commands/run" className={box} style={tint('var(--lc-color-vert-de-gris)')}>
             <code>lc run</code>
           </Link>
           <Link
-            href="/lightcone-cli/commands/materialize"
+            href="/docs/lightcone-cli/commands/materialize"
             className={box}
             style={tint('var(--lc-color-vert-de-gris)')}
           >
@@ -55,7 +55,7 @@ export function ComputeLayers() {
         </div>
       </Layer>
       <Layer note="Allocate and stop compute">
-        <Link href="/lightcone-cli/commands/compute" className={box} style={tint('var(--lc-color-antique-gold)')}>
+        <Link href="/docs/lightcone-cli/commands/compute" className={box} style={tint('var(--lc-color-antique-gold)')}>
           <code>lc compute</code>
         </Link>
       </Layer>

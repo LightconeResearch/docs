@@ -15,7 +15,8 @@ npm run dev     # local server at http://localhost:3000
 npm run build   # static export to out/
 ```
 
-Pages live in `content/docs` as MDX.
+Pages live in `content/docs` as MDX and are served under `/docs`. The landing page at `/` is
+`app/(home)/page.tsx`.
 
 ## License
 

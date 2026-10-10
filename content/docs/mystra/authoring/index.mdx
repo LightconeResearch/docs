@@ -3,7 +3,7 @@ title: Authoring overview
 description: "Reference any part of an ASTRA analysis with a path, inline with the {astra} role or as a block with the {astra} directive."
 ---
 
-You reference **any part** of an ASTRA analysis with one idea: a **[path](/mystra/authoring/paths)**
+You reference **any part** of an ASTRA analysis with one idea: a **[path](/docs/mystra/authoring/paths)**
 that mirrors `astra.yaml`. One name — `astra` — drives both surfaces, the MyST way (just as `{math}`
 is both a role and a directive): wrap a path in the `{astra}` *role* to mention it inline, or use the
 `{astra}` *directive* to embed it as a block.
@@ -17,13 +17,13 @@ change the language.
 
 | I want to… | Use | Example |
 |---|---|---|
-| Mention an element in a sentence | [`{astra}` role](/mystra/authoring/inline-references) | `` {astra}`decisions.algorithm` `` |
+| Mention an element in a sentence | [`{astra}` role](/docs/mystra/authoring/inline-references) | `` {astra}`decisions.algorithm` `` |
 | Refer to a placed figure by number | Explicit `:label:` + MyST [`{ref}`](https://mystmd.org/guide/cross-references) | `` {ref}`fig-hubble` `` |
-| Cite the literature behind an insight | [`{astra:cite}` / `{astra:cite:t}`](/mystra/authoring/inline-references#citations) | `` {astra:cite}`prior_insights.recon` `` |
-| Put a measured number in prose | [`{astra:value}`](/mystra/authoring/live-values) | `` {astra:value col=alpha pm=true}`outputs.table` `` |
-| Embed a figure, decision, finding, … as a block | [`{astra}` directive](/mystra/authoring/block-embeds) | `:::{astra} outputs.hubble_diagram` |
-| Link to a placed block | its explicit [`:label:`](/mystra/authoring/block-embeds#cross-referencing-an-embedded-block) | `` {ref}`fig-hubble` `` |
-| Split the report along sub-analyses | [Multi-page reports](/mystra/authoring/multi-page) | `reconstruction.md` |
+| Cite the literature behind an insight | [`{astra:cite}` / `{astra:cite:t}`](/docs/mystra/authoring/inline-references#citations) | `` {astra:cite}`prior_insights.recon` `` |
+| Put a measured number in prose | [`{astra:value}`](/docs/mystra/authoring/live-values) | `` {astra:value col=alpha pm=true}`outputs.table` `` |
+| Embed a figure, decision, finding, … as a block | [`{astra}` directive](/docs/mystra/authoring/block-embeds) | `:::{astra} outputs.hubble_diagram` |
+| Link to a placed block | its explicit [`:label:`](/docs/mystra/authoring/block-embeds#cross-referencing-an-embedded-block) | `` {ref}`fig-hubble` `` |
+| Split the report along sub-analyses | [Multi-page reports](/docs/mystra/authoring/multi-page) | `reconstruction.md` |
 
 ## The golden rule
 

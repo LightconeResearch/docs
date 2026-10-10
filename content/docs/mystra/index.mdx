@@ -4,7 +4,7 @@ description: A MyST plugin for reports that reference an ASTRA analysis instead 
 icon: CircleQuestionMark
 ---
 
-**MySTRA** lets you write publications on top of [ASTRA](/astra) analyses — in plain
+**MySTRA** lets you write publications on top of [ASTRA](/docs/astra) analyses — in plain
 [MyST](https://mystmd.org/) Markdown. You write a normal MyST document and reference ASTRA
 components — decisions, outputs, findings, prior insights, data tables, live numbers — *by
 reference*. The components stay single-sourced in your `astra.yaml`; MySTRA reads it at build time
@@ -37,13 +37,13 @@ and issues are very welcome on the [GitHub repo](https://github.com/LightconeRes
 
 Projects created with `lc init` are already set up for MySTRA: their `myst.yml` registers the
 plugin and uses the ASTRA article theme, and `index.md` is the report, ready to write. The
-[Lightcone CLI](/lightcone-cli) commits each output to `results/<universe>/<output>.<format>`, which
+[Lightcone CLI](/docs/lightcone-cli) commits each output to `results/<universe>/<output>.<format>`, which
 is where MySTRA finds the figures, tables and values it places in the report. For an agent writing
-one up, see the last step of [Your first analysis](/guides/first-analysis#5-write-it-up).
+one up, see the last step of [Your first analysis](/docs/guides/first-analysis#5-write-it-up).
 
 MySTRA is intentionally a **publication adapter**, not a project viewer. It does not emit a
 whole-project inventory, graph application, or host-specific UI, so reports remain normal, portable
-MyST documents. To explore a project interactively, use [Lightcone Lab](/lightcone-lab).
+MyST documents. To explore a project interactively, use [Lightcone Lab](/docs/lightcone-lab).
 
 ## Why MySTRA?
 
@@ -67,7 +67,7 @@ fills in the numbers, and makes no authoring or styling decisions of its own.
 ## At a glance
 
 One name — `astra` — drives every surface, the MyST way (just as `{math}` is both a role and a
-directive). You address any part of the analysis with a [path](/mystra/authoring/paths) that mirrors
+directive). You address any part of the analysis with a [path](/docs/mystra/authoring/paths) that mirrors
 `astra.yaml`:
 
 <Tabs items={['Report (index.md)', 'Analysis (astra.yaml)', 'Run it (myst.yml)']}>
@@ -152,13 +152,13 @@ linked reference list comes for free once a project bibliography is wired.
 ## Where to go next
 
 <Cards>
-  <Card title="Quick Start" href="/mystra/getting-started">
+  <Card title="Quick Start" href="/docs/mystra/getting-started">
     From an ASTRA project to a live, self-updating report in about five minutes.
   </Card>
-  <Card title="Authoring guide" href="/mystra/authoring">
+  <Card title="Authoring guide" href="/docs/mystra/authoring">
     Paths, inline references, block embeds, live values and multi-page reports.
   </Card>
-  <Card title="Reference" href="/mystra/reference/configuration">
+  <Card title="Reference" href="/docs/mystra/reference/configuration">
     Configuration, and the contract for theme authors.
   </Card>
   <Card title="GitHub" href="https://github.com/LightconeResearch/MySTRA">

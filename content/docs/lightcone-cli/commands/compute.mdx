@@ -28,14 +28,14 @@ all compute and execution commands. Each offer names its `provider` (`local` or 
 built-in local offer is appended after configured offers, unless the catalog lists its own local
 offers, which is how to change its CPU/RAM budget or time limits; the shortcut chooses the first
 eligible local offer. `allow_local: false` disables local compute. See
-[local configuration](/lightcone-cli/configuring-compute#on-your-machine). Missing explicit paths and
+[local configuration](/docs/lightcone-cli/configuring-compute#on-your-machine). Missing explicit paths and
 invalid catalogs are errors. Loading a catalog or planning with `--dry-run` creates no files or
 compute.
 
 Local launch and execution are automatically disabled on recognized NERSC login nodes, including
 the first run without a catalog. Interactive compute nodes remain eligible. This runtime guard
 creates no configuration file and cannot be overridden by `allow_local: true`; Slurm, status, and
-termination remain available. See [Keep work off the login node](/lightcone-cli/configuring-compute#login-nodes).
+termination remain available. See [Keep work off the login node](/docs/lightcone-cli/configuring-compute#login-nodes).
 
 ## Subcommands
 
@@ -87,8 +87,8 @@ offers. That is the default, except for the local shortcut, which takes the loca
 `--gpus 0` launches it without them. Names match case-insensitively. GPU counts are positive whole numbers, with no `+`
 or fractional form. Lightcone does not maintain SkyPilot's accelerator alias registry: use the
 labels configured in `resources` or use `GPU:N`. Catalog shapes use `accelerators: A100:4` or
-`accelerators: {A100: 4}`. See GPUs [on your own machine](/lightcone-cli/configuring-compute#local-gpus) and
-[on Slurm](/lightcone-cli/configuring-compute#slurm-gpus).
+`accelerators: {A100: 4}`. See GPUs [on your own machine](/docs/lightcone-cli/configuring-compute#local-gpus) and
+[on Slurm](/docs/lightcone-cli/configuring-compute#slurm-gpus).
 
 ## Time limits
 

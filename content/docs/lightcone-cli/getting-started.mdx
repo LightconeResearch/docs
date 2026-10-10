@@ -10,7 +10,7 @@ bottom without running anything, or follow along: every command is copy-paste re
 <Callout title="Working with an agent?">
 This tutorial drives `lc` by hand, so that you see what each command does. Most of the time your
 coding agent drives it for you: to start that way, follow
-[Your first analysis](/guides/first-analysis).
+[Your first analysis](/docs/guides/first-analysis).
 </Callout>
 
 **What you'll build:** a small two-output analysis that fits a line to a noisy dataset and sweeps
@@ -18,7 +18,7 @@ one methodological decision: whether points far from an initial fit are kept or 
 is two universes, `baseline` and `robust`, each with its own fitted slope and figure, and a project
 that ends published as an [RO-Crate](https://www.researchobject.org/ro-crate/).
 
-Make sure you've finished the [installation](/lightcone-cli/installation) first.
+Make sure you've finished the [installation](/docs/lightcone-cli/installation) first.
 
 ## 1. Create a project
 
@@ -169,7 +169,7 @@ uvx astra-tools@0.2.18 validate astra.yaml
 
 `astra` is the spec-side CLI, from `astra-tools`, the library lightcone-cli uses to read
 specifications. `uvx` fetches it on first use, at the version this release of `lc` depends on; see
-[The astra command](/astra#the-astra-command).
+[The astra command](/docs/astra#the-astra-command).
 
 ## 4. Write the scripts
 
@@ -251,7 +251,7 @@ Launch the built-in local offer; no compute configuration is needed. It provides
 and RAM, and stops once it has had no work for 30 minutes. Keep the returned ID in `CLUSTER` for
 this walkthrough. Configured remote offers coexist with that default. A catalog can disable local
 compute, or replace the built-in offer with its own local offers, for example to use less of the
-machine; see [Configuring compute](/lightcone-cli/configuring-compute). NERSC login nodes
+machine; see [Configuring compute](/docs/lightcone-cli/configuring-compute). NERSC login nodes
 automatically refuse local compute; use a compute node in an interactive allocation or a configured
 Slurm offer.
 
@@ -395,9 +395,9 @@ follow with `git annex get` whenever you actually need them.
 
 ## Where to next
 
-- [Core concepts](/lightcone-cli/concepts): the model behind what you just did, from the three
+- [Core concepts](/docs/lightcone-cli/concepts): the model behind what you just did, from the three
   states and the commit discipline to the two execution modes.
-- [Configuring compute](/lightcone-cli/configuring-compute): take the same project to Slurm, or to GPUs.
-- [Troubleshooting](/lightcone-cli/troubleshooting): when something goes sideways.
-- [ASTRA](/astra) and the [ASTRA docs](https://astra-spec.org/latest/): the full spec, with
+- [Configuring compute](/docs/lightcone-cli/configuring-compute): take the same project to Slurm, or to GPUs.
+- [Troubleshooting](/docs/lightcone-cli/troubleshooting): when something goes sideways.
+- [ASTRA](/docs/astra) and the [ASTRA docs](https://astra-spec.org/latest/): the full spec, with
   sub-analyses, prior insights, findings, and evidence.

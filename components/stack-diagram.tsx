@@ -53,7 +53,7 @@ export function StackDiagram() {
       <div className="sd-flow">
         <div className="min-w-0 [grid-area:agent]">
           <Card
-            title={<Title logo={<Bot aria-hidden className="size-5" />} name="You and your agent" href="/agent-skills" aside="Agent Skills" />}
+            title={<Title logo={<Bot aria-hidden className="size-5" />} name="You and your agent" href="/docs/agent-skills" aside="Agent Skills" />}
           >
             Agent Skills teach Claude Code or Codex to write the specification with you, drive <code>lc</code>,
             and write the report up.
@@ -67,7 +67,7 @@ export function StackDiagram() {
 
         <div className="min-w-0 [grid-area:cli]">
           <Card
-            title={<Title logo={<img src="/logos/lightcone-mark.svg" alt="" className="size-6 dark:invert" />} name="Lightcone CLI" href="/lightcone-cli" aside="lc" />}
+            title={<Title logo={<img src="/logos/lightcone-mark.svg" alt="" className="size-6 dark:invert" />} name="Lightcone CLI" href="/docs/lightcone-cli" aside="lc" />}
           >
             <div className="flex flex-col gap-3">
               <p>
@@ -107,7 +107,7 @@ export function StackDiagram() {
         </div>
 
         <div className="min-w-0 self-center [grid-area:compute]">
-          <Card title={<Title name="Compute" href="/lightcone-cli/configuring-compute" />}>
+          <Card title={<Title name="Compute" href="/docs/lightcone-cli/configuring-compute" />}>
             <div className="flex flex-col gap-3">
               <span className="flex items-center gap-2">
                 <img src="/logos/kubernetes.svg" alt="Kubernetes" className="size-6" />
@@ -133,7 +133,7 @@ export function StackDiagram() {
             Your project <span>· one git repository</span>
           </p>
           <Card
-            title={<Title logo={<img src="/logos/astra.svg" alt="" className="size-6 dark:invert" />} name="astra.yaml" href="/astra" aside="ASTRA" />}
+            title={<Title logo={<img src="/logos/astra.svg" alt="" className="size-6 dark:invert" />} name="astra.yaml" href="/docs/astra" aside="ASTRA" />}
           >
             <div className="sd-split">
               <ServerCodeBlock code={astraYaml} lang="yaml" codeblock={{ keepBackground: true }} />
@@ -145,7 +145,7 @@ export function StackDiagram() {
             </div>
           </Card>
           <Card
-            title={<Title logo={<img src="/logos/myst-logo.svg" alt="" className="h-5 w-auto dark:brightness-150" />} name="index.md" href="/mystra" aside="MySTRA" />}
+            title={<Title logo={<img src="/logos/myst-logo.svg" alt="" className="h-5 w-auto dark:brightness-150" />} name="index.md" href="/docs/mystra" aside="MySTRA" />}
           >
             <div className="sd-split">
               <ServerCodeBlock code={mystDocument} lang="md" codeblock={{ keepBackground: true }} />

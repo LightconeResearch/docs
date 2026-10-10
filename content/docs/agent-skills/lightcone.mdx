@@ -6,16 +6,16 @@ description: What your agent does at each phase of a Lightcone project, from the
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 
 The `lightcone` skill is a companion for a Lightcone project: an analysis declared in `astra.yaml`,
-executed with the [Lightcone CLI](/lightcone-cli) and written up in a [MySTRA](/mystra) report. It
+executed with the [Lightcone CLI](/docs/lightcone-cli) and written up in a [MySTRA](/docs/mystra) report. It
 covers the whole life of a project: scoping it with you, getting compute, producing outputs,
 diagnosing failures, keeping the report honest and publishing.
 
-The plugin also contains the [`astra` plugin](/agent-skills/astra), whose skill covers the
+The plugin also contains the [`astra` plugin](/docs/agent-skills/astra), whose skill covers the
 `astra.yaml` format itself. The two divide the work: the `lightcone` skill repeats nothing about the
 format, and the `astra` skill says nothing about running an analysis.
 
 This page describes what the agent does, and what it leaves to you. For a complete run through a
-project, follow [Your first analysis](/guides/first-analysis).
+project, follow [Your first analysis](/docs/guides/first-analysis).
 
 ## When the agent uses it
 
@@ -44,7 +44,7 @@ in the Codex CLI.
 ## Before it drives `lc`
 
 The skill assumes `lc` version `0.5.0rc5` or newer. If the plugin's
-[session-start check](/agent-skills/hooks#lightcone-cli-check) has already reported that the CLI is
+[session-start check](/docs/agent-skills/hooks#lightcone-cli-check) has already reported that the CLI is
 ready, the agent moves on; if it reported a problem, the agent follows the remedy it named. If
 neither happened, because hooks are off or the agent is a subagent, it runs `lc --version` itself.
 
@@ -149,7 +149,7 @@ stands, and asks what is next. It doesn't interview you again: `astra.yaml` and 
 
 `lc run` and `lc materialize` run on a compute allocation named as their first argument; neither
 starts one, and neither falls back to running locally. `lc compute` is the agent's single view of
-your compute, whatever machines and schedulers lie behind it. See the [Lightcone CLI](/lightcone-cli)
+your compute, whatever machines and schedulers lie behind it. See the [Lightcone CLI](/docs/lightcone-cli)
 for the commands.
 
 - **Reuse first.** If one of your allocations is already running, the agent uses it.
@@ -307,7 +307,7 @@ file whose content isn't in this clone is fetched by `lc materialize` when a rec
 
 ## The report
 
-`lc init` creates a MyST report next to the specification, with the [MySTRA](/mystra) plugin
+`lc init` creates a MyST report next to the specification, with the [MySTRA](/docs/mystra) plugin
 loaded. MySTRA resolves references against `astra.yaml`, so the report points at the analysis
 instead of restating it.
 

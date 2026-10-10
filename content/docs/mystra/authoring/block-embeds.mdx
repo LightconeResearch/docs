@@ -4,7 +4,7 @@ description: "Embed any ASTRA element, child or collection as a block with the {
 ---
 
 The `{astra}` directive embeds any addressable element, child, or collection as a block. The
-[path](/mystra/authoring/paths) decides what is rendered; the directive makes no styling decisions of
+[path](/docs/mystra/authoring/paths) decides what is rendered; the directive makes no styling decisions of
 its own, so the result is clean on the stock `book-theme` and richer under a dedicated theme.
 
 ```markdown
@@ -48,13 +48,13 @@ Examples:
 A bare sub-analysis target still renders a summary card. It does not guess a page URL: site
 navigation belongs to MyST's table of contents. An inline sub-analysis reference can expose a link
 when exactly one concrete TOC page is mapped to that analysis; see
-[multi-page reports](/mystra/authoring/multi-page).
+[multi-page reports](/docs/mystra/authoring/multi-page).
 
 Universe files still select decisions, conditional records, and artifact bindings for the entire
 rendered publication. They are resolution inputs, rather than records or collections, so `universes`
 and `universes.<id>` are not addressable `{astra}` paths. The rendered decisions and outputs already
 reflect the selected universe; see
-[project root and universe](/mystra/reference/configuration#project-root-and-universe).
+[project root and universe](/docs/mystra/reference/configuration#project-root-and-universe).
 
 ## Options
 

@@ -82,14 +82,14 @@ invented.
 
 ## How the stack uses it
 
-- **[Agent Skills](/agent-skills)**: the `astra` skill teaches your agent the format, so it writes and
+- **[Agent Skills](/docs/agent-skills)**: the `astra` skill teaches your agent the format, so it writes and
   revises `astra.yaml` with you. A hook validates the file each time the agent saves it.
-- **[Lightcone CLI](/lightcone-cli)**: `lc` executes the recipes. Each output that `lc` runs needs a
+- **[Lightcone CLI](/docs/lightcone-cli)**: `lc` executes the recipes. Each output that `lc` runs needs a
   `format`, a `recipe`, and its `inputs` and `decisions` declared; its file lands at
   `results/<universe>/<output>.<format>`, next to a manifest that records how it was made.
-- **[MySTRA](/mystra)**: the report refers to outputs, decisions and values by their path in
+- **[MySTRA](/docs/mystra)**: the report refers to outputs, decisions and values by their path in
   `astra.yaml`, rather than copying them.
-- **[Lightcone Lab](/lightcone-lab)**: the workbench shows the analysis as an inventory and a
+- **[Lightcone Lab](/docs/lightcone-lab)**: the workbench shows the analysis as an inventory and a
   pipeline.
 
 Keep the `version:` field that `lc init` writes: it is the version of the ASTRA schema, separate from

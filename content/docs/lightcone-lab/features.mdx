@@ -10,7 +10,7 @@ command palette (<kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd>) u
 
 <Callout title="Two installs">
   Sections marked **Full install** need `jupyterlab-lightcone[full]`; everything else also works in
-  the browser-only workbench. See [Installation](/lightcone-lab/installation).
+  the browser-only workbench. See [Installation](/docs/lightcone-lab/installation).
 </Callout>
 
 | Feature                                   | Where to find it                                                      | Install |
@@ -29,7 +29,7 @@ command palette (<kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd>) u
 | [Provenance and versions](#provenance)    | An output's record tab                                                | Full    |
 | [Comments](#comments)                     | Click a figure, or select text                                        | Full    |
 | [Report preview](#report)                 | **Open report** on Home                                               | Full    |
-| [Agents](/lightcone-lab/agents)           | The right-hand column of Home                                         | Both    |
+| [Agents](/docs/lightcone-lab/agents)           | The right-hand column of Home                                         | Both    |
 
 ## Project Home [#home]
 
@@ -53,7 +53,7 @@ From top to bottom, Home shows:
   [current](#freshness).
 - **Agents**, in a column on the right: **claude**, **codex** and a plain terminal in the
   browser-only workbench, or a **New session** box and the recent sessions in the full install. See
-  [Agents](/lightcone-lab/agents).
+  [Agents](/docs/lightcone-lab/agents).
 
 The **Tools** menu in Home's header holds everything JupyterLab's launcher offers, one submenu per
 launcher section (**Notebook**, **Console**, **Other**, and those other extensions add), running in
@@ -182,7 +182,7 @@ the status bar. Run it again to restore them as they were.
 
 **Full install.** Lab asks the Lightcone engine for each result's state, the same one `lc status`
 reports, with its reason: **current**, **behind** or **stale**. See
-[Core concepts](/lightcone-cli/concepts) for what each state means. The states appear in the
+[Core concepts](/docs/lightcone-cli/concepts) for what each state means. The states appear in the
 inventory, on Home's results line ("All 5 current", or which results are stale or behind) and on the
 pipeline's nodes, and are checked again while those views are visible. They cover the outputs of the
 project's root analysis.
@@ -230,7 +230,7 @@ the palette reloads them.
 ## Report preview [#report]
 
 **Full install.** When the project has a MyST configuration (`myst.yml` or `myst.yaml`), **Open
-report** on Home shows its [MySTRA](/mystra) report in a tab. So do the **MySTRA Viewer** command,
+report** on Home shows its [MySTRA](/docs/mystra) report in a tab. So do the **MySTRA Viewer** command,
 the project's launcher card, and **MySTRA Viewer** in the file browser's right-click menu. The
 report reloads when you save its sources; **Restart MySTRA Viewer** starts it again.
 

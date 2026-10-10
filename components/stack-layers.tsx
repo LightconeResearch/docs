@@ -5,40 +5,40 @@ import { CalloutContainer, CalloutDescription, CalloutTitle } from 'fumadocs-ui/
 // The layers of the stack, drawn with the brand's colours so the diagram
 // follows the light and dark schemes. ASTRA is the foundation the others
 // read from and write to.
-const layers = [
+export const layers = [
   {
     name: 'Agent Skills',
     role: 'Work with your agent',
     text: 'Teach Claude Code or Codex to scope, build, run and report on the analysis with you.',
-    href: '/agent-skills',
+    href: '/docs/agent-skills',
     color: 'var(--lc-color-slate-blue)',
   },
   {
     name: 'Lightcone Lab',
     role: 'Explore',
     text: 'A JupyterLab workbench for the project: its inventory, pipeline, provenance and report.',
-    href: '/lightcone-lab',
+    href: '/docs/lightcone-lab',
     color: 'var(--lc-color-vert-de-gris)',
   },
   {
     name: 'MySTRA',
     role: 'Communicate',
     text: 'A report that references the analysis by path, so it stays in step with it.',
-    href: '/mystra',
+    href: '/docs/mystra',
     color: 'var(--lc-color-wax-red)',
   },
   {
     name: 'Lightcone CLI',
     role: 'Execute',
     text: 'Runs every recipe in a sandbox and records the provenance of every output.',
-    href: '/lightcone-cli',
+    href: '/docs/lightcone-cli',
     color: 'var(--lc-color-blue-ink)',
   },
   {
     name: 'ASTRA',
     role: 'Describe',
     text: 'The specification: the inputs, outputs, decisions and evidence of the analysis, in astra.yaml.',
-    href: '/astra',
+    href: '/docs/astra',
     color: 'var(--lc-color-antique-gold)',
   },
 ];

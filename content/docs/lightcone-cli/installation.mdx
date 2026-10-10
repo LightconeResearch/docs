@@ -4,7 +4,7 @@ description: Install the Lightcone CLI and check that it works.
 icon: Wrench
 ---
 
-For setup with a coding agent, follow the [Quick Start](/quickstart). To install the CLI directly,
+For setup with a coding agent, follow the [Quick Start](/docs/quickstart). To install the CLI directly,
 make sure [uv](https://docs.astral.sh/uv/getting-started/installation/) and git are installed, then run:
 
 ```bash
@@ -12,7 +12,7 @@ uv tool install lightcone-cli==0.5.0rc5
 ```
 
 Keep the exact version: without it, uv installs an older stable release. Before your first run,
-make sure [git knows who you are](/lightcone-cli/troubleshooting#git-identity).
+make sure [git knows who you are](/docs/lightcone-cli/troubleshooting#git-identity).
 
 ## What the install brings
 
@@ -74,9 +74,9 @@ uv lands under `~/.local/bin`: make sure it's on your `PATH`. git is already on 
 things differ from a workstation once you run analyses there:
 
 - **Local compute is refused on login nodes.** Use a compute node in an interactive allocation, or
-  a configured Slurm offer; see [Keep work off the login node](/lightcone-cli/configuring-compute#login-nodes).
+  a configured Slurm offer; see [Keep work off the login node](/docs/lightcone-cli/configuring-compute#login-nodes).
 - **uv's cache must move off `$HOME`**, because Perlmutter's compute nodes cannot lock files there.
-  See [NERSC Perlmutter](/lightcone-cli/configuring-compute#nersc).
+  See [NERSC Perlmutter](/docs/lightcone-cli/configuring-compute#nersc).
 
 ## Container runtimes
 
@@ -86,7 +86,7 @@ machine in the project's own locked environment.
 
 - Local machine: install [Podman](https://podman.io/) (rootless, no daemon) or
   [Docker](https://docs.docker.com/get-docker/).
-- HPC login node: see [NERSC Perlmutter](/lightcone-cli/configuring-compute#nersc).
+- HPC login node: see [NERSC Perlmutter](/docs/lightcone-cli/configuring-compute#nersc).
 
 There is nothing to configure: `lc` detects whichever runtime is available (`podman-hpc`, then
 `podman`, then `docker`, skipping docker if its daemon isn't running).
