@@ -83,8 +83,8 @@ An option can also list the [prior insights](#prior-insights) that back it.
 
 A **prior insight** records something the analysis takes from the literature: a claim, and the
 evidence for it. Each piece of evidence cites a paper by its DOI and quotes the exact sentence the
-claim rests on, with its page. An option then lists the insights that back it. In the GD-1
-reproduction, one of the Milky Way potential options rests on Bovy (2015):
+claim rests on, with its page. In the GD-1 reproduction, one of the Milky Way potential options rests
+on this insight from Bovy (2015):
 
 ```yaml title="astra.yaml (excerpt from the GD-1 reproduction, shortened)"
 prior_insights:
@@ -105,14 +105,6 @@ prior_insights:
             required.
         location:
           page: 7
-
-decisions:
-  galactic_potential:
-    label: Milky Way potential
-    options:
-      gala_v2:
-        label: Gala Milky Way v2
-        insights: [mwpotential2014_composition]
 ```
 
 The `astra` command can [check each quote against its paper](#the-astra-command): a quote that
