@@ -20,16 +20,21 @@ Add the Lightcone plugin to your coding agent, then start an analysis together.
 The plugin teaches your agent to use Lightcone. When you start a project, it checks for the
 Lightcone CLI and offers to install the right version.
 
-<Tabs groupId="agent" persist items={['Claude Code', 'Codex', 'OpenCode']} soon={['OpenCode']}>
-<Tab value="Claude Code">
+<Tabs groupId="agent" persist defaultValue="claude-code">
+<TabsList>
+  <TabsTrigger value="claude-code">Claude Code</TabsTrigger>
+  <TabsTrigger value="codex">Codex</TabsTrigger>
+  <TabsTrigger value="opencode" disabled>OpenCode (soon)</TabsTrigger>
+</TabsList>
+<TabsContent value="claude-code">
 
 ```bash
 claude plugin marketplace add LightconeResearch/agent-skills
 claude plugin install lightcone@lightcone-research
 ```
 
-</Tab>
-<Tab value="Codex">
+</TabsContent>
+<TabsContent value="codex">
 
 ```bash
 codex plugin marketplace add LightconeResearch/agent-skills
@@ -39,7 +44,7 @@ codex plugin add lightcone@lightcone-research
 The first time Codex asks you to review the plugin's hooks, approve them: they are how the plugin
 checks the agent's work.
 
-</Tab>
+</TabsContent>
 </Tabs>
 
 </Step>
@@ -68,8 +73,13 @@ but we recommend one.
 </figure>
 </div>
 
-<Tabs items={['JupyterLab', 'VS Code', 'Browser']} soon={['VS Code', 'Browser']}>
-<Tab value="JupyterLab">
+<Tabs defaultValue="jupyterlab">
+<TabsList>
+  <TabsTrigger value="jupyterlab">JupyterLab</TabsTrigger>
+  <TabsTrigger value="vs-code" disabled>VS Code (soon)</TabsTrigger>
+  <TabsTrigger value="browser" disabled>Browser (soon)</TabsTrigger>
+</TabsList>
+<TabsContent value="jupyterlab">
 
 [Lightcone Lab](/lightcone-lab) is a JupyterLab extension, for JupyterLab 4.5.10 or newer. Start
 JupyterLab however you usually do, open the **Extension Manager** (the puzzle piece in the left
@@ -82,7 +92,7 @@ uv tool install jupyterlab --with "jupyterlab-lightcone[full]" --with-executable
 jupyter lab
 ```
 
-</Tab>
+</TabsContent>
 </Tabs>
 
 </Step>
@@ -95,21 +105,26 @@ jupyter lab
 2. **Launch your agent** in the project's directory.
 3. **Give it your research question**, using the Lightcone skill:
 
-<Tabs groupId="agent" persist items={['Claude Code', 'Codex', 'OpenCode']} soon={['OpenCode']}>
-<Tab value="Claude Code">
+<Tabs groupId="agent" persist defaultValue="claude-code">
+<TabsList>
+  <TabsTrigger value="claude-code">Claude Code</TabsTrigger>
+  <TabsTrigger value="codex">Codex</TabsTrigger>
+  <TabsTrigger value="opencode" disabled>OpenCode (soon)</TabsTrigger>
+</TabsList>
+<TabsContent value="claude-code">
 
 ```text
 /lightcone:lightcone I want to start a new analysis: <your research question>
 ```
 
-</Tab>
-<Tab value="Codex">
+</TabsContent>
+<TabsContent value="codex">
 
 ```text
 $lightcone:lightcone I want to start a new analysis: <your research question>
 ```
 
-</Tab>
+</TabsContent>
 </Tabs>
 
 From there, the agent:

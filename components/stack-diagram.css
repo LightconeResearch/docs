@@ -1,14 +1,5 @@
-/* The CLI is the hub; the dashed boundary contains only project files.
-   Keep the diagram's card styling and light/dark brand tokens. */
-.sd {
-  margin: 2rem 0 1.5rem;
-  container-type: inline-size;
-  font-variant-caps: normal;
-  --sd-ink: var(--color-fd-foreground);
-  --sd-muted: var(--color-fd-muted-foreground);
-  --sd-card: var(--color-fd-card);
-  --sd-edge: var(--lc-color-slate-blue);
-}
+/* Only the diagram's topology is custom. Cards, code, colors and typography
+   come from Fumadocs. Keep compute and the project connected to the CLI. */
 .sd-flow {
   display: grid;
   grid-template-columns: minmax(0, 2fr) 96px minmax(0, 1fr);
@@ -20,20 +11,17 @@
     'project project project';
   grid-template-rows: auto 48px auto 64px auto;
 }
-.sd-agent {
-  grid-area: agent;
-}
-.sd-cli {
-  grid-area: cli;
-}
-.sd-compute {
-  grid-area: compute;
-  align-self: center;
+.sd-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
 }
 .sd-edge {
   position: relative;
-  color: var(--sd-edge);
-  font: 500 0.75rem/1.4 var(--lc-font-ui);
+  color: var(--color-fd-muted-foreground);
+  font-size: 0.75rem;
+  line-height: 1.4;
 }
 .sd-edge--agent {
   grid-area: agent-link;
@@ -93,258 +81,7 @@
   text-align: center;
 }
 
-.sd-layer {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
-  padding: 12px 16px 14px;
-  background: var(--sd-card);
-  border: 1px solid var(--color-fd-border);
-  border-top: 3px solid var(--lc-color-slate-blue);
-  box-shadow: 0 10px 24px -18px rgb(78 90 112 / 0.45);
-  transition: box-shadow 0.15s ease;
-}
-.sd-layer:hover {
-  box-shadow: 0 14px 28px -16px rgb(78 90 112 / 0.55);
-}
-.sd-layer--strong {
-  border-top-color: var(--lc-color-blue-ink);
-}
-.sd-layer--tool {
-  border-top-color: var(--lc-color-vert-de-gris);
-}
-.sd-layer--tool .sd-name {
-  font-size: 1.125rem;
-}
-.sd-layer--tool .sd-logo {
-  height: 24px;
-}
-
-.sd-head {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.sd-logo {
-  height: 28px;
-  width: auto;
-  flex: none;
-}
-.sd-logo--wordmark {
-  height: 22px;
-}
-.sd-logo--icon {
-  width: 26px;
-  height: 26px;
-  color: var(--lc-color-slate-blue);
-}
-.dark .sd-logo--ink {
-  filter: brightness(0) invert(0.82);
-}
-.dark .sd-logo--wordmark {
-  filter: brightness(1.5);
-}
-.sd-name {
-  margin: 0;
-  font: 1.25rem/1.15 var(--lc-font-heading);
-  color: var(--sd-ink);
-}
-.sd-aside {
-  margin-left: 10px;
-  font: 0.8125rem/1 var(--lc-font-ui);
-  letter-spacing: 0.04em;
-  color: var(--sd-muted);
-}
-.sd-link {
-  color: inherit;
-  text-decoration: none;
-}
-/* A layer with one name is a link in its entirety. */
-.sd-link::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-}
-.sd-link:focus-visible::after {
-  outline: 2px solid var(--lc-color-slate-blue);
-  outline-offset: 3px;
-}
-.sd-layer:hover .sd-link,
-.sd-link:focus-visible {
-  text-decoration: underline;
-  text-decoration-color: var(--lc-color-antique-gold);
-  text-underline-offset: 3px;
-}
-
-.sd-text {
-  margin: 0;
-  font: 0.875rem/1.4 var(--lc-font-body);
-  color: var(--sd-muted);
-}
-.sd-text code,
-.sd-file > code {
-  padding: 0 5px;
-  font: 0.8125rem var(--lc-font-mono);
-  background: color-mix(in srgb, var(--lc-color-slate-blue) 12%, transparent);
-  color: var(--lc-color-slate-blue);
-}
-
-/* The repository: a dashed box around the specification and files. */
-.sd-repo {
-  grid-area: project;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 14px;
-  min-width: 0;
-  border: 2px dashed color-mix(in srgb, var(--lc-color-blue-ink) 35%, transparent);
-}
-.sd-repo__label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0;
-  font: 600 0.75rem/1 var(--lc-font-ui);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--lc-color-blue-ink);
-}
-.sd-repo__icon {
-  width: 14px;
-  height: 14px;
-}
-.sd-repo__label > span {
-  font-weight: 400;
-  letter-spacing: 0;
-  text-transform: none;
-}
-.sd-files {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-}
-.sd-file {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 10px 12px 12px;
-  background: var(--sd-card);
-  border: 1px solid var(--color-fd-border);
-  border-top: 3px solid var(--lc-color-antique-gold);
-}
-.sd-file > code {
-  align-self: flex-start;
-  font-size: 0.9375rem;
-  font-weight: 600;
-}
-
-/* The specification and write-up use matching code previews and explanations. */
-.sd-split {
-  display: grid;
-  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
-  gap: 14px;
-  align-items: start;
-}
-.sd-text b {
-  color: var(--sd-ink);
-  font-weight: 600;
-}
-.sd-code {
-  margin: 0;
-  padding: 10px 12px;
-  background: var(--lc-color-surface-muted);
-  font: 0.6875rem/1.45 var(--lc-font-mono);
-  color: var(--sd-ink);
-}
-/* One line of code: its indentation, then a hanging indent where it wraps. */
-.sd-line {
-  display: block;
-  padding-left: calc((var(--indent) + 2) * 1ch);
-  text-indent: -2ch;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-.sd-code .k {
-  color: var(--lc-color-slate-blue);
-  font-weight: 600;
-}
-.sd-code .s {
-  color: var(--sd-ink);
-}
-.sd-code .p {
-  color: var(--sd-muted);
-}
-.sd-code .b {
-  color: var(--lc-color-wax-red);
-  font-weight: 600;
-}
-.sd-code .ref {
-  color: var(--lc-color-vert-de-gris);
-  font-weight: 600;
-}
-.sd-code .id {
-  font-weight: 600;
-}
-.sd-code .ph {
-  color: var(--lc-color-antique-gold-strong);
-  font-weight: 600;
-}
-
-.sd-tools {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px 18px;
-  margin-top: 4px;
-}
-.sd-tool {
-  display: grid;
-  grid-template-columns: 52px minmax(0, 1fr);
-  gap: 10px;
-  align-items: center;
-  padding-top: 8px;
-  border-top: 1px solid var(--color-fd-border);
-}
-.sd-tool .sd-text b {
-  display: block;
-  font: 600 0.9375rem/1.3 var(--lc-font-ui);
-}
-.sd-logos {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-}
-.sd-logos img {
-  height: 26px;
-  width: auto;
-}
-.sd-logos .sd-logo--uv {
-  height: 20px;
-}
-.sd-logos--grid {
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 4px 6px;
-}
-.sd-logos--grid img {
-  height: 22px;
-}
-.sd-logos--grid .sd-logo--slurm {
-  height: 15px;
-}
-.sd-layer--compute .sd-tool {
-  grid-template-columns: 1fr;
-}
-.sd-layer--compute .sd-logos {
-  justify-content: flex-start;
-}
-
-/* Narrow screens keep two separate branches from the CLI. The rail beside
-   compute connects the CLI directly to the project, avoiding a false chain. */
+/* A shared rail keeps the two CLI branches distinct on narrow screens. */
 @container (max-width: 719px) {
   .sd-flow {
     grid-template-columns: 32px minmax(0, 1fr);
@@ -363,7 +100,7 @@
     grid-column: 1;
     grid-row: 4 / 7;
     margin: 0 0 32px 12px;
-    border-left: 1px solid var(--sd-edge);
+    border-left: 1px solid var(--color-fd-muted-foreground);
   }
   .sd-edge--compute .sd-edge__line,
   .sd-edge--project .sd-edge__line {
@@ -395,17 +132,7 @@
   .sd-edge--project .sd-edge__label > span + span::before {
     content: ' · ';
   }
-  .sd-aside {
-    display: block;
-    margin: 4px 0 0;
-  }
-  .sd-repo__label {
-    flex-wrap: wrap;
-    font-size: 0.6875rem;
-    letter-spacing: 0.06em;
-  }
-  .sd-split,
-  .sd-files {
+  .sd-split {
     grid-template-columns: 1fr;
   }
 }

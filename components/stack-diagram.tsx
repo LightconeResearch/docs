@@ -1,96 +1,45 @@
 import Link from 'fumadocs-core/link';
+import { Card, Cards } from 'fumadocs-ui/components/card';
+import { ServerCodeBlock } from 'fumadocs-ui/components/codeblock.rsc';
 import { Bot, FolderTree } from 'lucide-react';
-import type { CSSProperties, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import './stack-diagram.css';
 
-// The CLI connects the agent, compute and project. Only the specification and
-// files live inside the repository boundary; each tool links to its docs.
-
-type Line = (string | [string, string])[];
-
-// Each line keeps its indentation and wraps, when its column is narrow, with a
-// hanging indent, as an editor's soft wrap would.
-function Code({ lines }: { lines: Line[] }) {
-  return (
-    <pre className="sd-code">
-      <code>
-        {lines.map((line, i) => {
-          const indent = typeof line[0] === 'string' ? line[0].length - line[0].trimStart().length : 0;
-          const parts = typeof line[0] === 'string' ? [line[0].trimStart(), ...line.slice(1)] : line;
-          return (
-            <span key={i} className="sd-line" style={{ '--indent': indent } as CSSProperties}>
-              {parts.map((part, j) =>
-                typeof part === 'string' ? (
-                  part
-                ) : (
-                  <span key={j} className={part[0]}>
-                    {part[1]}
-                  </span>
-                ),
-              )}
-              {parts.every((part) => part === '') && '​'}
-            </span>
-          );
-        })}
-      </code>
-    </pre>
-  );
-}
-
-const astraYaml: Line[] = [
-  [['k', 'decisions:']],
-  ['  ', ['k', 'noise_model:']],
-  ['    ', ['k', 'rationale:'], ' ', ['s', 'sets the error budget']],
-  ['    ', ['k', 'options:']],
-  ['      ', ['k', 'gaussian:'], ' ', ['p', '{'], ['k', 'insights:'], ' ', ['p', '['], ['ref', 'gaussian_noise'], ['p', ']}']],
-  ['      ', ['k', 'heavy_tailed:'], ' ', ['p', '{'], ['k', 'excluded:'], ' ', ['b', 'true'], ['p', '}']],
-  [['k', 'outputs:']],
-  ['  ', ['p', '-'], ' ', ['k', 'id:'], ' ', ['id', 'fit_results']],
-  ['    ', ['k', 'decisions:'], ' ', ['p', '['], ['ref', 'noise_model'], ['p', ']']],
-  ['    ', ['k', 'recipe:']],
-  ['      ', ['k', 'command:'], ' ', ['s', 'python src/fit.py'], ' ', ['ph', '{decisions.noise_model}']],
-];
+const astraYaml = `decisions:
+  noise_model:
+    rationale: sets the error budget
+    options:
+      gaussian: {insights: [gaussian_noise]}
+      heavy_tailed: {excluded: true}
+outputs:
+  - id: fit_results
+    decisions: [noise_model]
+    recipe:
+      command: python src/fit.py {decisions.noise_model}`;
 
 // The OSPO talk's inline reference and output embed, using this project's IDs.
-const mystDocument: Line[] = [
-  ['Using ', ['k', '{astra}'], ['ref', '`decisions.noise_model`'], ','],
-  ['we obtain the following fit.'],
-  [''],
-  [['k', ':::{astra}'], ' ', ['ref', 'outputs.fit_results']],
-  [['k', ':::']],
-];
+const mystDocument = 'Using {astra}`decisions.noise_model`,\n'
+  + 'we obtain the following fit.\n\n'
+  + ':::{astra} outputs.fit_results\n:::';
 
-function Head({ logo, name, href, aside }: { logo?: ReactNode; name: string; href: string; aside?: string }) {
+function Title({ logo, name, href, aside }: { logo?: ReactNode; name: string; href: string; aside?: string }) {
   return (
-    <div className="sd-head">
+    <Link href={href} className="inline-flex flex-wrap items-center gap-2 hover:underline">
       {logo}
-      <p className="sd-name">
-        <Link href={href} className="sd-link">
-          {name}
-        </Link>
-        {aside && <span className="sd-aside">{aside}</span>}
-      </p>
-    </div>
+      {name}
+      {aside && <span className="text-xs font-normal text-fd-muted-foreground">{aside}</span>}
+    </Link>
   );
 }
 
-// A tool the CLI builds on, or runs on: its logos and a line about it.
-function Tool({ logos, title, children, grid }: { logos: ReactNode; title: string; children: ReactNode; grid?: boolean }) {
+function Tool({ logos, title, children }: { logos: ReactNode; title: string; children: ReactNode }) {
   return (
-    <div className="sd-tool">
-      <span className={`sd-logos${grid ? ' sd-logos--grid' : ''}`}>{logos}</span>
-      <p className="sd-text">
-        <b>{title}</b> {children}
+    <div className="flex items-start gap-3 border-t pt-3">
+      <span className="flex w-12 shrink-0 flex-wrap items-center justify-center gap-1">{logos}</span>
+      <p>
+        <strong className="block text-fd-foreground">{title}</strong>
+        {children}
       </p>
-    </div>
-  );
-}
-
-function File({ name, children }: { name: string; children: ReactNode }) {
-  return (
-    <div className="sd-file">
-      <code>{name}</code>
-      <p className="sd-text">{children}</p>
     </div>
   );
 }
@@ -98,21 +47,17 @@ function File({ name, children }: { name: string; children: ReactNode }) {
 export function StackDiagram() {
   return (
     <figure
-      className="sd not-prose"
+      className="not-prose my-8 @container"
       aria-label="The agent drives the Lightcone CLI, which reads the project, runs recipes on compute, and records results back in the project."
     >
       <div className="sd-flow">
-        <div className="sd-layer sd-layer--tool sd-agent">
-          <Head
-            logo={<Bot aria-hidden className="sd-logo sd-logo--icon" />}
-            name="You and your agent"
-            href="/agent-skills"
-            aside="Agent Skills"
-          />
-          <p className="sd-text">
+        <div className="min-w-0 [grid-area:agent]">
+          <Card
+            title={<Title logo={<Bot aria-hidden className="size-5" />} name="You and your agent" href="/agent-skills" aside="Agent Skills" />}
+          >
             Agent Skills teach Claude Code or Codex to write the specification with you, drive <code>lc</code>,
             and write the report up.
-          </p>
+          </Card>
         </div>
 
         <div className="sd-edge sd-edge--agent" aria-hidden="true">
@@ -120,42 +65,40 @@ export function StackDiagram() {
           <span className="sd-edge__label">Drives <code>lc</code></span>
         </div>
 
-        <div className="sd-layer sd-layer--strong sd-cli">
-          <Head
-            logo={<img src="/logos/lightcone-mark.svg" alt="" className="sd-logo sd-logo--ink" />}
-            name="Lightcone CLI"
-            href="/lightcone-cli"
-            aside="lc"
-          />
-          <p className="sd-text">
-            Reads the specification, runs each recipe sandboxed, and commits every result with{' '}
-            <b>certified provenance</b>: what ran, on which inputs, in which environment, under which sandbox.
-          </p>
-          <div className="sd-tools">
-            <Tool
-              title="Code and artifact versioning"
-              logos={
-                <>
-                  <img src="/logos/git.svg" alt="git" />
-                  <img src="/logos/git-annex.svg" alt="git-annex" />
-                </>
-              }
-            >
-              Code and spec in git, data and results in git-annex: every output committed with a
-              content-addressed run record.
-            </Tool>
-            <Tool
-              title="Reusable environment"
-              logos={
-                <>
-                  <img src="/logos/uv.svg" alt="uv" className="sd-logo--uv" />
-                  <img src="/logos/docker.svg" alt="Docker" />
-                </>
-              }
-            >
-              A uv lockfile, optionally in a container image, hashed on every output; recipes run sandboxed.
-            </Tool>
-          </div>
+        <div className="min-w-0 [grid-area:cli]">
+          <Card
+            title={<Title logo={<img src="/logos/lightcone-mark.svg" alt="" className="size-6 dark:invert" />} name="Lightcone CLI" href="/lightcone-cli" aside="lc" />}
+          >
+            <div className="flex flex-col gap-3">
+              <p>
+                Reads the specification, runs each recipe sandboxed, and commits every result with{' '}
+                <strong>certified provenance</strong>: what ran, on which inputs, in which environment, under which sandbox.
+              </p>
+              <Tool
+                title="Code and artifact versioning"
+                logos={
+                  <>
+                    <img src="/logos/git.svg" alt="git" className="size-6" />
+                    <img src="/logos/git-annex.svg" alt="git-annex" className="size-6" />
+                  </>
+                }
+              >
+                Code and spec in git, data and results in git-annex: every output committed with a
+                content-addressed run record.
+              </Tool>
+              <Tool
+                title="Reusable environment"
+                logos={
+                  <>
+                    <img src="/logos/uv.svg" alt="uv" className="size-5" />
+                    <img src="/logos/docker.svg" alt="Docker" className="h-6 w-auto" />
+                  </>
+                }
+              >
+                A uv lockfile, optionally in a container image, hashed on every output; recipes run sandboxed.
+              </Tool>
+            </div>
+          </Card>
         </div>
 
         <div className="sd-edge sd-edge--compute" aria-hidden="true">
@@ -163,21 +106,20 @@ export function StackDiagram() {
           <span className="sd-edge__label">Runs recipes</span>
         </div>
 
-        <div className="sd-layer sd-layer--compute sd-compute">
-          <Head name="Compute" href="/lightcone-cli/configuring-compute" />
-          <Tool
-            title="From a laptop to a cluster"
-            grid
-            logos={
-              <>
-                <img src="/logos/kubernetes.svg" alt="Kubernetes" />
-                <img src="/logos/dask.svg" alt="Dask" />
-                <img src="/logos/slurm.png" alt="Slurm" className="sd-logo--slurm" />
-              </>
-            }
-          >
-            Recipes run on your machine, or on Dask, Kubernetes or Slurm clusters, under the same run record.
-          </Tool>
+        <div className="min-w-0 self-center [grid-area:compute]">
+          <Card title={<Title name="Compute" href="/lightcone-cli/configuring-compute" />}>
+            <div className="flex flex-col gap-3">
+              <span className="flex items-center gap-2">
+                <img src="/logos/kubernetes.svg" alt="Kubernetes" className="size-6" />
+                <img src="/logos/dask.svg" alt="Dask" className="size-6" />
+                <img src="/logos/slurm.png" alt="Slurm" className="h-4 w-auto" />
+              </span>
+              <p>
+                <strong className="block text-fd-foreground">From a laptop to a cluster</strong>
+                Recipes run on your machine, or on Dask, Kubernetes or Slurm clusters, under the same run record.
+              </p>
+            </div>
+          </Card>
         </div>
 
         <div className="sd-edge sd-edge--project" aria-hidden="true">
@@ -185,49 +127,41 @@ export function StackDiagram() {
           <span className="sd-edge__label"><span>Reads the spec</span><span>Records results</span></span>
         </div>
 
-        <div className="sd-repo">
-          <p className="sd-repo__label">
-            <FolderTree aria-hidden className="sd-repo__icon" />
+        <div className="flex min-w-0 flex-col gap-4 rounded-xl border border-dashed p-4 [grid-area:project]">
+          <p className="flex flex-wrap items-center gap-2 text-sm text-fd-muted-foreground">
+            <FolderTree aria-hidden className="size-4" />
             Your project <span>· one git repository</span>
           </p>
-          <div className="sd-layer">
-            <Head
-              logo={<img src="/logos/astra.svg" alt="" className="sd-logo sd-logo--ink" />}
-              name="astra.yaml"
-              href="/astra"
-              aside="ASTRA"
-            />
+          <Card
+            title={<Title logo={<img src="/logos/astra.svg" alt="" className="size-6 dark:invert" />} name="astra.yaml" href="/astra" aside="ASTRA" />}
+          >
             <div className="sd-split">
-              <Code lines={astraYaml} />
-              <p className="sd-text">
-                The analysis as structured data: <b>insights</b> from the literature, <b>decisions</b> with their{' '}
-                <b>rationale</b> and the options not taken, <b>recipes</b> that make each <b>output</b>, and the{' '}
-                <b>findings</b> the outputs support.
+              <ServerCodeBlock code={astraYaml} lang="yaml" codeblock={{ keepBackground: true }} />
+              <p>
+                The analysis as structured data: <strong>insights</strong> from the literature, <strong>decisions</strong> with their{' '}
+                <strong>rationale</strong> and the options not taken, <strong>recipes</strong> that make each <strong>output</strong>, and the{' '}
+                <strong>findings</strong> the outputs support.
               </p>
             </div>
-          </div>
-          <div className="sd-layer">
-            <Head
-              logo={<img src="/logos/myst-logo.svg" alt="" className="sd-logo sd-logo--wordmark" />}
-              name="index.md"
-              href="/mystra"
-              aside="MySTRA"
-            />
+          </Card>
+          <Card
+            title={<Title logo={<img src="/logos/myst-logo.svg" alt="" className="h-5 w-auto dark:brightness-150" />} name="index.md" href="/mystra" aside="MySTRA" />}
+          >
             <div className="sd-split">
-              <Code lines={mystDocument} />
-              <p className="sd-text">
-                Your write-up in MyST: <b>decisions</b> link to their record, and <b>results</b> are embedded
+              <ServerCodeBlock code={mystDocument} lang="md" codeblock={{ keepBackground: true }} />
+              <p>
+                Your write-up in MyST: <strong>decisions</strong> link to their record, and <strong>results</strong> are embedded
                 from the project. MySTRA resolves the references when you build the document.
               </p>
             </div>
-          </div>
-          <div className="sd-files">
-            <File name="src/">Your code, in git. A recipe names the command that runs it.</File>
-            <File name="data/">Input data, carried by git-annex.</File>
-            <File name="results/">
+          </Card>
+          <Cards className="grid-cols-3">
+            <Card title={<code>src/</code>}>Your code, in git. A recipe names the command that runs it.</Card>
+            <Card title={<code>data/</code>}>Input data, carried by git-annex.</Card>
+            <Card title={<code>results/</code>}>
               What <code>lc</code> produced, each with a manifest and run record.
-            </File>
-          </div>
+            </Card>
+          </Cards>
         </div>
       </div>
     </figure>
