@@ -4,20 +4,15 @@ description: Rigorous research, without the bookkeeping.
 icon: CircleQuestionMark
 ---
 
-The Lightcone Stack is a sidecar for your research: it attaches to the project you're working on and
-to the agent you already use, stays out of the way of how you work, and makes sure your work is
-rigorous and reproducible by default. As you work, it keeps track of three things for you:
+The Lightcone Stack makes it easier to do research with an AI agent, from planning an analysis to
+running it and writing up the results. It works with agents such as Claude Code and Codex, using
+your own code, data and compute.
 
-- **Every decision, and why.** The methodological choices you make are written down with the options
-  you considered, the reasons for the choice, and the papers that informed it.
-- **Every result, and what made it.** Each result carries a record of the code, data and environment
-  that produced it, and anything made outside that record is flagged.
-- **What a change affects.** When a decision or the data changes, you can see which results are out
-  of date, and why.
-
-We're not prescriptive about how much you use AI in your research: use an agent for everything, for
-some things, or not at all. Our goal is to make sure that the science you do, however you do it, is
-rigorous and reproducible.
+Your agent writes down the methods, choices and supporting evidence as you work. When the analysis
+runs, Lightcone automatically records the code, data and environment behind each result. You and
+your collaborators can trace a result back to the work that produced it, review the reasoning and
+rerun the analysis. That record stays in your project, where you can check it long after the agent's
+session has ended.
 
 <Callout type="warn" title="Public beta">
   The Lightcone Stack is in a **public beta**: expect some breaking changes between minor versions.
@@ -25,17 +20,9 @@ rigorous and reproducible.
   Please [open an issue](https://github.com/LightconeResearch/lightcone-cli/issues).
 </Callout>
 
-## Start using Lightcone
+## Elements of the stack
 
-New to Lightcone? Follow the [Quick Start](/quickstart) to install it, add it to your agent, and
-open Lightcone Lab. If Lightcone is already installed, you can go on to:
-
-- [Your first analysis](/guides/first-analysis), a walk-through of a complete analysis that you do
-  with your agent, from a research question to a report.
-- [Configuring compute](/lightcone-cli/configuring-compute), to set Lightcone up on a high-performance
-  computing system.
-
-{/* TODO: more options */}
+<StackLayers />
 
 ## How it works
 

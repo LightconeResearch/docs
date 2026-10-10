@@ -4,6 +4,7 @@ import { Tab, Tabs, TabsContent, TabsList, TabsTrigger } from 'fumadocs-ui/compo
 import { ImageZoom, type ImageZoomProps } from 'fumadocs-ui/components/image-zoom';
 import type { MDXComponents } from 'mdx/types';
 import { StackDiagram } from '@/components/stack-diagram';
+import { StackLayers } from '@/components/stack-layers';
 import { ComputeLayers } from '@/components/compute-layers';
 
 export function getMDXComponents(components?: MDXComponents) {
@@ -18,6 +19,7 @@ export function getMDXComponents(components?: MDXComponents) {
     TabsList,
     TabsTrigger,
     StackDiagram,
+    StackLayers,
     ComputeLayers,
     ...components,
   } satisfies MDXComponents;
