@@ -15,17 +15,17 @@ of work in its own right. This page compares the stack with other tools for AI-a
 
 ## At a glance
 
-| Tool                        | Main focus                                                         |
-| --------------------------- | ------------------------------------------------------------------ |
-| Lightcone Stack             | Scientific decisions, their evidence, and an open analysis record  |
-| Claude Science, OpenScience | Research workbenches that track the provenance of artifacts        |
-| Kosmos, The AI Scientist    | Autonomous research, from question to report                       |
-| Snakemake, Nextflow         | Defining and running reproducible pipelines                        |
+| Tool | Main focus |
+| --- | --- |
+| Lightcone Stack | Scientific decisions, their evidence, and an open analysis record |
+| [Claude Science](https://www.anthropic.com/news/claude-science-ai-workbench), [Open Science](https://github.com/aipoch/open-science) | Research workbenches that track the provenance of artifacts |
+| [Kosmos](https://advances.edisonscientific.com/research/announcing-kosmos/), [The AI Scientist](https://sakana.ai/ai-scientist/), [Denario](https://github.com/Denario-AI/Denario) | Autonomous research, from question to report |
+| [Snakemake](https://snakemake.readthedocs.io/), [Nextflow](https://www.nextflow.io/) | Defining and running reproducible pipelines |
 
 ## Provenance and decisions
 
 Research workbenches such as [Claude Science](https://www.anthropic.com/news/claude-science-ai-workbench)
-and [OpenScience](https://github.com/synthetic-sciences/openscience) save versioned figures and other
+and [Open Science](https://github.com/aipoch/open-science) save versioned figures and other
 files, with the conversation, code and logs that produced them. That tells you how each file was made.
 ASTRA also records why: the scientific decisions behind the analysis, the options considered for each,
 and the literature that supports them.
@@ -40,8 +40,8 @@ the two together, as the next section shows.
 
 ## Bring your own workspace
 
-Claude Science and OpenScience come with their own agents and browser-based workspaces. With the
-Lightcone Stack, you keep the agent and the tools you already use.
+Claude Science and Open Science come with their own agents and workspaces. With the Lightcone Stack,
+you keep the agent and the tools you already use.
 
 The stack covers an analysis from start to finish, but its tools are independent, and none requires the
 others. You can record an analysis in `astra.yaml` and run it with your own scripts or workflow manager
@@ -52,8 +52,10 @@ instead of the Lightcone CLI. You could also ask the agent in Claude Science to 
 The Lightcone Stack is for researchers who want to understand every step of their analysis and stay
 responsible for it. Autonomous AI scientists such as
 [Kosmos](https://advances.edisonscientific.com/research/announcing-kosmos/) and Sakana's
-[AI Scientist](https://sakana.ai/ai-scientist/) pursue a research question end to end on their own. You
-receive their conclusions without having made the choices behind them.
+[AI Scientist](https://sakana.ai/ai-scientist/) pursue a research question end to end on their own.
+[Denario](https://github.com/Denario-AI/Denario) can do the same, from generating the idea to drafting and reviewing the paper, though
+its agents can also run a single step. You receive their conclusions without having made the choices
+behind them.
 
 ## Owned by the research community
 
