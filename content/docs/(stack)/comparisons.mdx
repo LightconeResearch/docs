@@ -57,6 +57,20 @@ responsible for it. Autonomous AI scientists such as
 its agents can also run a single step. You receive their conclusions without having made the choices
 behind them.
 
+## Share the whole project
+
+A Lightcone project is one git repository, holding the specification, the code, the data, the results
+with their run records, and the report. You share it the way you share any repository, with no export
+step. Git carries the code and the record to any git host, and
+[git-annex](https://git-annex.branchable.com/) keeps the data and results wherever you choose to store
+them, from a lab server to cloud storage, recording where each file lives.
+
+A collaborator who clones the project can check how every result was made before downloading any data,
+and `git annex get` fetches the files when they need them. When you publish, the agent adds a license
+and an [RO-Crate](https://www.researchobject.org/ro-crate/) description, so the project can be archived
+and cited as it stands. The other tools on this page focus on producing results, and leave sharing the
+work behind them to you.
+
 ## Owned by the research community
 
 The Lightcone Stack is open source. We believe the academic community should own, maintain and extend
