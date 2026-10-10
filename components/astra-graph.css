@@ -1,0 +1,197 @@
+/* The ASTRA graph's canvas is 900 units wide; --u is one unit, so text and
+   spacing scale with the column. Below 720px the canvas stops shrinking and
+   scrolls sideways instead. Kind colours follow astra-ui, as on the slide. */
+.ag-scroll {
+  overflow-x: auto;
+}
+.ag-sizer {
+  container-type: inline-size;
+  min-width: 720px;
+}
+.ag-stage {
+  --u: calc(100cqw / 900);
+  --ag-insight: #8b7d70;
+  --ag-input: #4e5a70;
+  --ag-decision: #a67c3c;
+  --ag-output: #3b7a73;
+  --ag-finding: #a45a43;
+  --ag-edge: color-mix(in srgb, var(--color-fd-muted-foreground) 70%, transparent);
+  position: relative;
+  aspect-ratio: 900 / 400;
+}
+.dark .ag-stage {
+  --ag-insight: #b3a598;
+  --ag-input: #9aa6bd;
+  --ag-decision: #c9a063;
+  --ag-output: #6fb3ab;
+  --ag-finding: #d38a72;
+}
+
+.ag-edges {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.ag-edge {
+  fill: none;
+  stroke: var(--ag-edge);
+  stroke-width: 1.5;
+}
+.ag-edge--decision {
+  stroke: var(--ag-decision);
+}
+.ag-edge--insight {
+  stroke: var(--ag-insight);
+  stroke-dasharray: 5 4;
+}
+.ag-edge--finding {
+  stroke: var(--ag-finding);
+}
+.ag-marker {
+  fill: var(--ag-edge);
+}
+.ag-marker--decision {
+  fill: var(--ag-decision);
+}
+.ag-marker--insight {
+  fill: var(--ag-insight);
+}
+.ag-marker--finding {
+  fill: var(--ag-finding);
+}
+.ag-rel {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  fill: var(--color-fd-muted-foreground);
+}
+
+.ag-node {
+  --k: var(--ag-output);
+  position: absolute;
+  box-sizing: border-box;
+  padding: calc(8 * var(--u)) calc(11 * var(--u)) calc(9 * var(--u));
+  overflow: hidden;
+  background: var(--color-fd-card);
+  border: 1px solid var(--color-fd-border);
+  border-left: 3px solid var(--k);
+  color: var(--color-fd-foreground);
+  line-height: 1.25;
+}
+.ag-node--insight {
+  --k: var(--ag-insight);
+}
+.ag-node--input {
+  --k: var(--ag-input);
+}
+.ag-node--decision {
+  --k: var(--ag-decision);
+  background: color-mix(in srgb, var(--k) 6%, var(--color-fd-card));
+}
+.ag-node--finding {
+  --k: var(--ag-finding);
+}
+.ag-type {
+  display: flex;
+  align-items: center;
+  gap: calc(5 * var(--u));
+  margin: 0 0 calc(2 * var(--u));
+  font-size: calc(9.5 * var(--u));
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--k);
+}
+.ag-type span {
+  font-size: calc(12 * var(--u));
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.ag-title {
+  margin: 0;
+  font-size: calc(14 * var(--u));
+  font-weight: 600;
+  line-height: 1.25;
+}
+.ag-meta {
+  margin: calc(4 * var(--u)) 0 0;
+  font-size: calc(11 * var(--u));
+  color: var(--color-fd-muted-foreground);
+}
+.ag-options {
+  list-style: none;
+  margin: calc(8 * var(--u)) 0 0;
+  padding: 0;
+  font-size: calc(12 * var(--u));
+  line-height: 1.25;
+  color: var(--color-fd-muted-foreground);
+}
+.ag-options li {
+  position: relative;
+  margin: 0 0 calc(4 * var(--u));
+  padding: calc(4 * var(--u)) calc(6 * var(--u)) calc(4 * var(--u)) calc(20 * var(--u));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border: 1px dashed color-mix(in srgb, var(--ag-decision) 45%, transparent);
+  background: var(--color-fd-card);
+}
+.ag-options li::before {
+  content: '';
+  position: absolute;
+  left: calc(7 * var(--u));
+  top: 50%;
+  width: calc(8 * var(--u));
+  height: calc(8 * var(--u));
+  margin-top: calc(-5 * var(--u));
+  border: 1.5px solid var(--ag-decision);
+  border-radius: 50%;
+}
+.ag-options li.is-on {
+  border-style: solid;
+  border-color: var(--ag-decision);
+  color: var(--color-fd-foreground);
+  font-weight: 600;
+}
+.ag-options li.is-on::before {
+  background: var(--ag-decision);
+}
+.ag-backed {
+  margin-left: calc(3 * var(--u));
+  font-weight: 400;
+  color: var(--ag-insight);
+}
+.ag-figure {
+  display: block;
+  width: 100%;
+  height: calc(56 * var(--u));
+  margin: calc(4 * var(--u)) 0;
+  object-fit: cover;
+  object-position: center 30%;
+  background: #fff;
+}
+.ag-recipe {
+  display: block;
+  margin-top: calc(6 * var(--u));
+  padding: calc(4 * var(--u)) calc(6 * var(--u));
+  background: var(--color-fd-muted);
+  font-family: var(--font-mono);
+  font-size: calc(9.5 * var(--u));
+  line-height: 1.45;
+  white-space: nowrap;
+  overflow: hidden;
+  color: var(--color-fd-foreground);
+}
+.ag-recipe > span {
+  display: block;
+}
+.ag-recipe__cmd::before {
+  content: '$ ';
+  color: var(--color-fd-muted-foreground);
+}
+.ag-recipe__ref {
+  color: var(--ag-decision);
+}

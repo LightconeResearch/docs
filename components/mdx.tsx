@@ -7,6 +7,8 @@ import { StackDiagram } from '@/components/stack-diagram';
 import { StackLayers } from '@/components/stack-layers';
 import { ComputeLayers } from '@/components/compute-layers';
 import { AgentDemo } from '@/components/agent-demo';
+import { AstraGraph } from '@/components/astra-graph';
+import { LoopVideo } from '@/components/loop-video';
 
 export function getMDXComponents(components?: MDXComponents) {
   return {
@@ -23,6 +25,8 @@ export function getMDXComponents(components?: MDXComponents) {
     StackLayers,
     ComputeLayers,
     AgentDemo,
+    AstraGraph,
+    LoopVideo,
     ...components,
   } satisfies MDXComponents;
 }
