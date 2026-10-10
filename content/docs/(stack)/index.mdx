@@ -17,6 +17,36 @@ The stack works with Claude Code and Codex, on your own code and data.
 
 <AgentDemo />
 
+Add the Lightcone plugin to your agent:
+
+<Tabs groupId="agent" persist defaultValue="claude-code">
+<TabsList>
+  <TabsTrigger value="claude-code">Claude Code</TabsTrigger>
+  <TabsTrigger value="codex">Codex</TabsTrigger>
+</TabsList>
+<TabsContent value="claude-code">
+
+```bash
+claude plugin marketplace add LightconeResearch/agent-skills
+claude plugin install lightcone@lightcone-research
+```
+
+</TabsContent>
+<TabsContent value="codex">
+
+```bash
+codex plugin marketplace add LightconeResearch/agent-skills
+codex plugin add lightcone@lightcone-research
+```
+
+The first time Codex asks you to review the plugin's hooks, approve them: they are how the plugin
+checks the agent's work.
+
+</TabsContent>
+</Tabs>
+
+Then follow the [Quick Start](/quickstart) to set up your first analysis.
+
 ## Elements of the stack
 
 <StackLayers />
