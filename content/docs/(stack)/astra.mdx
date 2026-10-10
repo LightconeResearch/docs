@@ -139,12 +139,18 @@ the version of any tool.
 ## The `astra` command
 
 [astra-tools](https://github.com/LightconeResearch/astra-tools) provides the `astra` command, which
-validates and inspects a specification. You don't need to install it: `uvx` fetches it on first use.
-Run it from your project directory, with the version the current Lightcone CLI expects:
+validates and inspects a specification. Install it with uv, at the version the current Lightcone CLI
+expects:
 
 ```bash
-uvx astra-tools@0.2.18 validate
-uvx astra-tools@0.2.18 info
+uv tool install astra-tools@0.2.18
+```
+
+Then run it from your project directory:
+
+```bash
+astra validate
+astra info
 ```
 
 With no file name, `validate` checks every specification file in the project.
@@ -153,15 +159,16 @@ To check the quotes in your evidence, add each cited paper to `astra`'s local ca
 with `--verify-evidence`:
 
 ```bash
-uvx astra-tools@0.2.18 paper add 10.1088/0004-637X/712/1/260
-uvx astra-tools@0.2.18 validate astra.yaml --verify-evidence
+astra paper add 10.1088/0067-0049/216/2/29 --pdf bovy2015.pdf
+astra validate astra.yaml --verify-evidence
 ```
 
-`paper add` downloads arXiv papers from arXiv, and other papers from an open-access copy when one
-exists. For a paper without one, register your own PDF with `--pdf`. Evidence that cites the
-analysis's own outputs is skipped until those outputs exist.
+Without `--pdf`, `paper add` downloads the paper itself: arXiv DOIs straight from arXiv, and other
+DOIs from an open-access copy when one exists. Publisher DOIs often have none, as for Bovy (2015)
+above, so download the PDF yourself and register it with `--pdf`. Evidence that cites the analysis's
+own outputs is skipped until those outputs exist.
 
-The agent plugin runs the same command with its own pinned version, so you only need it to check
+The agent plugin runs `astra` with its own pinned version, so you only need to install it to check
 things yourself.
 
 ## Learn more
