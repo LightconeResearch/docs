@@ -55,6 +55,24 @@
   --color-fd-primary: var(--lc-color-antique-gold);
 }
 
+/* Newsreader reads smaller than Fumadocs' sans-serif at the same size, so the
+   page's text runs at 18px instead of 16px. Only the page body: Fumadocs also
+   puts .prose on the table of contents' links, which keep their own size. */
+#nd-page > .prose {
+  font-size: 1.125rem;
+  line-height: 1.7;
+}
+
+/* The page title keeps Fumadocs' ratio to the section headings, which grow
+   with the text, and inline code keeps its ratio to the text around it. Code
+   blocks keep Fumadocs' size, so long commands fit. */
+#nd-page > h1 {
+  font-size: 2rem;
+}
+#nd-page > .prose :not(pre) > code {
+  font-size: 0.8125em;
+}
+
 html {
   scrollbar-gutter: stable;
 }
@@ -66,6 +84,13 @@ html {
 #nd-sidebar-mobile p {
   font-size: 1rem;
   font-weight: 600;
+}
+
+/* The sidebar's page links and folders, in its scroll area: 15px, as Alegreya's
+   small capitals read smaller than Fumadocs' sans-serif at its 14px. */
+#nd-sidebar [data-id$='-viewport'] :is(a, button),
+#nd-sidebar-mobile [data-id$='-viewport'] :is(a, button) {
+  font-size: 0.9375rem;
 }
 
 html > body[data-scroll-locked] {
