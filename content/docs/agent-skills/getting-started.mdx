@@ -1,29 +1,99 @@
 ---
 title: Quick Start
-description: Install the lightcone plugin and start, or pick up, a project with your agent.
+description: Install the lightcone plugin in Claude Code, Codex or their desktop apps, and start a project.
 icon: Rocket
 ---
+
+The plugin is distributed from the
+[LightconeResearch/agent-skills](https://github.com/LightconeResearch/agent-skills) repository,
+which your agent adds as a plugin marketplace named `lightcone-research`.
 
 <Steps>
 <Step>
 
+### Add the marketplace
+
+This is a one-time step for each agent.
+
+<Tabs groupId="agent" persist defaultValue="claude-code">
+<TabsList>
+  <TabsTrigger value="claude-code">Claude Code</TabsTrigger>
+  <TabsTrigger value="codex">Codex</TabsTrigger>
+  <TabsTrigger value="claude-app">Claude app</TabsTrigger>
+  <TabsTrigger value="codex-app">Codex app</TabsTrigger>
+</TabsList>
+<TabsContent value="claude-code">
+
+```bash
+claude plugin marketplace add LightconeResearch/agent-skills
+```
+
+</TabsContent>
+<TabsContent value="codex">
+
+```bash
+codex plugin marketplace add LightconeResearch/agent-skills
+```
+
+</TabsContent>
+<TabsContent value="claude-app">
+
+Open **Customize → Plugins → Add → Add marketplace → Add from repo** and paste
+`https://github.com/LightconeResearch/agent-skills`.
+
+</TabsContent>
+<TabsContent value="codex-app">
+
+Open **Plugins** from the arrow beside **Create** and add the `LightconeResearch/agent-skills`
+marketplace.
+
+</TabsContent>
+</Tabs>
+
+</Step>
+<Step>
+
 ### Install the plugin
 
-Register the Lightcone marketplace, then install the `lightcone` plugin, which includes `astra`:
+<Tabs groupId="agent" persist defaultValue="claude-code">
+<TabsList>
+  <TabsTrigger value="claude-code">Claude Code</TabsTrigger>
+  <TabsTrigger value="codex">Codex</TabsTrigger>
+  <TabsTrigger value="claude-app">Claude app</TabsTrigger>
+  <TabsTrigger value="codex-app">Codex app</TabsTrigger>
+</TabsList>
+<TabsContent value="claude-code">
 
-```bash tab="Claude Code"
-claude plugin marketplace add LightconeResearch/agent-skills
+```bash
 claude plugin install lightcone@lightcone-research
 ```
 
-```bash tab="Codex"
-codex plugin marketplace add LightconeResearch/agent-skills
+</TabsContent>
+<TabsContent value="codex">
+
+```bash
 codex plugin add lightcone@lightcone-research
 ```
 
-The plugin drives the Lightcone CLI, so install that too (`uv tool install lightcone-cli==0.5.0rc5`).
-[Installation](/agent-skills/installation) covers the desktop apps, installing `astra` on its own,
-and what the plugins need at runtime.
+The first time Codex asks you to review the plugin's hooks, approve them: they are how the plugin
+checks the agent's work.
+
+</TabsContent>
+<TabsContent value="claude-app">
+
+In **Customize → Plugins**, choose **lightcone** from the `lightcone-research` marketplace.
+
+</TabsContent>
+<TabsContent value="codex-app">
+
+Open **Plugins** from the arrow beside **Create**, then search for **lightcone** and install it.
+
+</TabsContent>
+</Tabs>
+
+The plugin runs the [Lightcone CLI](/lightcone-cli/getting-started#install-the-cli). At the start of
+each session, it checks for the CLI, and if it's missing or too old, your agent offers to install
+the version it needs.
 
 </Step>
 <Step>
