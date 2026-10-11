@@ -4,33 +4,51 @@ description: Install Lightcone Lab, open a project and find your way around the 
 icon: Rocket
 ---
 
-This page takes you from installing Lightcone Lab to working on a project with an agent. Each step
-links to the page that covers it in detail.
+Lab comes in two installs. The **full install** adds the features that run on the Jupyter server:
+agent sessions in Jupyter AI, each result's freshness and provenance, comments, and the report
+preview. The **workbench only** runs entirely in the browser, so it also works in a JupyterLab whose
+environment you can't change, such as a JupyterHub at a computing center. The
+[Workbench tour](/lightcone-lab/features) marks the features that need the full install.
 
 <Steps>
 <Step>
 
-### Install the extension
+### Install Lab
 
-Lab installs into the environment that runs JupyterLab 4.5.10 or newer. For the browser-only
-workbench:
+<Tabs items={['Full install', 'Workbench only']}>
+<Tab value="Full install">
+
+Install JupyterLab with Lab, using [uv](https://docs.astral.sh/uv/):
 
 ```bash
-pip install jupyterlab-lightcone
+uv tool install jupyterlab --with "jupyterlab-lightcone[full]"
 ```
 
-It creates projects with the Lightcone CLI, so it also needs `lc` on the terminal's `PATH`; see the
-[CLI install instructions](/lightcone-cli/getting-started#install-the-cli). For the features that run on the Jupyter
-server (freshness, provenance, comments, the report preview and Jupyter AI sessions), install
-`jupyterlab-lightcone[full]` instead. [Installation](/lightcone-lab/installation) compares the two.
+The full install needs Linux or macOS, and git. Previewing a report also needs
+[Node.js](https://nodejs.org/) 20 or newer.
+
+</Tab>
+<Tab value="Workbench only">
+
+In JupyterLab 4.5.10 or newer, open the **Extension Manager** (the puzzle piece in the left sidebar),
+search for `jupyterlab-lightcone`, install it, and restart JupyterLab. On JupyterHub, restart with
+**File › Hub Control Panel › Stop My Server**, then start your server again.
+
+The Extension Manager installs with pip, into the environment that runs JupyterLab, so it can't
+install into a JupyterLab installed with uv.
+
+</Tab>
+</Tabs>
 
 </Step>
 <Step>
 
 ### Start JupyterLab
 
+With the full install, start JupyterLab with:
+
 ```bash
-jupyter lab
+jupyter-lab
 ```
 
 </Step>
@@ -40,8 +58,9 @@ jupyter lab
 
 Browse the file browser into a folder that holds an `astra.yaml`: the launcher tab becomes the
 project's **Home**. To start a new project, choose **New Lightcone project** in a launcher outside
-any project, or run **Create project** from the command palette. See
-[New and existing projects](/lightcone-lab/features#projects).
+any project, or run **Create project** from the command palette. In the workbench only, this runs
+`lc init` in a terminal, so [install the Lightcone CLI](/lightcone-cli/getting-started#install-the-cli)
+where JupyterLab's terminals can find it. See [New and existing projects](/lightcone-lab/features#projects).
 
 </Step>
 <Step>
@@ -57,10 +76,58 @@ The [Workbench tour](/lightcone-lab/features) covers each feature.
 
 ### Work with an agent
 
-In the browser-only workbench, the **claude** and **codex** buttons on Home start an agent in a
-terminal, in the project folder. With the full install, the **New session** box starts a Jupyter AI
-session instead. Add the [Agent Skills](/agent-skills) plugin so the agent knows how to work on a
-Lightcone project; [Agents](/lightcone-lab/agents) covers the setup.
+In the workbench only, the **claude** and **codex** buttons on Home start an agent in a terminal, in
+the project folder. With the full install, the **New session** box starts a Jupyter AI session
+instead. Either way, add the [Agent Skills](/agent-skills/getting-started) plugin so the agent knows
+how to work on a Lightcone project.
+
+Jupyter AI talks to coding agents through [Agent Client Protocol](https://agentclientprotocol.com)
+adapters, and none comes with Lab. For each agent you want in Jupyter AI, install the agent and sign
+in, then install its adapter, which needs [Node.js](https://nodejs.org/) 22 or newer:
+
+<Tabs groupId="agent" persist defaultValue="claude-code">
+<TabsList>
+  <TabsTrigger value="claude-code">Claude Code</TabsTrigger>
+  <TabsTrigger value="codex">Codex</TabsTrigger>
+</TabsList>
+<TabsContent value="claude-code">
+
+Install [Claude Code](https://code.claude.com/docs/en/setup) and run `claude` once to sign in. Then:
+
+```bash
+npm install -g @agentclientprotocol/claude-agent-acp
+```
+
+</TabsContent>
+<TabsContent value="codex">
+
+Install the [Codex CLI](https://developers.openai.com/codex/cli) and sign in with `codex login`. Then:
+
+```bash
+npm install -g @agentclientprotocol/codex-acp
+```
+
+</TabsContent>
+</Tabs>
+
+Restart JupyterLab, and the agent appears in the **New session** box's agent picker.
+[Agents](/lightcone-lab/agents) covers sessions in detail.
 
 </Step>
 </Steps>
+
+## Update and uninstall
+
+For the full install:
+
+```bash tab="Update"
+uv tool upgrade jupyterlab
+```
+
+```bash tab="Uninstall"
+uv tool uninstall jupyterlab
+```
+
+For the workbench only, use the Extension Manager. Your projects are untouched. The full install
+keeps its state inside each project, sessions in `chats/` and comments in `.lightcone/`; delete
+those folders if you no longer want them.
