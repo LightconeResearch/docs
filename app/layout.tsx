@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Analytics } from '@vercel/analytics/next';
 import { Banner } from 'fumadocs-ui/components/banner';
 import { Provider } from '@/components/provider';
 import './global.css';
@@ -28,6 +29,7 @@ export default function Layout({ children }: LayoutProps<'/'>) {
           </Banner>
           {children}
         </Provider>
+        <Analytics />
       </body>
     </html>
   );

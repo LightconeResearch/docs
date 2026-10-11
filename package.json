@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@lightcone-research/brand": "^0.0.4",
+    "@vercel/analytics": "^2.0.1",
     "cn": "^0.3.0",
     "fumadocs-core": "16.17.1",
     "fumadocs-mdx": "15.4.7",
