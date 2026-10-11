@@ -1,126 +1,196 @@
 ---
 title: Core concepts
-description: The mental model behind lc, from what a project is to what the three output states mean.
+description: What a project contains, what lc records about each output, and how it decides what to remake.
 icon: Lightbulb
 ---
 
-The mental model behind `lc`, in one page. Nothing here is required to use the CLI: come back when
-you want to know *why* it behaves the way it does.
+This page explains how `lc` works: what a project contains, what it records about each output, and
+how it decides what to remake. You don't need it to use the CLI.
 
-## A project is three files
+## What a project contains
 
-A lightcone project is a directory holding an ASTRA spec and a uv project:
+A project is a [DataLad](https://www.datalad.org/) dataset, a git repository with git-annex, that
+holds an ASTRA specification and a uv project:
 
-- **`astra.yaml`** describes the analysis: inputs, outputs, recipes, methodological decisions. It is
-  the single source of truth: everything `lc` does is downstream of it.
-- **`pyproject.toml` + `uv.lock`** describe the environment: every package a recipe may import,
-  resolved to exact versions. The `.venv` is built *from* the lock and is disposable; the lock is
-  what's real, and it travels in git.
+- **`astra.yaml`** describes the analysis: its inputs, outputs, recipes and decisions. `lc` reads
+  everything it runs from this file.
+- **`pyproject.toml` and `uv.lock`** describe the environment: the packages recipes can import, at
+  exact versions. `lc` builds `.venv` from the lock. The lock is committed, and `.venv` isn't.
+- **The repository** holds the code, the data and the results, with their history. git stores the
+  code and the specification, and git-annex the data and results, as the
+  [next section](#a-project-is-a-datalad-dataset) explains.
 
-There is no global configuration, no registry, no state outside the project. Clone the repository
-and you have everything except two pieces of local machinery (`.venv` and the git-annex
-initialization), which `lc init` rebuilds.
+Everything about the analysis is in the project. The only `lc` configuration outside it,
+`~/.lightcone/compute.yaml`, describes the machines you run on. A clone has everything except `.venv`
+and the local git-annex setup, which `lc init` rebuilds.
 
-Adding a dependency is a uv operation, not an `lc` one:
+Add dependencies with uv:
 
 ```bash
 uv add numpy
 ```
 
-That updates `pyproject.toml`, re-locks, and syncs `.venv` in one step. Recipes import from the
-locked environment and nothing else: a stray `pip install` on your machine changes nothing they can
-see.
+This updates `pyproject.toml`, re-locks and syncs `.venv`. Recipes can import only from the locked
+environment, so packages installed elsewhere on your machine, with `pip install` for example, don't
+affect them.
 
-## An output has an identity, and three facts about it
+## A project is a DataLad dataset
 
-Every materialized output records, in its `.<output_id>.manifest.json`:
+A git repository with git-annex has the structure of a DataLad dataset, and `lc init` writes the
+one thing that makes it a dataset: an ID in `.datalad/config`. `lc` itself runs only git and
+git-annex, so you don't need DataLad, but DataLad commands work on the project: `datalad clone`, `datalad get`, `datalad rerun`.
 
-1. **What it is**: a hash of its recipe and the decision values that shaped it (its *definition*).
-2. **What it was made from**: a content hash of each declared input.
-3. **What it ran under**: a hash of the environment (the lock, the interpreter, the image
-   declaration if any), plus the git commit the run started at.
+### What git stores, and what git-annex stores
 
-Those three facts are deliberately not one fact, because they age differently, and that is what the
-three states mean:
+`.gitattributes`, written by `lc init`, sends data and results to git-annex and keeps everything
+else in git:
 
-| state     | means                                                                                                  | what `lc materialize` does  |
-| --------- | ------------------------------------------------------------------------------------------------------ | --------------------------- |
-| `current` | the output is exactly what the spec asks for, made from these inputs, under this environment           | nothing                     |
-| `stale`   | the output **contradicts** the project: the spec now defines it differently, or an input's content changed | remakes it                  |
-| `behind`  | the output is still exactly what the spec asks for; only the **environment** moved since it was made  | reports it, leaves it alone |
+| Path                              | Stored by | Why                                                    |
+| --------------------------------- | --------- | ------------------------------------------------------ |
+| `data/`                           | git-annex | Input data, which can be large                         |
+| `results/`                        | git-annex | Outputs, which can be large                            |
+| `results/**/.*.manifest.json`     | git       | Readable on a clone that has fetched no data           |
+| `.datalad/environments/*/image`   | git-annex | Container images, for containerized projects           |
+| Everything else                   | git       | The spec, code, lock and report                        |
 
-The line between `stale` and `behind` is contradiction versus circumstance. A stale output is
-mislabelled: keeping it would be a lie, so it is remade. A behind output is not wrong in any way:
-one `uv add` for a plotting script rewrites the lock for the whole project, and remaking a week of
-computation over that buys nothing. Its manifest records exactly which environment and commit
-produced it, and that commit's own `uv.lock` reconstructs the environment if you ever need it.
+Annexed files stay ordinary files in your working tree, not symlinks: git-annex's *unlocked* mode,
+through the `filter=annex` attribute. A plain `git add` hands their content to git-annex, which keeps
+it in `.git/annex/` and commits a small pointer in its place. `lc init` also sets
+`filter.annex.required`, so that a `git add` run without git-annex on the `PATH` fails, rather than
+silently committing the data into git itself.
 
-When you *do* want behind outputs remade (before a release, say), that is one flag:
+Inside an existing git repository, `lc init` doesn't create a nested one: the project becomes a
+directory of the enclosing repository, and git-annex is set up there.
+
+### Run records
+
+Each output's commit message is a run record in DataLad's format: the command that made the output,
+its inputs, and its outputs.
+
+```text title="git log -1 --format=%B 7fa75c1"
+[DATALAD RUNCMD] fit [baseline]
+
+=== Do not change lines below ===
+{
+ "chain": [],
+ "cmd": "uv run --no-project --with 'lightcone-cli==0.5.0' -- python -m lightcone.engine.worker baseline/fit",
+ "dsid": "2c1d341c-0dae-4827-a97a-5510eb672ad3",
+ "exit": 0,
+ "inputs": [
+  "data/points.csv"
+ ],
+ "outputs": [
+  "results/baseline/fit.json",
+  "results/baseline/.fit.manifest.json"
+ ],
+ "pwd": "."
+}
+^^^ Do not change lines above ^^^
+```
+
+The command runs the same version of `lc` that made the output, which rebuilds the environment from
+that commit's `uv.lock`. So on any clone, `datalad rerun 7fa75c1` fetches the inputs, remakes the
+output and commits it again. A containerized run also lists its image, which `datalad rerun` fetches
+too. `lc build` registers each image in `.datalad/config` the way
+[datalad-container](https://docs.datalad.org/projects/container/) does.
+
+### Clones and sharing
+
+A clone carries the history, the spec, the code and every manifest, but only pointers for annexed
+files. `git annex get` (or `datalad get`) fetches a file's content when you need it, and
+`lc materialize` fetches the declared inputs it needs on its own. `lc status` checks each output's
+inputs against its [manifest](#what-each-output-records), so it needs the inputs' content, and says so when they are missing; it
+never needs the results themselves. Fetch the inputs, and `lc status` tells you whether every result
+is current without downloading any of them.
+
+git-annex fetches content from wherever a copy is recorded. To share a project, push the git history
+to any git host, and the annexed content to a place that can store it: GitHub and similar hosts take
+only the git history, so use a server reached over SSH, a host that supports git-annex, or one of
+git-annex's [special remotes](https://git-annex.branchable.com/special_remotes/), such as an S3
+bucket. `datalad push` and `git annex copy --to` send the content there.
+
+## What each output records
+
+Next to each output, `lc` writes a manifest, `.<output_id>.manifest.json`, with three hashes:
+
+1. **The definition:** the output's recipe and the decision values it uses.
+2. **The inputs:** the content of each declared input.
+3. **The environment:** the lock, the Python interpreter, and the container image if the project
+   declares one.
+
+The manifest also records the git commit the run started from. `lc status` and `lc materialize`
+compare these hashes with the project to give each output a state:
+
+| State     | Meaning                                                                    | What `lc materialize` does |
+| --------- | -------------------------------------------------------------------------- | -------------------------- |
+| `current` | Matches the spec, the inputs and the environment                           | Nothing                    |
+| `stale`   | The spec now defines it differently, or an input's content changed         | Remakes it                 |
+| `behind`  | Matches the spec and the inputs, but the environment changed since         | Reports it, and leaves it  |
+
+A stale output no longer matches the analysis, so `lc materialize` remakes it. A behind output still
+does; only the environment changed. That happens often: adding a package for a plotting script
+re-locks the whole project, and remaking days of computation for that would be wasted. The manifest
+records the commit the output was made at, and that commit's `uv.lock` rebuilds its environment if
+you need it.
+
+To remake behind outputs as well, before a release for example, add `--refresh`:
 
 ```bash
 lc materialize "$CLUSTER" --refresh
 ```
 
-`--refresh` only ever widens a run: a `current` output stays current under it, and there is
-deliberately no flag in the other direction: nothing suppresses the rebuild of a stale output.
+`--refresh` doesn't remake current outputs, and no option skips stale ones.
 
-One more way an output can be stale: a hand edit. Every output is committed by the run that made it,
-so a file changed by hand and committed shows up in history under a commit that is not a run
-record, and the output classifies `stale` everywhere, with `lc status` naming the foreign commit.
+An output edited by hand is stale too. Each output is committed by the run that made it, so a later
+commit that changes it isn't a run record: `lc status` reports the output as stale and names that
+commit.
 
-## Everything is committed, and the tree stays clean
+## How results are committed
 
-`lc` versions results in the project's own git repository: git carries the history and the small
-files, git-annex carries the data bytes, transparently, behind the ordinary `git add` /
-`git commit` you already type.
+`lc` commits results to the project's repository, where git-annex stores them. Two rules follow:
 
-That model has two consequences you'll feel:
+- **Commit before you run.** `lc materialize` refuses to start with uncommitted changes, because
+  each output records the commit of the code that made it.
+- **Each output is committed as it's made**, with its manifest, in a commit whose message is a
+  [run record](#run-records). If a recipe fails, its partial output is removed. `git log` shows every
+  run.
 
-- **A run starts from a clean tree.** Every output is committed together with the code that
-  produced it; a run that started from uncommitted edits could not say what that code was. So:
-  commit, then materialize.
-- **A run ends with a clean tree.** Each output is committed as it lands, with its manifest, in a
-  commit whose message is a *run record* that `datalad rerun` can replay. A failed recipe's partial
-  work is rolled back. Your `git log` is the build log.
+Only `lc` writes to `results/`. Don't add or edit files there yourself: they would have no manifest
+or run record.
 
-`results/` is `lc`'s to write. Don't put files there by hand: a hand-placed file has no manifest
-and no run record, and the foreign write check above exists precisely to catch it.
+## Direct and containerized execution
 
-## Two modes, derived from the project
+The project decides how recipes run; there is no setting for it.
 
-How recipes execute is never configured; it is read off the project:
+- **Direct** (the default): recipes run on the host, in the project's `.venv`, inside a sandbox:
+  Landlock on Linux, Seatbelt on macOS. The project is read-only to them, except the directory their
+  output goes to, and tools the project doesn't declare don't run.
+- **Containerized**: declaring `[tool.lightcone.image]` in `pyproject.toml` makes recipes run in a
+  container image built from that declaration. [`lc build`](/lightcone-cli/commands/build) commits
+  the image to the repository, so a clone gets the exact image without a registry or credentials.
+  `lc status` shows the mode and whether the image is built.
 
-- **Direct mode** (the default): recipes run on your machine, in the project's `.venv`, under an OS
-  sandbox: Landlock on Linux, Seatbelt on macOS. The project tree is read-only except the directory
-  each recipe's output lands in; undeclared tools don't execute.
-- **Containerized mode**: declaring a `[tool.lightcone.image]` table in `pyproject.toml` *is* the
-  switch. Recipes then run inside a content-addressed image built from that declaration, and the
-  image itself is saved into the repository as versioned content, so a clone obtains the exact
-  bytes with no registry and no credentials. `lc status` shows the mode and the image's state.
+Each manifest records, in its `hermeticity` field, the isolation the run actually had. On a host with
+no sandbox, the recipe still runs, and its manifest says so.
 
-Either way, every manifest records what enforcement actually ran (`hermeticity`): a host with no
-sandbox mechanism runs the recipe and says so, rather than pretending.
+## Checking a project
 
-## Reading and gating are different verbs
+- **`lc status`** shows each output's state and the commit it was made at. It runs nothing, works with
+  uncommitted changes, and always exits 0.
+- **`lc materialize --check`** runs nothing either, and exits 1 if a run would make anything. Use it
+  in scripts and CI.
 
-- **`lc status`** reports. It always exits 0 (a state is not a failure), runs nothing, and doesn't
-  mind a dirty tree, because the moment you most need it is when things aren't clean. It's also the
-  verb that shows the commit each output was made at.
-- **`lc materialize --check`** gates. It classifies everything without running anything and exits
-  1 if a run would do work: the thing a script or CI job branches on.
+Both take `--json`. In the check's report, the `ok` and `up_to_date` keys are the ones to test.
 
-Both have `--json`; the first two keys of the check report, `ok` and `up_to_date`, are the ones to
-branch on.
+## Publishing
 
-## Publication is a license away
-
-Declaring a `license` under `[project]` in `pyproject.toml` is declaring the intent to publish.
-From then on, every `lc materialize` maintains `ro-crate-metadata.json` at the project root: an
-[RO-Crate](https://www.researchobject.org/ro-crate/) describing the project, its outputs, and the
-runs that produced them. The repository *is* the crate; depositing it is `git archive` on something
-you already have.
+Declaring a `license` under `[project]` in `pyproject.toml` marks the project for publication. From
+then on, each `lc materialize` keeps an [RO-Crate](https://www.researchobject.org/ro-crate/),
+`ro-crate-metadata.json`, at the project root: a description of the project, its outputs and the runs
+that made them. The repository is the crate, so to deposit the project, archive the repository, with
+`git archive` for example.
 
 ## Where to next
 
-- [Configuring compute](/lightcone-cli/configuring-compute): the same model on Slurm, and with GPUs.
-- [Troubleshooting](/lightcone-cli/troubleshooting): common problems, and how to get unstuck.
+- [Configuring compute](/lightcone-cli/configuring-compute): running on Slurm, and with GPUs.
+- [Troubleshooting](/lightcone-cli/troubleshooting): common problems, and how to solve them.
