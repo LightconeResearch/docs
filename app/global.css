@@ -3,9 +3,28 @@
 @import './lightcone.css';
 @import 'fumadocs-ui/css/preset.css';
 
+/* The brand's serifs read smaller than Fumadocs' sans-serif at the same size,
+   so all text runs one step larger: 18px rather than 16px. One factor scales
+   the three places Fumadocs takes its sizes from: Tailwind's type scale for
+   the interface, the body for the page title, and the typography plugin's
+   --tw-prose-size for the documentation's text, its headings and inline code.
+   Spacing and breakpoints stay in rem, so the layout does not move. Code
+   blocks and the table of contents use fixed sizes and keep them, so long
+   commands still fit. */
+:root {
+  --lc-type-scale: 1.125;
+}
+
 @theme {
   --font-sans: var(--lc-font-ui);
   --font-mono: var(--lc-font-mono);
+  --text-xs: calc(0.75rem * var(--lc-type-scale));
+  --text-sm: calc(0.875rem * var(--lc-type-scale));
+  --text-base: calc(1rem * var(--lc-type-scale));
+  --text-lg: calc(1.125rem * var(--lc-type-scale));
+  --text-xl: calc(1.25rem * var(--lc-type-scale));
+  --text-2xl: calc(1.5rem * var(--lc-type-scale));
+  --text-3xl: calc(1.875rem * var(--lc-type-scale));
 }
 
 /* Brand typography: Alegreya, in its small capitals, for the interface;
@@ -14,6 +33,10 @@
 @layer base {
   html {
     font-variant-caps: small-caps;
+  }
+
+  body {
+    font-size: var(--text-base);
   }
 
   h1,
@@ -53,24 +76,7 @@
   --tw-prose-headings: var(--lc-color-antique-gold);
   --tw-prose-links: var(--lc-color-slate-blue);
   --color-fd-primary: var(--lc-color-antique-gold);
-}
-
-/* Newsreader reads smaller than Fumadocs' sans-serif at the same size, so the
-   page's text runs at 18px instead of 16px. Only the page body: Fumadocs also
-   puts .prose on the table of contents' links, which keep their own size. */
-#nd-page > .prose {
-  font-size: 1.125rem;
-  line-height: 1.7;
-}
-
-/* The page title keeps Fumadocs' ratio to the section headings, which grow
-   with the text, and inline code keeps its ratio to the text around it. Code
-   blocks keep Fumadocs' size, so long commands fit. */
-#nd-page > h1 {
-  font-size: 2rem;
-}
-#nd-page > .prose :not(pre) > code {
-  font-size: 0.8125em;
+  --tw-prose-size: var(--lc-type-scale);
 }
 
 html {
@@ -82,15 +88,8 @@ html {
    They sit a step above the page links under them, rather than below. */
 #nd-sidebar p,
 #nd-sidebar-mobile p {
-  font-size: 1rem;
+  font-size: var(--text-base);
   font-weight: 600;
-}
-
-/* The sidebar's page links and folders, in its scroll area: 15px, as Alegreya's
-   small capitals read smaller than Fumadocs' sans-serif at its 14px. */
-#nd-sidebar [data-id$='-viewport'] :is(a, button),
-#nd-sidebar-mobile [data-id$='-viewport'] :is(a, button) {
-  font-size: 0.9375rem;
 }
 
 html > body[data-scroll-locked] {
