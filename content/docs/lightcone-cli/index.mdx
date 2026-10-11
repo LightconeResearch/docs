@@ -8,60 +8,29 @@ The Lightcone CLI is an agent-native scientific workflow management system desig
 to orchestrate the materialization of research artifacts declared in an `astra.yaml`
 file while guaranteeing their provenance and reproducibility.
 
-<Callout type="warn" title="Alpha development">
-lightcone-cli is in **early alpha**. The CLI is still evolving: expect
-breaking changes between minor versions. Bug reports, design challenges, and use cases the tooling
-doesn't yet cover are exactly what we want to hear at this stage; please open an issue on the
-[GitHub repo](https://github.com/LightconeResearch/lightcone-cli/issues).
-</Callout>
+<TerminalVideo
+  name="cli-demo/cli"
+  label="A terminal session: lc init creates a project, then uv add, git commit, lc compute launch, lc materialize and lc status run its analysis and show the committed results."
+/>
 
 ## What it does
 
-- **Provenance by construction.** Every output is committed to git together with a
-  content-addressed manifest and a re-runnable run record; git-annex carries the bytes, so results
-  travel with the repository.
-- **Containers and HPC.** Declare `[tool.lightcone.image]` and recipes run in a content-addressed
-  image archived in the repository itself; allocate local or Slurm Dask clusters explicitly with
-  `lc compute`, then pass the cluster name or full ID to `run` or `materialize`.
-- **Publication view.** Declare a license and `lc materialize` maintains an
-  [RO-Crate](https://www.researchobject.org/ro-crate/) of the project and its provenance, ready to
-  archive or deposit.
+- **Manages an ASTRA project.** `lc init` sets up `astra.yaml`, a locked uv environment and a git
+  repository. Only the CLI writes results, each from the recipe `astra.yaml` declares for it, so every
+  artifact traces back to the code, data and decisions that made it.
+- **Runs the analysis.** `lc materialize` turns `astra.yaml` into a graph of tasks and runs each
+  recipe in a sandbox, in parallel where it can, skipping outputs that are already up to date.
+- **Versions and shares the data.** [git-annex](https://git-annex.branchable.com/) carries data and
+  results alongside the code, so collaborators clone the project and fetch files with
+  `git annex get` when they need them.
+- **Certifies how each result was made.** Each output is committed with a manifest of its recipe,
+  inputs and environment, and a run record that can replay it. Declare a license, and the CLI also
+  maintains an [RO-Crate](https://www.researchobject.org/ro-crate/) ready to archive or deposit.
+- **Gives your agent compute.** `lc compute launch` starts a [Dask](https://www.dask.org/) cluster,
+  and `lc run` and `lc materialize` send it work. The commands are the same on a laptop and on a
+  supercomputer.
 
-## In a handful of lines
+<ComputeBackends />
 
-With the CLI [installed](/lightcone-cli/installation), the shortest path from an empty directory to committed
-results is:
-
-```bash
-# Create a new analysis
-lc init my-analysis
-# Describe your analysis in astra.yaml, write your scripts,
-# and add their dependencies with uv
-# When you are done editing, commit your changes
-git add -A && git commit -m "First analysis"
-# Allocate compute resources to materialize your scientific outputs
-lc compute launch --wait
-# Generate outputs with full provenance tracking
-lc materialize local
-```
-
-The [Quick Start](/lightcone-cli/getting-started) walks through it step by step. Every output is
-committed together with the code that produced it, which is why a build starts from a clean tree.
-
-## Where to go next
-
-<Cards>
-  <Card title="Quick Start" href="/lightcone-cli/getting-started">
-    Create your first project, build it end to end, and see what each piece does.
-  </Card>
-  <Card title="Core concepts" href="/lightcone-cli/concepts">
-    The model behind the tool: what the states mean, why everything is committed, and how the two
-    execution modes differ.
-  </Card>
-  <Card title="Configuring compute" href="/lightcone-cli/configuring-compute">
-    Set up local or Slurm compute, with or without GPUs, and take your analysis to an HPC system.
-  </Card>
-  <Card title="Troubleshooting" href="/lightcone-cli/troubleshooting">
-    Common problems, and how to get unstuck.
-  </Card>
-</Cards>
+Without a configuration file, the CLI uses your own machine. [Configuring compute](/lightcone-cli/configuring-compute)
+sets up Slurm offers, and [HPC clusters](/clusters/nersc) gives ready configurations for known systems.

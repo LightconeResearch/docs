@@ -1,0 +1,4 @@
+id: baseline
+description: Every point kept.
+decisions:
+  outliers: keep

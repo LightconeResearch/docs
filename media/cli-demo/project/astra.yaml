@@ -1,0 +1,32 @@
+version: "0.0.14"
+name: line_fit
+description: Fit a line to noisy points, keeping or clipping the outliers.
+
+inputs:
+  - id: points
+    type: data
+    source: data/points.csv
+
+outputs:
+  - id: fit
+    type: metric
+    format: json
+    inputs: [points]
+    decisions: [outliers]
+    recipe:
+      command: python src/fit.py {inputs.points} {decisions.outliers} {output}
+  - id: fit_plot
+    type: figure
+    format: png
+    inputs: [points, fit]
+    recipe:
+      command: python src/plot.py {inputs.points} {inputs.fit} {output}
+
+decisions:
+  outliers:
+    label: Outlier handling
+    rationale: A few points sit far off the line and pull the slope.
+    default: keep
+    options:
+      keep: {label: Keep every point}
+      clip: {label: Drop points beyond 3 sigma}
