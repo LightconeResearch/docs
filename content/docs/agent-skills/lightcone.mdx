@@ -10,8 +10,7 @@ executed with the [Lightcone CLI](/lightcone-cli) and written up in a [MySTRA](/
 covers the whole life of a project: scoping it with you, getting compute, producing outputs,
 diagnosing failures, keeping the report honest and publishing.
 
-The plugin also contains the [`astra` plugin](/agent-skills/astra), whose skill covers the
-`astra.yaml` format itself. The two divide the work: the `lightcone` skill repeats nothing about the
+The plugin also contains the `astra` skill, which covers the [`astra.yaml` format](/astra) itself. The two divide the work: the `lightcone` skill repeats nothing about the
 format, and the `astra` skill says nothing about running an analysis.
 
 This page describes what the agent does, and what it leaves to you. For a complete run through a
@@ -44,7 +43,7 @@ in the Codex CLI.
 ## Before it drives `lc`
 
 The skill assumes `lc` version `0.5.0rc5` or newer. If the plugin's
-[session-start check](/agent-skills/hooks#lightcone-cli-check) has already reported that the CLI is
+session-start check has already reported that the CLI is
 ready, the agent moves on; if it reported a problem, the agent follows the remedy it named. If
 neither happened, because hooks are off or the agent is a subagent, it runs `lc --version` itself.
 
