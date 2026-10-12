@@ -133,5 +133,16 @@ must also be able to reach its service from the compute node.
 <Callout type="warn" title="Codex file locking on compute nodes">
   Codex uses file locks under `~/.codex` by default, but Perlmutter's compute nodes
   [do not support file locking on `$HOME`](https://docs.nersc.gov/connect/vscode/#running-on-a-compute-node).
-  This can cause errors when running Codex inside an interactive allocation.
+  This can cause errors when running Codex inside an interactive allocation. To keep Codex's state
+  off `$HOME`, run this before starting Codex:
+
+  ```bash
+  export CODEX_HOME="${PSCRATCH:?PSCRATCH is not set}/codex"
+  mkdir -p "$CODEX_HOME"
+  chmod 700 "$CODEX_HOME"
+  ```
+
+  Reuse this location across jobs to retain session history; add the export to `~/.bashrc` to make
+  it persistent. Existing settings and history are not migrated automatically, and you may need to
+  sign in again. Back up important sessions: [scratch files may be purged after 8 weeks without access](https://docs.nersc.gov/filesystems/perlmutter-scratch/#file-system-purging).
 </Callout>
