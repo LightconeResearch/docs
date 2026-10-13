@@ -87,11 +87,10 @@ offers:
     max_nodes: 2
     time: {default: 1h, max: 4h}
     startup: batch
-    config: {account: myproject_g, constraint: gpu, qos: regular}
+    config: {account: myproject, constraint: gpu, qos: regular}
 ```
 
-Replace `myproject` with your NERSC project, such as `m1234`. The GPU offer uses the project's GPU
-account, ending in `_g`, which NERSC charges GPU jobs to. The two CPU offers have the same shape, so
+Replace `myproject` with your NERSC project, such as `m1234`. The two CPU offers have the same shape, so
 `lc compute launch --cpus 256 --memory 480` takes the regular queue, and `--startup fast` the
 interactive one. [Configuring compute](/lightcone-cli/configuring-compute) explains every field.
 
@@ -126,7 +125,24 @@ salloc --nodes 1 --qos interactive --time 01:00:00 --constraint cpu --account m1
 ```
 
 The CLI then runs recipes on that node through its built-in local offer, which uses one node, so ask
-for one. For GPUs, use `--constraint gpu --gpus 4` and your `_g` account; the CLI uses the GPUs listed
+for one. For GPUs, use `--constraint gpu --gpus 4`; the CLI uses the GPUs listed
 in [`CUDA_VISIBLE_DEVICES`](/lightcone-cli/configuring-compute#local-gpus). An interactive allocation
 lasts at most 4 hours, and NERSC cancels the request if no node is free within 6 minutes. Your agent
 must also be able to reach its service from the compute node.
+
+<Callout type="warn" title="Codex file locking on compute nodes">
+  Codex uses file locks under `~/.codex` by default, but Perlmutter's compute nodes
+  [do not support file locking on `$HOME`](https://docs.nersc.gov/connect/vscode/#running-on-a-compute-node).
+  This can cause errors when running Codex inside an interactive allocation. To keep Codex's state
+  off `$HOME`, run this before starting Codex:
+
+  ```bash
+  export CODEX_HOME="${PSCRATCH:?PSCRATCH is not set}/codex"
+  mkdir -p "$CODEX_HOME"
+  chmod 700 "$CODEX_HOME"
+  ```
+
+  Reuse this location across jobs to retain session history; add the export to `~/.bashrc` to make
+  it persistent. Existing settings and history are not migrated automatically, and you may need to
+  sign in again. Back up important sessions: [scratch files may be purged after 8 weeks without access](https://docs.nersc.gov/filesystems/perlmutter-scratch/#file-system-purging).
+</Callout>
