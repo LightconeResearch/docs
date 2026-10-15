@@ -97,7 +97,6 @@ stronger consent than a flag.
 
 ```json
 {
-  "ok": true,
   "up_to_date": true,
   "made": [],
   "current": ["baseline/fit", "robust/fit", "baseline/fit_plot", "robust/fit_plot"],
@@ -110,11 +109,15 @@ stronger consent than a flag.
 }
 ```
 
-The first two keys are the ones to branch on: `ok` means everything attempted finished;
-`up_to_date` means nothing needed doing (a failed run is never up to date, and `behind` outputs
-don't count against it). `planned` is check mode's answer, mapping each would-run output to why;
+There is no overall success key. `up_to_date` is the check's answer: nothing needed doing (a
+failed run is never up to date, and `behind` outputs don't count against it). A run succeeded when
+`failed` and `blocked` are empty. The exit code is 1 when any of `failed`, `blocked` or `planned`
+is non-empty. `planned` is check mode's answer, mapping each would-run output to why;
 `behind` maps each left-alone output to the commit that can rebuild its environment. `notes` carries
 sandbox messages verbatim: denial remedies are built to be pasted.
+
+An output declared without a recipe never appears in `planned`: a run skips it, so the check
+passes over it. [`lc status`](/lightcone-cli/commands/status) lists it as `no recipe`.
 
 ## Examples
 
