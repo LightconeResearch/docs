@@ -188,7 +188,9 @@ integrates, so each intermediate result can be inspected:
 4. **Materialize.** It runs `lc materialize local <output>`, which remakes what is stale,
    dependencies first, and commits each output as it lands.
 
-The work is done when `lc materialize --check` passes. A script that ran well under `lc run` is a
+The work is done when `lc materialize --check` passes and `lc status` lists no output as
+`no recipe`. The check covers only outputs that have a recipe, so an output declared without one
+never fails it. A script that ran well under `lc run` is a
 probe, not a result: nothing counts until `lc materialize` has produced it.
 
 Each output lands at `results/<universe>/<output>.<format>`, a path `lc` composes from the
@@ -220,13 +222,14 @@ nothing a recipe sees.
 ### Status
 
 The agent reads `lc` through its `--json` output, and quotes the reason `lc` gives for each output
-rather than inferring one. Each output is in one of three states:
+rather than inferring one. Each output is in one of four states:
 
-| State     | Means                                                                                   | What happens                                              |
-| --------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------- |
-| `current` | Matches the specification, made under this environment                                  | Nothing                                                   |
-| `behind`  | Still matches the specification, but the environment has changed                       | Nothing, unless you want it remade                        |
-| `stale`   | Contradicts the specification, or its bytes were changed by something other than its run | The next `lc materialize` remakes it                      |
+| State       | Means                                                                                   | What happens                                              |
+| ----------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| `current`   | Matches the specification, made under this environment                                  | Nothing                                                   |
+| `behind`    | Still matches the specification, but the environment has changed                       | Nothing, unless you want it remade                        |
+| `stale`     | Contradicts the specification, or its bytes were changed by something other than its run | The next `lc materialize` remakes it                      |
+| `no recipe` | Declared in the specification, with no recipe to make it                                | Skipped by `lc materialize` until a recipe is written     |
 
 Every output going `behind` after a `uv add` is normal. Upgrading `lc` invalidates nothing.
 
@@ -341,5 +344,5 @@ archive or cite the analysis, the agent:
    `ro-crate-metadata.json`, an [RO-Crate](https://www.researchobject.org/ro-crate/) description of
    the project rendered from the repository.
 
-It is ready when validation passes, `lc materialize --check` passes, and `ro-crate-metadata.json`
-exists.
+It is ready when validation passes, `lc materialize --check` passes, `lc status` lists no output as
+`no recipe`, and `ro-crate-metadata.json` exists.
