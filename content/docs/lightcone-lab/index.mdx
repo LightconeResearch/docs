@@ -28,16 +28,19 @@ In both installs, in the browser:
 - **[Search](/lightcone-lab/features#search)**: <kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>K</kbd> across
   records, files and commands.
 
-With the [full install](/lightcone-lab/getting-started), the Jupyter server adds:
+With the [engine install](/lightcone-lab/getting-started), the Jupyter server adds:
 
-- **[Agent sessions](/lightcone-lab/agents)** in Jupyter AI, started at the project root, which show
-  results as cards and list what each reply changed.
 - **[Freshness](/lightcone-lab/features#freshness) and [provenance](/lightcone-lab/features#provenance)**:
   each result's `lc status`, the code, inputs and environment behind it, and its committed versions,
   side by side.
+- **[Report preview](/lightcone-lab/features#report)** of the project's [MySTRA](/mystra) report.
+
+The [AI install](/lightcone-lab/getting-started) adds Jupyter AI on top:
+
+- **[Agent sessions](/lightcone-lab/agents)** in Jupyter AI, started at the project root, which show
+  results as cards and list what each reply changed.
 - **[Comments](/lightcone-lab/features#comments)** on figures, text and papers, which reach the agent
   with your next message.
-- **[Report preview](/lightcone-lab/features#report)** of the project's [MySTRA](/mystra) report.
 
 ## How it fits the stack
 
@@ -48,4 +51,4 @@ With the [full install](/lightcone-lab/getting-started), the Jupyter server adds
   run `lc`.
 - **[Agent Skills](/agent-skills)**: the **claude** and **codex** buttons on Home start the agent in
   a terminal in the project folder, where the `lightcone` plugin works as in any terminal.
-- **[MySTRA](/mystra)**: with the full install, Lab previews the project's report in a tab.
+- **[MySTRA](/mystra)**: with the engine install, Lab previews the project's report in a tab.

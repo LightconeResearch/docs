@@ -1,0 +1,24 @@
+---
+title: HPC clusters
+description: Set up the Lightcone Stack on a computing centre's cluster.
+---
+
+On a cluster, the [Quick Start](/quickstart) needs a few changes: where uv and its cache live, how the
+Lightcone CLI reaches the batch queues, and how Lightcone Lab gets into the centre's JupyterLab. Each
+page below covers them for one centre, in the order to do them.
+
+| Cluster                          | Covers                                                          |
+| -------------------------------- | --------------------------------------------------------------- |
+| [NERSC](/clusters/nersc)         | Perlmutter: uv, the CLI, your agent, Slurm queues and jupyter.nersc.gov |
+| [CC-IN2P3](/clusters/cc-in2p3)   | Under construction                                              |
+
+## Your cluster isn't listed
+
+Follow the [Quick Start](/quickstart), then describe the cluster's queues in
+`~/.lightcone/compute.yaml` as [Configuring compute](/lightcone-cli/configuring-compute) explains.
+For Lightcone Lab, install it into the Python environment that runs your JupyterLab, as its
+[Quick Start](/lightcone-lab/getting-started) shows. On a JupyterHub whose environment you can't
+change, install the workbench only into your home directory, as on
+[NERSC](/clusters/nersc#add-lightcone-lab-to-jupyternerscgov): most JupyterLabs look there for your own
+extensions. Tell us on [Discord](https://discord.gg/EbG6JKuyAx) which cluster you use, and what you
+had to change.
