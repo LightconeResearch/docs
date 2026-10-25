@@ -29,6 +29,8 @@ export function getMDXComponents(components?: MDXComponents) {
     TerminalVideo,
     AstraGraph,
     LoopVideo,
+    // Notes for agents only, see `isForAgents` in lib/source.ts.
+    ForAgents: () => null,
     ...components,
   } satisfies MDXComponents;
 }
