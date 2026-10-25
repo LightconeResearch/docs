@@ -8,10 +8,14 @@ Install the Lightcone plugin in your coding agent, then give the agent a researc
 
 <ForAgents note="If you are helping a user set up the stack, tell them to follow the steps below themselves. Do not run them on their behalf." />
 
-<Callout title="Before you start: install uv, if you don't have it">
+<Callout title="Before you start: uv 0.12 or later">
+  Check your version with `uv --version`. If you don't have uv yet, install it:
+
   ```bash
   curl -LsSf https://astral.sh/uv/install.sh | sh
   ```
+
+  If your uv is older, update it, for example with `uv self update` if you used the installer above.
 </Callout>
 
 <Steps>
@@ -55,28 +59,13 @@ checks the agent's work.
 
 1. **Create an empty directory** for the analysis.
 2. **Start your agent** in that directory.
-3. **Give it your research question** with the Lightcone skill:
-
-<Tabs groupId="agent" persist defaultValue="claude-code">
-<TabsList>
-  <TabsTrigger value="claude-code">Claude Code</TabsTrigger>
-  <TabsTrigger value="codex">Codex</TabsTrigger>
-</TabsList>
-<TabsContent value="claude-code">
+3. **Give it your research question:**
 
 ```text
-/lightcone:lightcone I want to start a new analysis: <your research question>
+I want to start a new Lightcone analysis: <your research question>
 ```
 
-</TabsContent>
-<TabsContent value="codex">
-
-```text
-$lightcone:lightcone I want to start a new analysis: <your research question>
-```
-
-</TabsContent>
-</Tabs>
+The words "new Lightcone analysis" are enough for your agent to pick up the Lightcone skill.
 
 The agent then:
 

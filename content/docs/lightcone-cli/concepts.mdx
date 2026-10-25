@@ -178,9 +178,10 @@ no sandbox, the recipe still runs, and its manifest says so.
 - **`lc status`** shows each output's state and the commit it was made at. It runs nothing, works with
   uncommitted changes, and always exits 0.
 - **`lc materialize --check`** runs nothing either, and exits 1 if a run would make anything. Use it
-  in scripts and CI.
+  in scripts and CI. It covers only outputs that have a recipe: `lc status` lists any declared
+  without one as `no recipe`.
 
-Both take `--json`. In the check's report, the `ok` and `up_to_date` keys are the ones to test.
+Both take `--json`. In the check's report, `up_to_date` is the key to test.
 
 ## Publishing
 

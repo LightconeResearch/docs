@@ -1,3 +1,5 @@
 {
+  "title": "Lightcone Research Stack",
+  "description": "Rigorous and reproducible research with AI agents.",
   "pages": ["(stack)", "lightcone-cli", "agent-skills", "lightcone-lab", "mystra"]
 }
