@@ -18,8 +18,8 @@ it in the `note` prop of `<ForAgents>`:
 ```
 
 The site renders nothing for it (`components/mdx.tsx`). The page's Markdown keeps the element as
-written, and agents get that Markdown at `/<page>.md`, at the page's own URL when they ask for
-Markdown (`proxy.ts`), and in `/llms-full.txt`.
+written, and agents get that Markdown through the links in `/llms.txt`, at `/<page>.md`, at the
+page's own URL when they ask for Markdown (`proxy.ts`), and in `/llms-full.txt`.
 
 Write the note in the prop, not as children: site search indexes an element's children but not its
 props. Both behaviours are Fumadocs defaults, so check them after upgrading Fumadocs: the Markdown

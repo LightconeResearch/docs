@@ -1,7 +1,7 @@
 import { createElement } from 'react';
 import { llms, loader, type LoaderPlugin } from 'fumadocs-core/source';
 import { lucideIconsPlugin } from 'fumadocs-core/source/lucide-icons';
-import { docsContentRoute, docsImageRoute, docsRoute } from './shared';
+import { docsContentRoute, docsImageRoute, docsRoute, getPageMarkdownUrl } from './shared';
 import { defineDocs } from 'fumadocs-mdx/macro';
 import { metaSchema, pageSchema } from 'fumadocs-core/source/schema';
 
@@ -43,3 +43,12 @@ export const docsLlms = llms(source, {
 
 ${await page.data.getText('processed')}`,
 });
+
+// For llms.txt: the same pages, linked to their Markdown, for agents that don't ask for Markdown.
+export const markdownLlms = llms(
+  loader({
+    baseUrl: docsContentRoute,
+    source: docs.toFumadocsSource(),
+    url: (slugs) => getPageMarkdownUrl({ slugs }).url,
+  }),
+);
