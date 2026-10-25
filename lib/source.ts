@@ -3,34 +3,14 @@ import { llms, loader, type LoaderPlugin } from 'fumadocs-core/source';
 import { lucideIconsPlugin } from 'fumadocs-core/source/lucide-icons';
 import { docsContentRoute, docsImageRoute, docsRoute } from './shared';
 import { defineDocs } from 'fumadocs-mdx/macro';
-import { applyMdxPreset } from 'fumadocs-mdx/config';
 import { metaSchema, pageSchema } from 'fumadocs-core/source/schema';
-import type { Nodes } from 'mdast';
-
-// `<ForAgents>` holds notes for agents: the site renders nothing for it (components/mdx.tsx),
-// search skips it, and the Markdown versions of the page keep its content, unwrapped.
-const isForAgents = (node: Nodes) => 'name' in node && node.name === 'ForAgents';
-
-// Search records a node's `structuredData` in place of its content: here, nothing.
-function remarkForAgents() {
-  const skip = (node: Nodes) => {
-    if (isForAgents(node)) node.data = { ...node.data, structuredData: { contents: [] } };
-    else if ('children' in node) node.children.forEach(skip);
-  };
-
-  return skip;
-}
 
 const docs = defineDocs({
   dir: 'content/docs',
   docs: {
     schema: pageSchema,
-    // A collection's own `mdxOptions` replace Fumadocs' default plugins; the preset keeps them.
-    mdxOptions: applyMdxPreset({ remarkPlugins: [remarkForAgents] }),
     postprocess: {
-      includeProcessedMarkdown: {
-        filterElement: (node) => (isForAgents(node) ? 'children-only' : true),
-      },
+      includeProcessedMarkdown: true,
     },
   },
   meta: {
