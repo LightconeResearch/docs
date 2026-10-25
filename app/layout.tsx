@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Analytics } from '@vercel/analytics/next';
 import { Banner } from 'fumadocs-ui/components/banner';
-import { Provider } from '@/components/provider';
+import { RootProvider } from 'fumadocs-ui/provider/next';
 import './global.css';
 
 export const metadata: Metadata = {
@@ -18,7 +18,7 @@ export default function Layout({ children }: LayoutProps<'/'>) {
       suppressHydrationWarning
     >
       <body className="flex flex-col min-h-screen">
-        <Provider>
+        <RootProvider>
           {/* Readers can close the banner; its id remembers that they did. */}
           <Banner id="public-beta">
             Public beta:&nbsp;
@@ -28,7 +28,7 @@ export default function Layout({ children }: LayoutProps<'/'>) {
             <span className="max-sm:hidden">&nbsp;to share feedback and suggestions</span>
           </Banner>
           {children}
-        </Provider>
+        </RootProvider>
         <Analytics />
       </body>
     </html>
