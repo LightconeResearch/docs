@@ -8,6 +8,12 @@ The plugin is distributed from the
 [LightconeResearch/agent-skills](https://github.com/LightconeResearch/agent-skills) repository,
 which your agent adds as a plugin marketplace named `lightcone-research`.
 
+<Callout title="Let your agent do it">
+  The quickest way is to point your coding agent at the repository and let it install the skills and
+  plugins itself: "Install the Lightcone skills and plugins from
+  https://github.com/LightconeResearch/agent-skills". The steps below do the same by hand.
+</Callout>
+
 <Steps>
 <Step>
 
@@ -95,6 +101,10 @@ The plugin runs the [Lightcone CLI](/lightcone-cli/getting-started#install-the-c
 each session, it checks for the CLI, and if it's missing or too old, your agent offers to install
 the version it needs.
 
+<Callout type="warn" title="Reload before you go on">
+  You may need to reload the plugins, or restart your agent, before they work.
+</Callout>
+
 </Step>
 <Step>
 
@@ -103,7 +113,7 @@ the version it needs.
 Start your agent in an empty directory and tell it what you want to find out:
 
 ```text
-I want to start a new analysis: <your research question>
+I want to start a new Lightcone analysis: <your research question>
 ```
 
 The agent interviews you about the question and the structure of the analysis before it writes any

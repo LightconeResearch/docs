@@ -4,12 +4,16 @@ description: Install the Lightcone plugin and start an analysis with your agent.
 icon: Rocket
 ---
 
-Install the Lightcone plugin in your coding agent, then give the agent a research question.
+Have your coding agent install the Lightcone plugin, then give it a research question.
 
-<Callout title="Before you start: install uv, if you don't have it">
+<Callout title="Before you start: uv 0.12 or later">
+  Check your version with `uv --version`. If you don't have uv yet, install it:
+
   ```bash
   curl -LsSf https://astral.sh/uv/install.sh | sh
   ```
+
+  If your uv is older, update it, for example with `uv self update` if you used the installer above.
 </Callout>
 
 <Steps>
@@ -20,31 +24,22 @@ Install the Lightcone plugin in your coding agent, then give the agent a researc
 The plugin teaches your agent to use Lightcone. When you start a project, it checks for the
 Lightcone CLI and offers to install the version it needs.
 
-<Tabs groupId="agent" persist defaultValue="claude-code">
-<TabsList>
-  <TabsTrigger value="claude-code">Claude Code</TabsTrigger>
-  <TabsTrigger value="codex">Codex</TabsTrigger>
-</TabsList>
-<TabsContent value="claude-code">
+Point your favorite coding agent (Claude Code, Codex, …) at the skills repository and let it install
+the skills and plugins itself:
 
-```bash
-claude plugin marketplace add LightconeResearch/agent-skills
-claude plugin install lightcone@lightcone-research
+```text
+Install the Lightcone skills and plugins from https://github.com/LightconeResearch/agent-skills
 ```
 
-</TabsContent>
-<TabsContent value="codex">
+<Callout type="warn" title="Reload before you go on">
+  You may need to reload the plugins, or restart your agent, before they work.
+</Callout>
 
-```bash
-codex plugin marketplace add LightconeResearch/agent-skills
-codex plugin add lightcone@lightcone-research
-```
+If Codex asks you to review the plugin's hooks, approve them: they are how the plugin checks the
+agent's work.
 
-The first time Codex asks you to review the plugin's hooks, approve them: they are how the plugin
-checks the agent's work.
-
-</TabsContent>
-</Tabs>
+To install the plugin by hand instead, follow the
+[Agent Skills Quick Start](/agent-skills/getting-started).
 
 </Step>
 <Step>
@@ -53,28 +48,13 @@ checks the agent's work.
 
 1. **Create an empty directory** for the analysis.
 2. **Start your agent** in that directory.
-3. **Give it your research question** with the Lightcone skill:
-
-<Tabs groupId="agent" persist defaultValue="claude-code">
-<TabsList>
-  <TabsTrigger value="claude-code">Claude Code</TabsTrigger>
-  <TabsTrigger value="codex">Codex</TabsTrigger>
-</TabsList>
-<TabsContent value="claude-code">
+3. **Give it your research question:**
 
 ```text
-/lightcone:lightcone I want to start a new analysis: <your research question>
+I want to start a new Lightcone analysis: <your research question>
 ```
 
-</TabsContent>
-<TabsContent value="codex">
-
-```text
-$lightcone:lightcone I want to start a new analysis: <your research question>
-```
-
-</TabsContent>
-</Tabs>
+The words "new analysis" are enough for your agent to pick up the Lightcone skill.
 
 The agent then:
 
