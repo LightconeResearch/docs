@@ -16,6 +16,11 @@ Install the Lightcone plugin in your coding agent, then give the agent a researc
   If your uv is older, update it, for example with `uv self update` if you used the installer above.
 </Callout>
 
+<Callout title="On an HPC cluster?">
+  Follow your cluster's page under [HPC clusters](/clusters) instead: it covers these same steps, plus
+  what the cluster needs, such as where uv's cache goes, its batch queues and its JupyterHub.
+</Callout>
+
 <Steps>
 <Step>
 
@@ -86,7 +91,10 @@ them and the papers they cite, so you don't have to read `astra.yaml` yourself. 
 
 To install it, open JupyterLab's **Extension Manager** (the puzzle piece in the left sidebar), search
 for `jupyterlab-lightcone`, install it and restart JupyterLab. Then browse into the project's
-directory: the launcher becomes the project's Home.
+directory: the launcher becomes the project's Home. This installs the workbench only;
+[Lab's Quick Start](/lightcone-lab/getting-started) shows the installs that add freshness,
+provenance and Jupyter AI sessions, and [HPC clusters](/clusters) how to add Lab to a cluster's
+JupyterHub.
 
 ![Lightcone Lab's Home for a reproduction of the GD-1 stream analysis: the project's title and description, counts of its results, decisions, inputs, findings and papers, a grid of its figures, and a panel of agent sessions.](./lab-home.png)
 
@@ -108,7 +116,7 @@ are out of date. Keep Lightcone Lab open beside it to see each change as the age
 
 - Follow [Your first analysis](/guides/first-analysis), a worked example from a research question to
   a report.
-- [Run your recipes on an HPC cluster](/lightcone-cli/configuring-compute).
+- Set up the stack on an [HPC cluster](/clusters).
 
 ## Uninstall
 

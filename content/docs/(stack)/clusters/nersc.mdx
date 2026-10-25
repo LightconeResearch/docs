@@ -25,12 +25,17 @@ later: check with `uv --version`. git is already installed.
 ## Move uv's cache to scratch
 
 Recipes run through uv, which locks files in its cache, and Perlmutter's compute nodes can't lock
-files in `$HOME`, where the cache lives by default. Add this line to your `~/.bashrc`, then open a new
-shell:
+files in `$HOME`, where the cache lives by default. Add these lines to your `~/.bashrc`, then open a
+new shell:
 
 ```bash
 export UV_CACHE_DIR=$PSCRATCH/uv-cache
+export UV_LINK_MODE=copy
 ```
+
+The second line tells uv to copy packages from the cache into each project's environment: your
+projects live on another file system (see [Where things go](#where-things-go)), where uv can't link
+them, and it would otherwise warn every time. A purged cache then costs only a download.
 
 Do this before you launch any compute: an allocation started without it has to be relaunched.
 
@@ -107,7 +112,52 @@ lc compute resources
 </Callout>
 
 </Step>
+<Step>
+
+## Add Lightcone Lab to jupyter.nersc.gov
+
+This step is optional: [Lightcone Lab](/lightcone-lab) shows your projects in
+[jupyter.nersc.gov](https://jupyter.nersc.gov)'s JupyterLab. NERSC turns off JupyterLab's Extension
+Manager and its environment can't be changed, but JupyterLab also loads extensions from your home
+directory. Install the workbench there:
+
+```bash
+uv pip install --python 3.12 --prefix ~/.local --no-deps jupyterlab-lightcone
+```
+
+Then restart your server: in JupyterLab, **File › Hub Control Panel**, **stop** your server and
+**start** it again. The launcher now has a **Lightcone Lab** section, beside NERSC's kernels.
+
+This is the [workbench only](/lightcone-lab/getting-started): it runs in the browser, and its
+**claude** and **codex** buttons start your agent in a terminal in the project folder, with the `lc`
+you installed above. `--no-deps` skips the packages of the server features, which NERSC's JupyterLab
+can't load. The command also leaves an unused copy of the package in `~/.local/lib/python3.12`.
+
+JupyterLab at NERSC starts at the file system's root, `/`. To create a project, browse to your home
+or project folder first, or give **New Lightcone project** a full path such as
+`/global/homes/u/user/my-analysis`.
+
+To update Lab, run the install command again with `--upgrade`; to remove it, run
+`uv pip uninstall --python 3.12 --prefix ~/.local jupyterlab-lightcone`. Restart your server after
+either.
+
+</Step>
 </Steps>
+
+## Where things go [#where-things-go]
+
+Perlmutter's [file systems](https://docs.nersc.gov/filesystems/) differ in what they keep: home and
+the Community File System (CFS) are permanent, while
+[scratch is purged](https://docs.nersc.gov/filesystems/perlmutter-scratch/#file-system-purging) of
+files not used for 8 weeks. Keep everything you need to keep off scratch:
+
+| What                                                  | Where                                 | Why                                                                     |
+| ----------------------------------------------------- | ------------------------------------- | ----------------------------------------------------------------------- |
+| uv, `lc` and `git-annex`                              | `~/.local`, in home                   | Small, permanent and on every node                                      |
+| Lightcone Lab                                         | `~/.local/share/jupyter`, in home     | Where NERSC's JupyterLab looks for your extensions                      |
+| uv's cache                                            | `$PSCRATCH/uv-cache`                  | Large and rebuilt on demand; compute nodes can't lock files in home     |
+| Your projects, with their environment (`.venv`)        | Home, or CFS for large or shared ones | Permanent; a purge would delete the analysis and its record             |
+| Codex's state, inside an allocation                   | `$PSCRATCH/codex`                     | See [the callout below](#where-to-work)                                 |
 
 ## Where to work
 
