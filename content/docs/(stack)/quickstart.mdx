@@ -4,7 +4,7 @@ description: Install the Lightcone plugin and start an analysis with your agent.
 icon: Rocket
 ---
 
-Have your coding agent install the Lightcone plugin, then give it a research question.
+Install the Lightcone plugin in your coding agent, then give the agent a research question.
 
 <Callout title="Before you start: uv 0.12 or later">
   Check your version with `uv --version`. If you don't have uv yet, install it:
@@ -24,23 +24,36 @@ Have your coding agent install the Lightcone plugin, then give it a research que
 The plugin teaches your agent to use Lightcone. When you start a project, it checks for the
 Lightcone CLI and offers to install the version it needs.
 
-Point your favorite coding agent (Claude Code, Codex, …) at the skills repository and let it install
-the skills and plugins itself:
+<Tabs groupId="agent" persist defaultValue="claude-code">
+<TabsList>
+  <TabsTrigger value="claude-code">Claude Code</TabsTrigger>
+  <TabsTrigger value="codex">Codex</TabsTrigger>
+</TabsList>
+<TabsContent value="claude-code">
 
-```text
-Install the Lightcone skills and plugins from https://github.com/LightconeResearch/agent-skills
+```bash
+claude plugin marketplace add LightconeResearch/agent-skills
+claude plugin install lightcone@lightcone-research
 ```
+
+</TabsContent>
+<TabsContent value="codex">
+
+```bash
+codex plugin marketplace add LightconeResearch/agent-skills
+codex plugin add lightcone@lightcone-research
+```
+
+The first time Codex asks you to review the plugin's hooks, approve them: they are how the plugin
+checks the agent's work.
+
+</TabsContent>
+</Tabs>
 
 <Callout type="warn" title="Enable and reload before you go on">
   You may need to enable the plugin and reload it (`/reload-plugins` in Claude Code), or restart
   your agent, before the skill is available.
 </Callout>
-
-If Codex asks you to review the plugin's hooks, approve them: they are how the plugin checks the
-agent's work.
-
-To install the plugin by hand instead, follow the
-[Agent Skills Quick Start](/agent-skills/getting-started).
 
 </Step>
 <Step>
