@@ -50,14 +50,8 @@ When something in the stack breaks, or you want to suggest a change, tell your a
 Report this to the Lightcone team.
 ```
 
-The `feedback` skill writes a GitHub issue from what happened in the session, with credentials and
-personal paths removed. It files the issue in the repository of the tool you were using and checks
-for an existing report first; if it finds one, it asks whether to file anyway, comment on it, or
-stop. It shows you the complete issue and files it only once you approve; ask for a draft if you'd
-rather file it yourself.
-
-Filing uses the [GitHub CLI](https://cli.github.com/), signed in with `gh auth login`. If it isn't set
-up yet, your agent walks you through it first.
+The `feedback` skill writes a GitHub issue for the appropriate repository and shows it to you before
+filing it. It files issues with the [GitHub CLI](https://cli.github.com/) (`gh`).
 
 ## Pinned tool versions
 
