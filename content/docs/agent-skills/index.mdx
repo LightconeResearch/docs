@@ -52,11 +52,12 @@ Report this to the Lightcone team.
 
 The `lightcone-feedback` skill writes a GitHub issue from what happened in the session, with
 credentials and personal paths removed. It files the issue in the repository of the tool you were
-using and checks for an existing report first. It shows you the complete issue and files it only
-once you approve; ask for a draft if you'd rather file it yourself.
+using and checks for an existing report first; if it finds one, it asks whether to file anyway,
+comment on it, or stop. It shows you the complete issue and files it only once you approve; ask for a
+draft if you'd rather file it yourself.
 
-Filing needs the [GitHub CLI](https://cli.github.com/), signed in with `gh auth login`. Without it,
-you get the draft and a link to open the issue yourself.
+Filing uses the [GitHub CLI](https://cli.github.com/), signed in with `gh auth login`. If it isn't set
+up yet, your agent walks you through it first.
 
 If you don't use the `lightcone` plugin, for example because you only work in Lightcone Lab or
 MySTRA, install the feedback skill on its own from the same marketplace:
