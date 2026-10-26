@@ -12,17 +12,19 @@ Codex, in the terminal or in their desktop apps.
 
 The `lightcone` plugin works with you on a whole Lightcone project: it scopes the analysis with you,
 runs it with `lc`, diagnoses failures, keeps the report in sync with the results, and publishes. It
-has two skills:
+has three skills:
 
-| Skill       | What it covers                                                                  | Claude Code, Claude app, Codex app | Codex CLI              |
-| ----------- | ------------------------------------------------------------------------------- | ---------------------------------- | ---------------------- |
-| `lightcone` | The project, from the first interview to publication                            | `/lightcone:lightcone`             | `$lightcone:lightcone` |
-| `astra`     | The [ASTRA](/astra) format: writing, validating and restructuring `astra.yaml`  | `/lightcone:astra`                 | `$lightcone:astra`     |
+| Skill                | What it covers                                                                 | Claude Code, Claude app, Codex app | Codex CLI                       |
+| -------------------- | ------------------------------------------------------------------------------ | ---------------------------------- | ------------------------------- |
+| `lightcone`          | The project, from the first interview to publication                           | `/lightcone:lightcone`             | `$lightcone:lightcone`          |
+| `astra`              | The [ASTRA](/astra) format: writing, validating and restructuring `astra.yaml` | `/lightcone:astra`                 | `$lightcone:astra`              |
+| `lightcone-feedback` | Reporting a bug, a feature request or a docs problem to the Lightcone team     | `/lightcone:lightcone-feedback`    | `$lightcone:lightcone-feedback` |
 
 You rarely need to call them. Agents load a skill on their own when the task matches it: the
 `lightcone` skill when you start, resume, run, debug or publish an analysis, or ask to run or fix one
 in a directory that holds an `astra.yaml`; the `astra` skill when the agent reads or writes an ASTRA
-file. The [Quick Start](/agent-skills/getting-started) installs the plugin.
+file; the `lightcone-feedback` skill when you ask it to [report a problem](#report-a-problem). The
+[Quick Start](/agent-skills/getting-started) installs the plugin.
 
 ## How the skills behave
 
@@ -39,6 +41,59 @@ file. The [Quick Start](/agent-skills/getting-started) installs the plugin.
   job scheduler itself, so every output carries its run record.
 - **Quotes are checked.** A quote from a paper is verified against the PDF before it enters the
   specification; one that can't be verified is dropped, not cited.
+
+## Report a problem
+
+When something in the stack breaks, or you want to suggest a change, tell your agent:
+
+```text
+Report this to the Lightcone team.
+```
+
+The `lightcone-feedback` skill writes a GitHub issue from what happened in the session, with
+credentials and personal paths removed. It files the issue in the repository of the tool you were
+using and checks for an existing report first. It shows you the complete issue and files it only
+once you approve; ask for a draft if you'd rather file it yourself.
+
+Filing needs the [GitHub CLI](https://cli.github.com/), signed in with `gh auth login`. Without it,
+you get the draft and a link to open the issue yourself.
+
+If you don't use the `lightcone` plugin, for example because you only work in Lightcone Lab or
+MySTRA, install the feedback skill on its own from the same marketplace:
+
+<Tabs groupId="agent" persist defaultValue="claude-code">
+<TabsList>
+  <TabsTrigger value="claude-code">Claude Code</TabsTrigger>
+  <TabsTrigger value="codex">Codex</TabsTrigger>
+  <TabsTrigger value="claude-app">Claude app</TabsTrigger>
+  <TabsTrigger value="codex-app">Codex app</TabsTrigger>
+</TabsList>
+<TabsContent value="claude-code">
+
+```bash
+claude plugin install lightcone-feedback@lightcone-research
+```
+
+</TabsContent>
+<TabsContent value="codex">
+
+```bash
+codex plugin add lightcone-feedback@lightcone-research
+```
+
+</TabsContent>
+<TabsContent value="claude-app">
+
+In **Customize → Plugins**, choose **lightcone-feedback** from the `lightcone-research` marketplace.
+
+</TabsContent>
+<TabsContent value="codex-app">
+
+Open **Plugins** from the arrow beside **Create**, then search for **lightcone-feedback** and install
+it.
+
+</TabsContent>
+</Tabs>
 
 ## Pinned tool versions
 
