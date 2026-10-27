@@ -12,17 +12,19 @@ Codex, in the terminal or in their desktop apps.
 
 The `lightcone` plugin works with you on a whole Lightcone project: it scopes the analysis with you,
 runs it with `lc`, diagnoses failures, keeps the report in sync with the results, and publishes. It
-has two skills:
+has three skills:
 
-| Skill       | What it covers                                                                  | Claude Code, Claude app, Codex app | Codex CLI              |
-| ----------- | ------------------------------------------------------------------------------- | ---------------------------------- | ---------------------- |
-| `lightcone` | The project, from the first interview to publication                            | `/lightcone:lightcone`             | `$lightcone:lightcone` |
-| `astra`     | The [ASTRA](/astra) format: writing, validating and restructuring `astra.yaml`  | `/lightcone:astra`                 | `$lightcone:astra`     |
+| Skill       | What it covers                                                                 | Claude Code, Claude app, Codex app | Codex CLI              |
+| ----------- | ------------------------------------------------------------------------------ | ---------------------------------- | ---------------------- |
+| `lightcone` | The project, from the first interview to publication                           | `/lightcone:lightcone`             | `$lightcone:lightcone` |
+| `astra`     | The [ASTRA](/astra) format: writing, validating and restructuring `astra.yaml` | `/lightcone:astra`                 | `$lightcone:astra`     |
+| `feedback`  | Reporting a bug, a feature request or a docs problem to the Lightcone team     | `/lightcone:feedback`              | `$lightcone:feedback`  |
 
 You rarely need to call them. Agents load a skill on their own when the task matches it: the
 `lightcone` skill when you start, resume, run, debug or publish an analysis, or ask to run or fix one
 in a directory that holds an `astra.yaml`; the `astra` skill when the agent reads or writes an ASTRA
-file. The [Quick Start](/agent-skills/getting-started) installs the plugin.
+file; the `feedback` skill when you ask it to [report a problem](#report-a-problem). The
+[Quick Start](/agent-skills/getting-started) installs the plugin.
 
 ## How the skills behave
 
@@ -39,6 +41,18 @@ file. The [Quick Start](/agent-skills/getting-started) installs the plugin.
   job scheduler itself, so every output carries its run record.
 - **Quotes are checked.** A quote from a paper is verified against the PDF before it enters the
   specification; one that can't be verified is dropped, not cited.
+
+## Report a problem
+
+When something in the stack breaks, or you want to suggest a change, tell your agent:
+
+```text
+Report this to the Lightcone team.
+```
+
+The `feedback` skill writes a GitHub issue in
+[LightconeResearch/feedback](https://github.com/LightconeResearch/feedback) and shows it to you
+before filing it. It files issues with the [GitHub CLI](https://cli.github.com/) (`gh`).
 
 ## Pinned tool versions
 
