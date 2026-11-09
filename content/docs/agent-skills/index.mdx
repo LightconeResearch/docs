@@ -10,13 +10,13 @@ Codex, in the terminal or in their desktop apps.
 
 ## The lightcone plugin
 
-The `lightcone` plugin works with you on a whole Lightcone project: it scopes the analysis with you,
+The `lightcone` plugin works with you on a whole Lightcone project: it sets the project up with you,
 runs it with `lc`, diagnoses failures, keeps the report in sync with the results, and publishes. It
 has three skills:
 
 | Skill       | What it covers                                                                 | Claude Code, Claude app, Codex app | Codex CLI              |
 | ----------- | ------------------------------------------------------------------------------ | ---------------------------------- | ---------------------- |
-| `lightcone` | The project, from the first interview to publication                           | `/lightcone:lightcone`             | `$lightcone:lightcone` |
+| `lightcone` | The project, from setup to publication                                         | `/lightcone:lightcone`             | `$lightcone:lightcone` |
 | `astra`     | The [ASTRA](/astra) format: writing, validating and restructuring `astra.yaml` | `/lightcone:astra`                 | `$lightcone:astra`     |
 | `feedback`  | Reporting a bug, a feature request or a docs problem to the Lightcone team     | `/lightcone:feedback`              | `$lightcone:feedback`  |
 
@@ -28,9 +28,8 @@ file; the `feedback` skill when you ask it to [report a problem](#report-a-probl
 
 ## How the skills behave
 
-- **The scientific choices stay yours.** A new analysis starts with an interview, not with code.
-  Candidate decisions, findings and evidence are written to `astra.yaml`, where you can review them,
-  and the conversation keeps to a summary.
+- **The scientific choices stay yours.** Candidate decisions, findings and evidence are written to
+  `astra.yaml`, where you can review them, and the conversation keeps to a summary.
 - **Nothing is installed without asking.** In an interactive session the agent offers the command
   and waits for your answer. Only in a headless run, where no one can answer, does it act, and then
   it says what it changed.
