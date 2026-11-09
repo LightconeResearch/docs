@@ -1,13 +1,13 @@
 ---
 title: The lightcone plugin
-description: What your agent does at each phase of a Lightcone project, from the first interview to publication.
+description: What your agent does at each phase of a Lightcone project, from setup to publication.
 ---
 
 import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 
 The `lightcone` skill is a companion for a Lightcone project: an analysis declared in `astra.yaml`,
 executed with the [Lightcone CLI](/lightcone-cli) and written up in a [MySTRA](/mystra) report. It
-covers the whole life of a project: scoping it with you, getting compute, producing outputs,
+covers the whole life of a project: setting it up, getting compute, producing outputs,
 diagnosing failures, keeping the report honest and publishing.
 
 The plugin also contains the `astra` skill, which covers the [`astra.yaml` format](/astra) itself. The two divide the work: the `lightcone` skill repeats nothing about the
@@ -50,77 +50,33 @@ neither happened, because hooks are off or the agent is a subagent, it runs `lc 
 Where a person can answer, the agent offers the install command and waits. Where no one can, in a
 headless run or CI, it runs the command and reports what it changed.
 
-## Scoping a new analysis
+## Starting a new project
 
-When a project has no specification yet, or only the empty one `lc init` creates, the agent works
-as a specification agent, not an implementation agent. Until scoping is done, it creates or edits
-only `astra.yaml`, the universe files and `AGENTS.md`, and writes no analysis code.
+When a project has no specification yet, the agent sets it up with `lc init`: an empty
+specification, a baseline universe that selects nothing, a uv project, a git repository whose
+`data/` and `results/` are stored with git-annex, and a MyST report. It is safe to run again and
+never overwrites what you wrote.
 
-`lc init` sets up the project: an empty specification, a baseline universe that selects nothing, a
-uv project, a git repository whose `data/` and `results/` are stored with git-annex, and a MyST
-report. It is safe to run again and never overwrites what you wrote.
+It then fills `astra.yaml` with you, following the `astra` skill: the inputs, the outputs (one file
+each, with its `format`), and the decisions, citing published work as prior insights where a choice
+rests on it. Once the specification gains its first decision, validation reports `MISSING_DECISION`
+for `universes/baseline.yaml`; that is expected until the agent regenerates the baseline universe
+from the decisions' defaults and validates. It then writes `AGENTS.md`: what the analysis is, the
+commands the project uses, and Project Notes for what the specification can't hold (the constraints
+you mentioned, the avenues considered and rejected, quirks of the data).
 
-The interview then goes through four stages, each announced with a banner so you can follow, and
-each ending with a write to `astra.yaml`:
-
-<Steps>
-<Step>
-
-### Research question
-
-The agent asks what you are trying to learn, and sharpens it with you: what would a clear answer
-look like, and why does it matter? "Analyze this data" is not a research question, and it will push
-back until you have one. The answer becomes the analysis's `name`.
-
-</Step>
-<Step>
-
-### Analysis structure
-
-The agent asks you to walk through the analysis: what goes in, what comes out. It records the
-inputs and outputs, keeping to one flat analysis however many stages it has, and one output for each
-metric, figure or table: every output becomes a single file, so it gets a `format` (its file
-extension) as soon as it is declared.
-
-</Step>
-<Step>
-
-### Literature deep dive
-
-Optional, section by section. The agent offers a pass through the literature; if you decline, it
-goes straight to identifying decisions. See [The literature pass](#the-literature-pass).
-
-</Step>
-<Step>
-
-### Finalizing
-
-The agent asks whether anything else should inform the analysis. It then regenerates the baseline
-universe from the decisions' defaults, validates the specification (checking every quote, if any
-were extracted) until it is clean, and writes the analysis's `description` now that the structure is
-stable. It writes `AGENTS.md`: how to work in the project, the commands it uses, and the scoping
-outcome in its Project Notes (the constraints you mentioned, the avenues considered and rejected,
-quirks of the data). It ends with a summary of decisions, outputs and prior insights for you to
-confirm.
-
-</Step>
-</Steps>
-
-Once the specification gains its first decision, validation reports `MISSING_DECISION` for
-`universes/baseline.yaml`. That is expected while decisions are in flux: finalizing regenerates the
-universe.
+The scoping interview that used to open a project (research question, analysis structure,
+literature deep dive, finalize) now lives in a separate `research` skill, which is not yet part of
+the plugin.
 
 ## The literature pass
 
-The literature pass runs in a fixed order: collect the papers, extract from them, then identify the
-decisions. Decisions identified before the papers are read tend to be the ones the analyst already
-had in mind.
+When you ask for a pass through the literature, it runs in a fixed order: collect the papers,
+extract from them, then identify the decisions.
 
 - **Collect.** The agent asks for the papers you already have in mind, then searches for a limited
   set of directly relevant ones, about two per topic and at most ten per section. You approve,
-  reject or add to the list. It never starts a search while the interview is still running: results
-  arriving mid-conversation interrupt your train of thought, and papers chosen before the structure
-  settles tend to be the wrong ones.
+  reject or add to the list.
 - **Extract.** The agent caches each approved paper, then reads them with one subagent per paper,
   in parallel, so the PDFs never fill the main conversation. Each subagent extracts only the claims
   that bear on the decisions at hand, each with a verbatim quote, its page and the text around it.
@@ -131,18 +87,15 @@ had in mind.
   to `astra.yaml` as prior insights, links them to the options they bear on, and summarizes them by
   topic for you. A quote that failed verification is gone: the agent doesn't add it back by hand, and
   doesn't cite the paper for that claim.
-- **Identify decisions.** From the conversation and the literature, the agent looks for what could
-  be done differently and still be defensible: where papers disagreed or compared alternatives, and
-  where you were uncertain. It probes the choices analysts tend to overlook, such as data exclusion,
-  how variables are defined, and inference criteria, not only the choice of method.
-- **Review.** Candidate decisions go into `astra.yaml` as a batch. You confirm or set each default,
-  and drop any you reject.
+- **Identify decisions.** Candidate decisions go into `astra.yaml` as a batch, and the conversation
+  keeps to a summary that names them.
+- **Review.** You confirm or set each default, and drop any you reject.
 
 ## Resuming a project
 
 When you pick up an existing project, the agent runs `lc status`, summarizes where the analysis
-stands, and asks what is next. It doesn't interview you again: `astra.yaml` and the notes in
-`AGENTS.md` already answer the scoping questions.
+stands, and asks what is next. It doesn't set the project up again: `astra.yaml` and the notes in
+`AGENTS.md` already say what the analysis is.
 
 ## Getting compute
 
