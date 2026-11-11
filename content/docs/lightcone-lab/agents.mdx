@@ -8,7 +8,7 @@ import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 Lab starts coding agents in the project folder, so that they, and `lc`, find its `astra.yaml`. Where
 they run depends on the install:
 
-|                   | Workbench only                                  | Full install                                               |
+|                   | Workbench only or engine install                | AI install                                                 |
 | ----------------- | ----------------------------------------------- | ---------------------------------------------------------- |
 | The agent runs in | a JupyterLab terminal                           | a Jupyter AI session, in a chat tab                        |
 | Start it from     | the **claude** and **codex** buttons on Home    | the **New session** box on Home, or **New session**        |
@@ -17,7 +17,8 @@ they run depends on the install:
 
 ## In a terminal [#terminal]
 
-In the browser-only workbench, Home's right-hand column holds an **Agents** card with two buttons:
+Without Jupyter AI, in the workbench only or the engine install, Home's right-hand column holds an
+**Agents** card with two buttons:
 **claude** starts [Claude Code](https://code.claude.com/docs/en/setup) and **codex** starts
 [Codex](https://developers.openai.com/codex/cli). Each opens a new terminal beside Home, in the
 project folder, and runs the command there. **Open a plain terminal** opens one without an agent.
@@ -28,13 +29,13 @@ the [Agent Skills](/agent-skills) plugin so it knows how to work on a Lightcone 
 terminals need the [Lightcone CLI](/lightcone-cli/getting-started#install-the-cli) for the agent to run the
 analysis.
 
-The full install replaces this card with Jupyter AI sessions. Its **Open terminal** button, on
+The AI install replaces this card with Jupyter AI sessions. Its **Open terminal** button, on
 Home's title page, still opens a terminal in the project folder, where you can run `claude` or
 `codex` yourself.
 
 ## In Jupyter AI [#jupyter-ai]
 
-**Full install.** Jupyter AI connects to coding agents through adapters, and none comes bundled.
+**AI install.** Jupyter AI connects to coding agents through adapters, and none comes bundled.
 For each agent you want:
 
 <Steps>
@@ -119,8 +120,8 @@ side panel keeps talking to the same agent.
 
 ## What the agent can show you [#tools]
 
-In the full install, Lab gives agents two tools, through Jupyter's MCP server
-(`jupyter-server-mcp`, part of the full install), so that they can show you records in JupyterLab
+In the AI install, Lab gives agents two tools, through Jupyter's MCP server
+(`jupyter-server-mcp`, part of the AI install), so that they can show you records in JupyterLab
 instead of describing them:
 
 | Tool                                | What it does                                                                                                                                                                      |

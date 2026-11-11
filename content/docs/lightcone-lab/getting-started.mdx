@@ -4,28 +4,41 @@ description: Install Lightcone Lab, open a project and find your way around the 
 icon: Rocket
 ---
 
-Lab comes in two installs. The **full install** adds the features that run on the Jupyter server:
-agent sessions in Jupyter AI, each result's freshness and provenance, comments, and the report
-preview. The **workbench only** runs entirely in the browser, so it also works in a JupyterLab whose
-environment you can't change, such as a JupyterHub at a computing center. The
-[Workbench tour](/lightcone-lab/features) marks the features that need the full install.
+Lab comes in three installs. The **workbench only** runs entirely in the browser, so it also works
+in a JupyterLab whose environment you can't change, such as a JupyterHub at a computing center. The
+**engine install** adds the features that run on the Jupyter server: each result's freshness and
+provenance, project setup without a terminal, and the report preview. The **AI install** adds agent
+sessions in Jupyter AI and comments on top. The [Workbench tour](/lightcone-lab/features) marks the
+features that need each install.
 
 <Steps>
 <Step>
 
 ### Install Lab
 
-<Tabs items={['Full install', 'Workbench only']}>
-<Tab value="Full install">
+<Tabs items={['Engine install', 'AI install', 'Workbench only']}>
+<Tab value="Engine install">
 
 Install JupyterLab with Lab, using [uv](https://docs.astral.sh/uv/):
 
 ```bash
-uv tool install jupyterlab --with "jupyterlab-lightcone[full]"
+uv tool install jupyterlab --with "jupyterlab-lightcone[engine]"
 ```
 
-The full install needs Linux or macOS, and git. Previewing a report also needs
+The engine install needs Linux or macOS, and git. Previewing a report also needs
 [Node.js](https://nodejs.org/) 20 or newer.
+
+</Tab>
+<Tab value="AI install">
+
+Install JupyterLab with Lab and Jupyter AI, using [uv](https://docs.astral.sh/uv/):
+
+```bash
+uv tool install jupyterlab --with "jupyterlab-lightcone[ai]"
+```
+
+The AI install needs what the engine install needs, and an agent adapter for each agent you want in
+Jupyter AI (see [Work with an agent](#work-with-an-agent)).
 
 </Tab>
 <Tab value="Workbench only">
@@ -35,7 +48,7 @@ search for `jupyterlab-lightcone`, install it, and restart JupyterLab. On Jupyte
 **File › Hub Control Panel › Stop My Server**, then start your server again.
 
 The Extension Manager installs with pip, into the environment that runs JupyterLab, so it can't
-install into a JupyterLab installed with uv.
+install into a JupyterLab installed with uv. On a cluster's JupyterHub, see [HPC clusters](/clusters).
 
 </Tab>
 </Tabs>
@@ -45,7 +58,7 @@ install into a JupyterLab installed with uv.
 
 ### Start JupyterLab
 
-With the full install, start JupyterLab with:
+With the engine or AI install, start JupyterLab with:
 
 ```bash
 jupyter-lab
@@ -76,9 +89,9 @@ The [Workbench tour](/lightcone-lab/features) covers each feature.
 
 ### Work with an agent
 
-In the workbench only, the **claude** and **codex** buttons on Home start an agent in a terminal, in
-the project folder. With the full install, the **New session** box starts a Jupyter AI session
-instead. Either way, add the [Agent Skills](/agent-skills/getting-started) plugin so the agent knows
+Without Jupyter AI, in the workbench only or the engine install, the **claude** and **codex** buttons
+on Home start an agent in a terminal, in the project folder. With the AI install, the **New session**
+box starts a Jupyter AI session instead. Either way, add the [Agent Skills](/agent-skills/getting-started) plugin so the agent knows
 how to work on a Lightcone project.
 
 Jupyter AI talks to coding agents through [Agent Client Protocol](https://agentclientprotocol.com)
@@ -118,7 +131,7 @@ Restart JupyterLab, and the agent appears in the **New session** box's agent pic
 
 ## Update and uninstall
 
-For the full install:
+For the engine or AI install:
 
 ```bash tab="Update"
 uv tool upgrade jupyterlab
@@ -128,6 +141,6 @@ uv tool upgrade jupyterlab
 uv tool uninstall jupyterlab
 ```
 
-For the workbench only, use the Extension Manager. Your projects are untouched. The full install
+For the workbench only, use the Extension Manager. Your projects are untouched. The AI install
 keeps its state inside each project, sessions in `chats/` and comments in `.lightcone/`; delete
 those folders if you no longer want them.
